@@ -8,6 +8,7 @@
 
 #include "stb_image.h"
 #include "shader.h"
+#include "camera.h"
 
 #include <iostream>
 #include <cmath>
@@ -21,30 +22,14 @@ void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-// settings
 // I think these are in pixels.
 static int window_width = 1600;
 static int window_height = 1200;
 
-// mouse tracking. Looks like these are relative to k_screen_dimensions.
-bool is_first_mouse_input = true;
-float last_x = 400;
-float last_y = 300;
-
-// I'm shuddering
-glm::vec3 camera_pos   = glm::vec3(0.0f, 0.0f,  3.0f);
-glm::vec3 camera_front = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 camera_up    = glm::vec3(0.0f, 1.0f,  0.0f);
-
-// camera fov. degrees
-float fov = 45.0f;
-
 float delta_time = 0.0f;  // time between current and last frame.
 float last_frame_start_time = 0.0f;  // The time when the last frame started rendering.
 
-// The negative will only affect the sin of yaw, which only the z-axis looks at.
-float yaw = -90.0f;  // we have too many negative signs` for this -z thing. Should make that a single point of maintenance.
-float pitch = 0.0f;
+Camera camera;
 
 int main() {
 
@@ -131,7 +116,6 @@ int main() {
     stbi_image_free(data);
 
 
-
     // SECOND TEXTURE
     unsigned int face_texture_id;
     glGenTextures(1, &face_texture_id);
@@ -163,13 +147,6 @@ int main() {
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // float vertices[] = {
-    //     // positions          // colors           // texture coords
-    //     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-    //     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    //     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    //     -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
-    // };
     // for a cube.
     float vertices[] = {
         // pos                // tex chords?
@@ -262,15 +239,15 @@ int main() {
 
     glm::vec3 cubePositions[] = {
         glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+        glm::vec3( 2.0f,  5.0f, 15.0f),
+        glm::vec3(-1.5f, -2.2f, 2.5f),
+        glm::vec3(-3.8f, -2.0f, 12.3f),
+        glm::vec3( 2.4f, -0.4f, 3.5f),
+        glm::vec3(-1.7f,  3.0f, 7.5f),
+        glm::vec3( 1.3f, -2.0f, 2.5f),
+        glm::vec3( 1.5f,  2.0f, 2.5f),
+        glm::vec3( 1.5f,  0.2f, 1.5f),
+        glm::vec3(-1.3f,  1.0f, 1.5f)
     };
 
     // render loop
@@ -280,7 +257,6 @@ int main() {
         float current_frame_start_time = glfwGetTime();
         delta_time = current_frame_start_time - last_frame_start_time;
         last_frame_start_time = current_frame_start_time;
-
 
         // input
         // -----
@@ -298,45 +274,16 @@ int main() {
         my_shader.set_int("texture1", 0); // map the texture1 sampler variable to texture unit 0.
         my_shader.set_int("texture2", 1); // map the texture2 sampler variable to texture unit 1.
 
-        // MODEL
-        // Put it on the floor transform.
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-        // VIEW
-        // positive z axis is the vector from screen to you.
-        // glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
-        // glm::vec3 camera_target = glm::vec3(0.0f, 0.0f, 0.0f);
-        // The name direction vector is not the best chosen name, since it is actually pointing in the reverse direction of what it is targeting.
-        // glm::vec3 camera_dir = glm::normalize(camera_pos - camera_target);
-        // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-        // glm::vec3 camera_right = glm::normalize(glm::cross(up, camera_dir));
-        // glm::vec3 camera_up = glm::cross(camera_dir, camera_right); // this seems unnecessary.
-        // Want to create lookAt, luckily glm will do it for us.
-        // glm::mat4 view;
-        // view = glm::lookAt(
-        //     glm::vec3(0.0f, 0.0f, 3.0f), // camera pos. (pos z is screen to me)
-        //     glm::vec3(0.0f, 0.0f, 0.0f), // target, the thing you want to look at.
-        //     glm::vec3(0.0f, 1.0f, 0.0f)  // up vector for the camera.
-        // );
-        // const float radius = 10.0f;
-        // float cam_x = sin(glfwGetTime()) * radius;
-        // float cam_z = cos(glfwGetTime()) * radius;
-        // view = glm::lookAt(glm::vec3(cam_x, 0.0f, cam_z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        // glm::mat4 view = glm::mat4(1.0f);
-        // note that we're translating the scene in the reverse direction of where we want to move
-        // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-        glm::mat4 view{glm::lookAt(camera_pos, camera_pos + camera_front, camera_up)};
+        glm::mat4 view = camera.GetViewMatrix();
 
         // PROJECTION
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(fov), static_cast<float>(window_width) / window_height, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(
+            glm::radians(camera.get_fov()),
+            static_cast<float>(window_width) / window_height, 0.1f,
+            100.0f
+        );
 
         // model
-        unsigned int model_loc = glGetUniformLocation(my_shader.program_id, "model");
-        glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
         // view
         unsigned int view_loc = glGetUniformLocation(my_shader.program_id, "view");
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
@@ -344,18 +291,6 @@ int main() {
         unsigned int projection_loc = glGetUniformLocation(my_shader.program_id, "projection");
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
 
-
-
-        // ======= random transformation set 1. ========================================
-        // glm::mat4 trans = glm::mat4(1.0f);
-        // trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        // // (tran, radians, axis of rotation)
-        // trans = glm::rotate(trans, static_cast<float>(glfwGetTime() * 3), glm::vec3{0.0f, 0.0f, 1.0f});
-        // trans = glm::scale(trans, static_cast<float>(sin(glfwGetTime() * 2)) * glm::vec3{1.0f});
-
-        // unsigned int transform_loc = glGetUniformLocation(my_shader.program_id, "transform");
-        // // (location, how many matrices to send, transpose?, //value ptr is like address-of operator)
-        // glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm::value_ptr(trans));
         // ============================================================================
 
         // Populate (numbered) texture units with desired textures.
@@ -405,26 +340,6 @@ int main() {
     glfwTerminate();
 
 
-
-    // random learning
-    // To create an orthographic projection matrix we make use of GLM's built-in function glm::ortho
-    // ** REMEMBER, THE THINGS GOING INTO THIS ARE ALREADY IN VIEW SPACE!!!!! **
-    // THIS MATRIX TAKES US FROM VIEW SPACE TO CLIP SPACE. Its one of the two forms a projection matrix takes.
-    // AND we're still working on vertices!
-    glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-    // The first two parameters specify the left and right coordinate of the frustum and the third and fourth parameter specify the bottom and top part of the frustum. With those 4 points we've defined the size of the near and far planes and the 5th and 6th parameter then define the distances between the near and far plane. This specific projection matrix transforms all coordinates between these x, y and z range values to normalized device coordinates.
-
-    // (left coord, right coord, bottom coord, top coord of frustum, 5 and 6 define the distances between the near and far plane...)
-
-    // Perspective viewing
-    // higher w -> appear farthur away.
-    // Once the coordinates are transformed to clip space they are in the range -w to w. They are in this range BEFORE perspective division! (anything outside this range is clipped)
-    // create perspective projection matrix.
-    // (fov in radians, aspect ratio: width/height, near clipping plane distance, far plane distance.)
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
-
-
-
     return 0;
 }
 
@@ -436,18 +351,17 @@ void processInput(GLFWwindow *window) {
         glfwSetWindowShouldClose(window, true);
     }
 
-    const float camera_speed = 3.5f * delta_time; // adjust as needed, not controlling frequency of checking for input. Depends on processor.
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        camera_pos += camera_speed * camera_front;
+        camera.ProcessKeyboard(Camera_Movement::FORWARD, delta_time);
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        camera_pos -= camera_speed * camera_front;
+        camera.ProcessKeyboard(Camera_Movement::BACKWARD, delta_time);
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-        camera_pos -= glm::normalize(glm::cross(camera_front, camera_up)) * camera_speed;
+        camera.ProcessKeyboard(Camera_Movement::LEFT, delta_time);
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        camera_pos += glm::normalize(glm::cross(camera_front, camera_up)) * camera_speed;
+        camera.ProcessKeyboard(Camera_Movement::RIGHT, delta_time);
     }
 
 }
@@ -462,47 +376,30 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     window_height = height;
 }
 
+// [in]	xpos	The new cursor x-coordinate, relative to the left edge of the content area.
+// [in]	ypos	The new cursor y-coordinate, relative to the top edge of the content area.
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos) {
+
+    static bool is_first_mouse_input = true;
+    static float last_x = 400;
+    static float last_y = 300;
+
     if(is_first_mouse_input){
         is_first_mouse_input = false;
         last_x = x_pos;
         last_y = y_pos;
     }
+
     float x_offset = x_pos - last_x;
+    // TODO: this is kind of dumb, don't do this. Put this logic in camera.
     float y_offset = y_pos - last_y;
     last_x = x_pos;
     last_y = y_pos;
-
-    static const float sensitivity = 0.05f;
-    x_offset *= sensitivity;
-    y_offset *= sensitivity * -1;
-
-    yaw += x_offset;
-    pitch += y_offset;
-
-    if(pitch > 89.0f){
-        pitch = 89.0f;
-    }
-    if(pitch < -89.0f){
-        pitch = -89.0f;
-    }
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
-    camera_front = glm::normalize(direction);
+    camera.ProcessMouseMovement(x_offset, y_offset);
 }
 
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 
-    fov -= yoffset;
-    if(fov < 1.0f){
-        fov = 1.0f;
-    }
-    else if(fov > 45.0f){
-        fov = 45.0f;
-    }
+    camera.ProcessMouseScroll(yoffset);
 }

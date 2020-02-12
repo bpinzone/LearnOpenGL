@@ -47,7 +47,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/BenPinzone/Documents/@MAIN_DOCUMENTS/@REPOS/Graphics/LearnOpenGL/hello_window/hello_window"
+      customWorkingDirectory = "/Users/BenPinzone/Documents/@MAIN_DOCUMENTS/@REPOS/Graphics/LearnOpenGL/hello_window"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
