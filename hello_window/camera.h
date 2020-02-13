@@ -31,18 +31,15 @@ static constexpr glm::vec3 c_world_up{0, 1, 0};
 static constexpr float c_movement_speed = 2.5f;
 static constexpr float c_look_sensitivity = 0.1f;
 
-// In the WORLD, positive x is right, positive y is up, positive z is forward.
 class Camera {
 
 public:
 
     using vec3 = glm::vec3;
 
-    // Tweaks: sign of z in position, sign of yaw.
-
     // Position is in world. Move forward -> z coord getting larger.
     Camera()
-        : position{0, 0, -10}, yaw{c_initial_yaw},
+        : position{0, 0, 10}, yaw{c_initial_yaw},
         pitch{c_initial_pitch}, fov{c_initial_fov}{
 
         update_cache();
@@ -55,7 +52,6 @@ public:
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-
         float velocity = c_movement_speed * deltaTime;
         switch(direction){
             case FORWARD:  position += front * velocity; break;
@@ -67,14 +63,9 @@ public:
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    // x offset positive -> mouse move right
-    // y offset positive -> mouse moved down
+    // x offset positive -> mouse move right, want yaw to decrease.
+    // y offset positive -> mouse moved down, want pitch to decrease.
     void ProcessMouseMovement(float xoffset, float yoffset) {
-
-        // TODO understand mouse movement...
-        // TODO understand mouse movement...
-        // TODO understand mouse movement...
-        // TODO understand mouse movement...
         yaw   -= xoffset * c_look_sensitivity;
         pitch -= yoffset * c_look_sensitivity;
         pitch = glm::clamp(pitch, c_min_pitch, c_max_pitch);
@@ -110,22 +101,19 @@ private:
     void update_cache() {
 
         /*
-        Picture a plane going forward.
-            Wings are x axis.
-            Pilot's head points to y axis.
-            Flying along z axis.
+        Picture a plane flying going forward.
+            Wings are x axis. Right wing is positive x.
+            Pilot's head points to positive y.
+            Flying into the -z axis.
         When looking straight forward, pitch = 0, yaw = 90.
         */
-
         front = glm::normalize(vec3{
-            cos(glm::radians(pitch)) * -cos(glm::radians(yaw)),
+            cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
             sin(glm::radians(pitch)),
-            // Flip z axis for open GL.
-            cos(glm::radians(pitch)) * sin(glm::radians(yaw))
+            cos(glm::radians(pitch)) * -sin(glm::radians(yaw))
         });
 
         right = glm::normalize(glm::cross(front, c_world_up));
-
         vec3 up = glm::normalize(glm::cross(right, front));
         view_matrix = glm::lookAt(position, position + front, up);
     }
