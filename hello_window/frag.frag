@@ -16,7 +16,6 @@ void main() {
     // mix = lerp.
     FragColor = mix(
         texture(texture1, TexCoord),
-        texture(texture2, TexCoord), 0.3)
-        // * vec4(ourColor, 1.0)
-        * intensity;
+        texture(texture2, TexCoord), 0.3
+    );
 }

@@ -35,42 +35,44 @@ void Mesh::construct_cube(){
     vector<float> vertices {
         // pos                // tex chords
         // Top. Start at top left, going clockwise.
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f,  // 0
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // 0
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
         0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        // Bottom
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // 4
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
-        // Right
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
-        // Left
         -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        // Bottom
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // 4
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        // Right
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        // Left
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
         -0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
         // Front
-        -0.5, 0.5f, 0.5f, 0.0f, 0.0f,
-        0.5, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5, 0.5f, 0.5f, 0.0f, 1.0f,
+        0.5, 0.5f, 0.5f, 1.0f, 1.0f,
         0.5, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5, -0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5, -0.5f, 0.5f, 0.0f, 0.0f,
         // Back
-        -0.5, 0.5f, -0.5f, 0.0f, 0.0f,
-        0.5, 0.5f, -0.5f, 0.0f, 1.0f,
-        0.5, -0.5f, -0.5f, 1.0f, 0.0f,
-        -0.5, -0.5f, -0.5f, 1.0f, 1.0f
+        -0.5, 0.5f, -0.5f, 0.0f, 1.0f, // t1  //t2
+        0.5, 0.5f, -0.5f, 1.0f, 1.0f,  // t1
+        0.5, -0.5f, -0.5f, 1.0f, 0.0f, // t1  //t2
+        -0.5, -0.5f, -0.5f, 0.0f, 0.0f        //t2
     };
 
     vector<unsigned int> indices;
     for(int face = 0; face < 6; ++face){
         for(int triangle = 0; triangle < 2; ++triangle){
             for(int vertex = 0; vertex < 3; ++vertex){
-                indices.push_back(face*4 + triangle + vertex);
+                indices.push_back(
+                    (4*face) + ((2*triangle + vertex) % 4)
+                );
             }
         }
     }
