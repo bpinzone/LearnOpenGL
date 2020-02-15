@@ -82,7 +82,7 @@ int main() {
     Mesh cube_mesh {Mesh::Primitive::Cube};
     Material basic_image_material{wood_texture, face_texture, basic_image_shader};
 
-    glm::vec3 cube_positions[] = {
+    vector<glm::vec3> cube_positions = {
         glm::vec3( 0.0f,  0.0f,  -0.0f),
         glm::vec3( 2.0f,  5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -96,7 +96,7 @@ int main() {
     };
 
     vector<Gameobject> game_objects;
-    for(int i = 0; i < 10; ++i){
+    for(int i = 0; i < cube_positions.size(); ++i){
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cube_positions[i]);
         float angle = 20.0f * i;
