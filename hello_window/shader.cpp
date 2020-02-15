@@ -1,18 +1,22 @@
 #include "shader.h"
 
-#include <glad.h>
+#include <glad/glad.h>
+#include <glm.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <stdexcept>
 
 using std::string;
+using std::ostringstream;
 using std::ifstream;
+
 using std::ios;
 using std::runtime_error;
 using std::cout; using std::endl;
 
-static constexpr int k_info_log_size = 512;
+static constexpr int c_info_log_size = 512;
 
 static string read_file(const char* const path);
 static void compile_shader(unsigned int shader_id, const char* path);
@@ -35,18 +39,22 @@ Shader::Shader(const char* vertex_path, const char* fragment_path){
     int success;
     glGetProgramiv(program_id, GL_LINK_STATUS, &success);
     if(!success){
-        char info_log[k_info_log_size];
-        glGetProgramInfoLog(program_id, k_info_log_size, nullptr, info_log);
-        cout << "Error Linking Shader Program" << endl;
-        cout << info_log << endl;
+        char info_log[c_info_log_size];
+        glGetProgramInfoLog(program_id, c_info_log_size, nullptr, info_log);
+        ostringstream oss;
+        oss << "Error Linking Shader Program:\n" << info_log;
+        throw runtime_error{oss.str()};
     }
 
     glDeleteShader(vertex_id);
     glDeleteShader(fragment_id);
 }
 
-void Shader::use() const {
+void Shader::use(const glm::mat4& view, const glm::mat4& projection) const {
+
     glUseProgram(program_id);
+    set_mat4fv("view", view);
+    set_mat4fv("projection", projection);
 }
 
 void Shader::set_bool(const string& name, bool value) const {
@@ -57,6 +65,10 @@ void Shader::set_int(const string& name, int value) const {
 }
 void Shader::set_float(const string& name, float value) const {
     glUniform1f(glGetUniformLocation(program_id, name.c_str()), value);
+}
+void Shader::set_mat4fv(const string& name, const glm::mat4& value) const {
+
+    glUniformMatrix4fv(glGetUniformLocation(program_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 // Returns a string representing the entire file.
@@ -87,9 +99,10 @@ void compile_shader(unsigned int shader_id, const char* path){
     int success;
     glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
     if(!success){
-        char info_log[k_info_log_size];
-        glGetShaderInfoLog(shader_id, k_info_log_size, nullptr, info_log);
-        cout << "ERROR Compiling Shader: " << path << endl;
-        cout << info_log << endl;
+        char info_log[c_info_log_size];
+        glGetShaderInfoLog(shader_id, c_info_log_size, nullptr, info_log);
+        ostringstream oss;
+        oss << "ERROR Compiling Shader: " << path << "\n" << info_log;
+        throw runtime_error{oss.str()};
     }
 }

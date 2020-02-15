@@ -12,6 +12,10 @@
 		1370D6A623BF0DD0009038B3 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1370D6A523BF0DD0009038B3 /* libglfw.3.3.dylib */; };
 		1391196F23D40DFF00D00550 /* stb_image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1391196D23D40DFF00D00550 /* stb_image.cpp */; };
 		1399878823F36C72000E836B /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1399878723F36C72000E836B /* camera.cpp */; };
+		13E2B32C23F87C760062C7E9 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13E2B32423F87C760062C7E9 /* material.cpp */; };
+		13E2B32D23F87C760062C7E9 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13E2B32523F87C760062C7E9 /* mesh.cpp */; };
+		13E2B32E23F87C760062C7E9 /* game_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13E2B32623F87C760062C7E9 /* game_object.cpp */; };
+		13E2B32F23F87C760062C7E9 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13E2B32723F87C760062C7E9 /* texture.cpp */; };
 		13F7D0EB23CE4FC4007D57F3 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13F7D0EA23CE4FC4007D57F3 /* shader.cpp */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +40,14 @@
 		1391196E23D40DFF00D00550 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		1399878623F36C72000E836B /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		1399878723F36C72000E836B /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
+		13E2B32423F87C760062C7E9 /* material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = material.cpp; sourceTree = "<group>"; };
+		13E2B32523F87C760062C7E9 /* mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mesh.cpp; sourceTree = "<group>"; };
+		13E2B32623F87C760062C7E9 /* game_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = game_object.cpp; sourceTree = "<group>"; };
+		13E2B32723F87C760062C7E9 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
+		13E2B32823F87C760062C7E9 /* texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
+		13E2B32923F87C760062C7E9 /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
+		13E2B32A23F87C760062C7E9 /* mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mesh.h; sourceTree = "<group>"; };
+		13E2B32B23F87C760062C7E9 /* game_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = game_object.h; sourceTree = "<group>"; };
 		13F7D0E923CE4FC4007D57F3 /* shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		13F7D0EA23CE4FC4007D57F3 /* shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shader.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -72,6 +84,14 @@
 		1370D69A23BF02FE009038B3 /* hello_window */ = {
 			isa = PBXGroup;
 			children = (
+				13E2B32623F87C760062C7E9 /* game_object.cpp */,
+				13E2B32B23F87C760062C7E9 /* game_object.h */,
+				13E2B32423F87C760062C7E9 /* material.cpp */,
+				13E2B32923F87C760062C7E9 /* material.h */,
+				13E2B32523F87C760062C7E9 /* mesh.cpp */,
+				13E2B32A23F87C760062C7E9 /* mesh.h */,
+				13E2B32723F87C760062C7E9 /* texture.cpp */,
+				13E2B32823F87C760062C7E9 /* texture.h */,
 				1399878723F36C72000E836B /* camera.cpp */,
 				1399878623F36C72000E836B /* camera.h */,
 				1391196D23D40DFF00D00550 /* stb_image.cpp */,
@@ -148,11 +168,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13E2B32E23F87C760062C7E9 /* game_object.cpp in Sources */,
+				13E2B32C23F87C760062C7E9 /* material.cpp in Sources */,
 				13F7D0EB23CE4FC4007D57F3 /* shader.cpp in Sources */,
+				13E2B32F23F87C760062C7E9 /* texture.cpp in Sources */,
 				1391196F23D40DFF00D00550 /* stb_image.cpp in Sources */,
 				1370D69C23BF02FE009038B3 /* main.cpp in Sources */,
 				1370D6A323BF088F009038B3 /* glad.c in Sources */,
 				1399878823F36C72000E836B /* camera.cpp in Sources */,
+				13E2B32D23F87C760062C7E9 /* mesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
