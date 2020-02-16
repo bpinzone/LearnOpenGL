@@ -22,16 +22,14 @@ using std::cout; using std::endl;
 using std::sin;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-// The callback functions receives the cursor position, measured in screen coordinates but relative to the top-left corner of the window content area. On platforms that provide it, the full sub-pixel cursor position is passed on.
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-// I think these are in pixels.
 static int window_width = 1600;
 static int window_height = 1200;
 
-float delta_time = 0.0f;  // time between current and last frame.
+float delta_time = 0.0f;
 float last_frame_start_time = 0.0f;  // The time when the last frame started rendering.
 
 Camera camera;
@@ -83,24 +81,16 @@ int main() {
     Material basic_image_material{wood_texture, face_texture, basic_image_shader};
 
     vector<glm::vec3> cube_positions = {
-        glm::vec3( 0.0f,  0.0f,  -0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+        glm::vec3( 0.0f,  0.0f,  -0.0f), glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f), glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f), glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f), glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f), glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
     vector<Gameobject> game_objects;
-    for(int i = 0; i < cube_positions.size(); ++i){
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, cube_positions[i]);
-        float angle = 20.0f * i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+    for(const auto& pos : cube_positions){
+        glm::mat4 model = glm::translate(model, pos);
         game_objects.push_back(Gameobject{basic_image_material, cube_mesh, model});
     }
 
@@ -109,7 +99,6 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
     glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it to. See the call to glClear() below.
-
 
     // render loop
     // -----------

@@ -12,12 +12,10 @@ Material::Material(const Texture& t1_in, const Texture& t2_in, const Shader& s_i
 
 }
 
-void Material::use(const glm::mat4& view, const glm::mat4& projection) const {
+void Material::use(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) const {
 
     s.use(view, projection);
-    // shouldn't need these two.
-    s.set_int("texture1", 0); // map the texture1 sampler variable to texture unit 0.
-    s.set_int("texture2", 1); // map the texture2 sampler variable to texture unit 1.
+    s.set_mat4fv("model", model);
 
     // Populate (numbered) texture units with desired textures.
     // Activate unit, then bind the texture to it. Repeat.

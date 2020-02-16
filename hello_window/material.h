@@ -10,12 +10,11 @@ class Material {
 public:
 
     Material(const Texture& t1_in, const Texture& t2_in, const Shader& s_in);
-    void use(const glm::mat4& view, const glm::mat4& projection) const;
-
-    Shader s;
+    void use(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) const;
 
 private:
 
+    Shader s;
     Texture t1;
     Texture t2;
 };

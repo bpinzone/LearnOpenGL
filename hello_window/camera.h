@@ -12,10 +12,8 @@ public:
     using vec3 = glm::vec3;
 
     enum Movement {
-        FORWARD,
-        BACKWARD,
-        LEFT,
-        RIGHT
+        FORWARD, BACKWARD,
+        LEFT, RIGHT
     };
 
     // Place the camera at (0, 0, 10), looking forward.

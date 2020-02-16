@@ -6,25 +6,21 @@
 Gameobject::Gameobject(Material material_in, Mesh mesh_in, const glm::mat4& model_in)
     : material{material_in}, mesh{mesh_in}, model{model_in} {
 
-    std::default_random_engine generator;
-    std::uniform_real_distribution<double> distribution{};
-    auto random_double = std::bind(distribution, generator);
+    auto random_float = std::bind(
+        std::uniform_real_distribution<float>{0, 1},
+        std::default_random_engine{}
+    );
 
-    rotation_axis = glm::vec3{
-        random_double(), random_double(), random_double()
-    };
-    rotation_speed = random_double() * 5;
-
+    rotation_axis = glm::vec3{random_float()};
+    rotation_speed = random_float() * 5;
 }
 
 void Gameobject::draw(const glm::mat4& view, const glm::mat4& projection) const {
 
-    material.use(view, projection); // sets up shading.
+    material.use(model, view, projection); // sets up shading.
     mesh.use();  // binds vao
 
-    material.s.set_mat4fv("model", model);
     glDrawElements(GL_TRIANGLES, mesh.get_indices_size(), GL_UNSIGNED_INT, 0);
-    // Another style not using EBO's : glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void Gameobject::update(float delta_time) {
