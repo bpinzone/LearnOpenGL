@@ -14,8 +14,7 @@ Material::Material(const Texture& t1_in, const Texture& t2_in, const Shader& s_i
 
 void Material::use(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) const {
 
-    s.use(view, projection);
-    s.set_mat4fv("model", model);
+    s.use(model, view, projection);
 
     // Populate (numbered) texture units with desired textures.
     // Activate unit, then bind the texture to it. Repeat.

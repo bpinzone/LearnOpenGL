@@ -8,7 +8,7 @@
 #include <utility>
 #include <string>
 
-// Really basic texture class.
+// basic texture class.
 // Has lots of default settings chosen for you.
 class Texture {
 public:

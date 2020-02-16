@@ -4,19 +4,14 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include <vector>
-
 class Camera {
 public:
 
-    using vec3 = glm::vec3;
-
     enum Movement {
-        FORWARD, BACKWARD,
-        LEFT, RIGHT
+        FORWARD, BACKWARD, LEFT, RIGHT
     };
 
-    // Place the camera at (0, 0, 10), looking forward.
+    // Place the camera at (0, 0, 10), looking down -z.
     Camera();
 
     // Returns the view matrix for this camera.
@@ -40,19 +35,16 @@ public:
 private:
 
     // Fundamental
-    vec3 position;
+    glm::vec3 position;
     float yaw;
     float pitch;  // -89 <= pitch <= 89
     float fov;  // 1 <= fov <= 45
 
     // Cached Calculations.
-    // For view matrix
     glm::mat4 view_matrix;
-    // For Process keyboard
-    vec3 front;
-    vec3 right;
+    glm::vec3 front;
+    glm::vec3 right;
 
-    // Calculates the front vector from the Camera's (updated) Euler Angles
     void update_cache();
 };
 #endif

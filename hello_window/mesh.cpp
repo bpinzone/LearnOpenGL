@@ -13,6 +13,7 @@ Mesh::Mesh(Primitive p) {
 
 Mesh::Mesh(const vector<float>& vertices, const vector<unsigned int>& indices) {
     generate_vao(vertices, indices);
+    indices_size = static_cast<int>(indices.size());
 }
 
 void Mesh::use() const {
@@ -76,7 +77,7 @@ void Mesh::construct_cube(){
             }
         }
     }
-    indices_size = indices.size();
+    indices_size = static_cast<int>(indices.size());
     generate_vao(vertices, indices);
 
 }
@@ -117,6 +118,4 @@ void Mesh::generate_vao(const vector<float>& vertices, const vector<unsigned int
     // UV attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(3*sizeof(float)));
     glEnableVertexAttribArray(1);
-
-
 }

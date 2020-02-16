@@ -27,10 +27,10 @@ private:
     unsigned int vbo;
     unsigned int ebo;
 
-    long indices_size;
+    int indices_size;
 
-    void generate_vao(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
     void construct_cube();
+    void generate_vao(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
 };
 
 #endif

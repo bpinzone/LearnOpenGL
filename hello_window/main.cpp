@@ -4,9 +4,7 @@
 
 #include <glm.hpp>
 #include <matrix_transform.hpp>
-#include <type_ptr.hpp>
 
-#include "stb_image.h"
 #include "shader.h"
 #include "camera.h"
 #include "texture.h"

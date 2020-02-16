@@ -60,14 +60,14 @@ void Camera::update_cache() {
         Flying into the -z axis.
     When looking straight forward, pitch = 0, yaw = 90.
     */
-    front = glm::normalize(vec3{
+    front = glm::normalize(glm::vec3{
         cos(glm::radians(pitch)) * cos(glm::radians(yaw)),
         sin(glm::radians(pitch)),
         cos(glm::radians(pitch)) * -sin(glm::radians(yaw))
     });
 
     right = glm::normalize(glm::cross(front, c_world_up));
-    vec3 up = glm::normalize(glm::cross(right, front));
+    glm::vec3 up = glm::normalize(glm::cross(right, front));
 
     // Could make view matrix myself.
     view_matrix = glm::lookAt(position, position + front, up);

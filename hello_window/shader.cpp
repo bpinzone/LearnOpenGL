@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <glm.hpp>
+#include <type_ptr.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -14,7 +15,6 @@ using std::ifstream;
 
 using std::ios;
 using std::runtime_error;
-using std::cout; using std::endl;
 
 static constexpr int c_info_log_size = 512;
 
@@ -50,9 +50,10 @@ Shader::Shader(const char* vertex_path, const char* fragment_path){
     glDeleteShader(fragment_id);
 }
 
-void Shader::use(const glm::mat4& view, const glm::mat4& projection) const {
+void Shader::use(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) const {
 
     glUseProgram(program_id);
+    set_mat4fv("model", model);
     set_mat4fv("view", view);
     set_mat4fv("projection", projection);
 }
@@ -67,7 +68,6 @@ void Shader::set_float(const string& name, float value) const {
     glUniform1f(glGetUniformLocation(program_id, name.c_str()), value);
 }
 void Shader::set_mat4fv(const string& name, const glm::mat4& value) const {
-
     glUniformMatrix4fv(glGetUniformLocation(program_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 

@@ -11,7 +11,7 @@ public:
 
     Shader(const char* vertex_path, const char* fragment_path);
 
-    void use(const glm::mat4& view, const glm::mat4& projection) const;
+    void use(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) const;
 
     void set_bool(const std::string& name, bool value) const;
     void set_int(const std::string& name, int value) const;
