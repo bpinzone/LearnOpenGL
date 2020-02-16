@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>hello_window.xcscheme_^#shared#^_</key>
+		<key>learn_open_gl.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>1370D69723BF02FE009038B3</key>
+		<key>13F0928023F9D452001D4461</key>
 		<dict>
 			<key>primary</key>
 			<true/>

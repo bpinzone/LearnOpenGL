@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1370D69723BF02FE009038B3"
-               BuildableName = "hello_window"
-               BlueprintName = "hello_window"
-               ReferencedContainer = "container:hello_window.xcodeproj">
+               BlueprintIdentifier = "13F0928023F9D452001D4461"
+               BuildableName = "learn_open_gl"
+               BlueprintName = "learn_open_gl"
+               ReferencedContainer = "container:learn_open_gl.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1370D69723BF02FE009038B3"
-            BuildableName = "hello_window"
-            BlueprintName = "hello_window"
-            ReferencedContainer = "container:hello_window.xcodeproj">
+            BlueprintIdentifier = "13F0928023F9D452001D4461"
+            BuildableName = "learn_open_gl"
+            BlueprintName = "learn_open_gl"
+            ReferencedContainer = "container:learn_open_gl.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -47,7 +47,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/BenPinzone/Documents/@MAIN_DOCUMENTS/@REPOS/Graphics/LearnOpenGL/hello_window"
+      customWorkingDirectory = "/Users/BenPinzone/Documents/@MAIN_DOCUMENTS/@REPOS/Graphics/LearnOpenGL/learn_open_gl"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -56,10 +56,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1370D69723BF02FE009038B3"
-            BuildableName = "hello_window"
-            BlueprintName = "hello_window"
-            ReferencedContainer = "container:hello_window.xcodeproj">
+            BlueprintIdentifier = "13F0928023F9D452001D4461"
+            BuildableName = "learn_open_gl"
+            BlueprintName = "learn_open_gl"
+            ReferencedContainer = "container:learn_open_gl.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -75,10 +75,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1370D69723BF02FE009038B3"
-            BuildableName = "hello_window"
-            BlueprintName = "hello_window"
-            ReferencedContainer = "container:hello_window.xcodeproj">
+            BlueprintIdentifier = "13F0928023F9D452001D4461"
+            BuildableName = "learn_open_gl"
+            BlueprintName = "learn_open_gl"
+            ReferencedContainer = "container:learn_open_gl.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
