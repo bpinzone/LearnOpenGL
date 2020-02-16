@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		130AD50B23F9E66D00BED868 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */; };
 		132BA32C23F9D4AB00DF94F0 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31D23F9D4AA00DF94F0 /* texture.cpp */; };
 		132BA32D23F9D4AB00DF94F0 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31E23F9D4AA00DF94F0 /* material.cpp */; };
 		132BA32E23F9D4AB00DF94F0 /* stb_image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31F23F9D4AA00DF94F0 /* stb_image.cpp */; };
@@ -15,7 +16,6 @@
 		132BA33123F9D4AB00DF94F0 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA32423F9D4AA00DF94F0 /* mesh.cpp */; };
 		132BA33223F9D4AB00DF94F0 /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = 132BA32723F9D4AA00DF94F0 /* glad.c */; };
 		132BA33323F9D4AB00DF94F0 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA32B23F9D4AB00DF94F0 /* camera.cpp */; };
-		132BA33623F9D55800DF94F0 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 132BA33523F9D55800DF94F0 /* libglfw.3.3.dylib */; };
 		132BA33823F9D5CD00DF94F0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA33723F9D5CD00DF94F0 /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../graphics_project_include_lib/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		132BA31D23F9D4AA00DF94F0 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = texture.cpp; path = learn_open_gl/texture.cpp; sourceTree = "<group>"; };
 		132BA31E23F9D4AA00DF94F0 /* material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = material.cpp; path = learn_open_gl/material.cpp; sourceTree = "<group>"; };
 		132BA31F23F9D4AA00DF94F0 /* stb_image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stb_image.cpp; path = learn_open_gl/stb_image.cpp; sourceTree = "<group>"; };
@@ -57,7 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				132BA33623F9D55800DF94F0 /* libglfw.3.3.dylib in Frameworks */,
+				130AD50B23F9E66D00BED868 /* libglfw.3.3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,6 +68,7 @@
 		132BA33423F9D55800DF94F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */,
 				132BA33523F9D55800DF94F0 /* libglfw.3.3.dylib */,
 			);
 			name = Frameworks;
@@ -290,9 +292,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/BenPinzone/Desktop/graphics_project_include_lib/**";
-				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Desktop/graphics_project_include_lib/lib;
-				"LIBRARY_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Desktop/graphics_project_include_lib/lib;
+				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/BenPinzone/Documents/graphics_project_include_lib/**";
+				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Documents/graphics_project_include_lib/lib;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Documents/graphics_project_include_lib/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -301,9 +303,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/BenPinzone/Desktop/graphics_project_include_lib/**";
-				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Desktop/graphics_project_include_lib/lib;
-				"LIBRARY_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Desktop/graphics_project_include_lib/lib;
+				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/BenPinzone/Documents/graphics_project_include_lib/**";
+				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Documents/graphics_project_include_lib/lib;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Documents/graphics_project_include_lib/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
