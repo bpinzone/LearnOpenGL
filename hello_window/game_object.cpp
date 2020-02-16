@@ -6,12 +6,12 @@
 Gameobject::Gameobject(Material material_in, Mesh mesh_in, const glm::mat4& model_in)
     : material{material_in}, mesh{mesh_in}, model{model_in} {
 
-    auto random_float = std::bind(
-        std::uniform_real_distribution<float>{0, 1},
+    static auto random_float = std::bind(
+        std::uniform_real_distribution<float>{0.0, 1.0},
         std::default_random_engine{}
     );
 
-    rotation_axis = glm::vec3{random_float()};
+    rotation_axis = glm::vec3{random_float(), random_float(), random_float()};
     rotation_speed = random_float() * 5;
 }
 
