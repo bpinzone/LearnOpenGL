@@ -136,7 +136,8 @@ int main() {
             100.0f
         );
 
-        for(const auto& go : game_objects){
+        for(auto& go : game_objects){
+            go.update(delta_time);
             go.draw(view, projection);
         }
 
