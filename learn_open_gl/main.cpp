@@ -74,7 +74,7 @@ int main() {
     Texture wood_texture{"wood_container.jpg"};
     Texture face_texture{"awesomeface.png"};
 
-    Shader basic_image_shader{"vert.vert", "frag.frag"};
+    Shader basic_image_shader{"basic.vert", "basic.frag"};
     Mesh cube_mesh {Mesh::Primitive::Cube};
     Material basic_image_material{wood_texture, face_texture, basic_image_shader};
 
