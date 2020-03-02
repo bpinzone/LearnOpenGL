@@ -11,15 +11,18 @@ public:
 
     Gameobject(Material material_in, Mesh mesh_in, const glm::mat4& model_in);
 
-    void draw(const glm::mat4& view, const glm::mat4& projection) const;
+    void draw() const;
 
     void update(float delta_time);
+
+    void set_model(const glm::mat4 model_in);
 
 private:
 
     Material material;
     Mesh mesh;
     glm::mat4 model;
+    glm::mat3 normal;
 
     glm::vec3 rotation_axis;
     float rotation_speed;

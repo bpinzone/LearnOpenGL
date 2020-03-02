@@ -31,6 +31,9 @@ public:
     float get_fov() const {
         return fov;
     }
+    const glm::vec3& get_position() const {
+        return position;
+    }
 
 private:
 

@@ -34,37 +34,37 @@ Mesh::~Mesh() {
 void Mesh::construct_cube(){
 
     vector<float> vertices {
-        // pos                // tex chords
+        // pos                // tex chords  /// normals
         // Top. Start at top left, going clockwise.
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // 0
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // 0
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         // Bottom
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // 4
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,  // 4
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
         // Right
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
         // Left
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
         // Front
-        -0.5, 0.5f, 0.5f, 0.0f, 1.0f,
-        0.5, 0.5f, 0.5f, 1.0f, 1.0f,
-        0.5, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
         // Back
-        -0.5, 0.5f, -0.5f, 0.0f, 1.0f, // t1  //t2
-        0.5, 0.5f, -0.5f, 1.0f, 1.0f,  // t1
-        0.5, -0.5f, -0.5f, 1.0f, 0.0f, // t1  //t2
-        -0.5, -0.5f, -0.5f, 0.0f, 0.0f        //t2
+        -0.5, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, // t1  //t2
+        0.5, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,  // t1
+        0.5, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, // t1  //t2
+        -0.5, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f        //t2
     };
 
     vector<unsigned int> indices;
@@ -111,11 +111,14 @@ void Mesh::generate_vao(const vector<float>& vertices, const vector<unsigned int
     // (location, number things in this attribute, type, normalize?, stride (distance between vertices), offset to get to this attribute for first vertex.)
 
     // Stride is sizeof(float) * 5.
-    const GLsizei stride = sizeof(float) * 5;
+    const GLsizei stride = sizeof(float) * 8;
     // Position attribute.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, static_cast<void*>(0));
     glEnableVertexAttribArray(0);
     // UV attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(3*sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(5*sizeof(float)));
+    glEnableVertexAttribArray(2);
 }

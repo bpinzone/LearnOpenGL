@@ -10,6 +10,7 @@
 #include "texture.h"
 #include "material.h"
 #include "game_object.h"
+#include "shader_globals.h"
 
 #include <iostream>
 #include <vector>
@@ -71,12 +72,21 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    Texture wood_texture{"wood_container.jpg"};
     Texture face_texture{"awesomeface.png"};
+    Texture wood_texture{"wood_container.jpg"};
+    Shader basic_image_shader{"basic_texture.vert", "basic_texture.frag"};
+    Material basic_image_material{
+        basic_image_shader,
+        {
+            {"primary", wood_texture},
+            {"secondary", face_texture}
+        }
+    };
 
-    Shader basic_image_shader{"basic.vert", "basic.frag"};
+    Shader lit_shader{"lit.vert", "lit.frag"};
+    Material lit_material{lit_shader, {}};
+
     Mesh cube_mesh {Mesh::Primitive::Cube};
-    Material basic_image_material{wood_texture, face_texture, basic_image_shader};
 
     vector<glm::vec3> cube_positions = {
         { 0.0f,  0.0f,  -0.0f}, { 2.0f,  5.0f, -15.0f},
@@ -90,8 +100,13 @@ int main() {
     for(const auto& pos : cube_positions){
         glm::mat4 model = glm::mat4(1.0);
         model = glm::translate(model, pos);
-        game_objects.push_back(Gameobject{basic_image_material, cube_mesh, model});
+        game_objects.push_back(Gameobject{lit_material, cube_mesh, model});
     }
+
+    Shader light_source_shader{"light_source.vert", "light_source.frag"};
+    Material light_source_material{light_source_shader, {}};
+
+    Gameobject light_source{light_source_material, cube_mesh, glm::mat4(1.0)};
 
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -116,17 +131,35 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 view = camera.GetViewMatrix();
-
-        glm::mat4 projection = glm::perspective(
+        Shader_globals::get_instance().set_view(camera.GetViewMatrix());
+        Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
             static_cast<float>(window_width) / window_height, 0.1f,
             100.0f
+        ));
+
+        // move light source
+        float light_speed = 1;
+        float light_radius = 3;
+        glm::vec3 light_pos{
+            light_radius * sin(glfwGetTime() * light_speed),
+            0,
+            light_radius* cos(glfwGetTime() * light_speed)
+        };
+        light_source.set_model(
+            glm::translate(glm::mat4(1.0), light_pos)
         );
+        light_source.draw();
+
+        lit_material.use();
+        lit_material.s.set_vec3("light_color", {1.0f, 1.0f, 1.0f});
+        lit_material.s.set_vec3("light_pos", light_pos);
+        lit_material.s.set_vec3("object_color", {1.0f, 0.5f, 0.31f});
+        lit_material.s.set_vec3("view_pos", camera.get_position());
 
         for(auto& go : game_objects){
             go.update(delta_time);
-            go.draw(view, projection);
+            go.draw();
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

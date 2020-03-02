@@ -1,5 +1,7 @@
 #include "shader.h"
 
+#include "shader_globals.h"
+
 #include <glad/glad.h>
 #include <glm.hpp>
 #include <type_ptr.hpp>
@@ -50,12 +52,13 @@ Shader::Shader(const char* vertex_path, const char* fragment_path){
     glDeleteShader(fragment_id);
 }
 
-void Shader::use(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) const {
+void Shader::use() const {
 
     glUseProgram(program_id);
-    set_mat4fv("model", model);
-    set_mat4fv("view", view);
-    set_mat4fv("projection", projection);
+    set_mat4fv("model", Shader_globals::get_instance().get_model());
+    set_mat4fv("view", Shader_globals::get_instance().get_view());
+    set_mat4fv("projection", Shader_globals::get_instance().get_projection());
+    set_mat3fv("normal", Shader_globals::get_instance().get_normal());
 }
 
 void Shader::set_bool(const string& name, bool value) const {
@@ -67,8 +70,22 @@ void Shader::set_int(const string& name, int value) const {
 void Shader::set_float(const string& name, float value) const {
     glUniform1f(glGetUniformLocation(program_id, name.c_str()), value);
 }
+
+void Shader::set_vec3(const std::string& name, const glm::vec3& value) const{
+    glUniform3fv(
+        glGetUniformLocation(program_id, name.c_str()),
+        1,
+        // todo better way?
+        &value[0]
+    );
+}
+
 void Shader::set_mat4fv(const string& name, const glm::mat4& value) const {
     glUniformMatrix4fv(glGetUniformLocation(program_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::set_mat3fv(const string& name, const glm::mat3& value) const {
+    glUniformMatrix3fv(glGetUniformLocation(program_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 // Returns a string representing the entire file.
