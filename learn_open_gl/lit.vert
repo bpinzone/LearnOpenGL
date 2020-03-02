@@ -10,9 +10,11 @@ uniform mat3 normal;
 
 out vec3 Normal;
 out vec3 WorldPos;
+out vec2 TexCoords;
 
 void main() {
     gl_Position = projection * view * model * vec4(aPos, 1.0);
     Normal = normal * aNormal;
     WorldPos = vec3(model * vec4(aPos, 1.0));
+    TexCoords = aTexCoord;
 }

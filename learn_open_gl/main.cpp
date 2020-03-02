@@ -83,8 +83,15 @@ int main() {
         }
     };
 
+    Texture box_texture{"box.png"};
+    Texture box_specular_texture{"box_specular.png"};
+    Texture box_emission_texture{"box_emission_texture.png"};
     Shader lit_shader{"lit.vert", "lit.frag"};
-    Material lit_material{lit_shader, {}};
+    Material lit_material{lit_shader, {
+        {"material.diffuse", box_texture},
+        {"material.specular", box_specular_texture},
+        {"material.emission", box_emission_texture}
+    }};
 
     Mesh cube_mesh {Mesh::Primitive::Cube};
 
@@ -151,11 +158,22 @@ int main() {
         );
         light_source.draw();
 
+        //
         lit_material.use();
-        lit_material.s.set_vec3("light_color", {1.0f, 1.0f, 1.0f});
-        lit_material.s.set_vec3("light_pos", light_pos);
-        lit_material.s.set_vec3("object_color", {1.0f, 0.5f, 0.31f});
         lit_material.s.set_vec3("view_pos", camera.get_position());
+
+        // set lit material color reflection properties.
+        lit_material.s.set_float("material.shininess", 32.0f);
+
+        // Pass light source stuff to lit material.
+        glm::vec3 light_color{
+            // sin(glfwGetTime() * 2.0f), sin(glfwGetTime() * 0.7f), sin(glfwGetTime() * 1.3f)
+            1, 1, 1
+        };
+        lit_material.s.set_vec3("light.position", light_pos);
+        lit_material.s.set_vec3("light.ambient",  light_color * 0.5f * 0.2f);
+        lit_material.s.set_vec3("light.diffuse",  light_color * 0.5f); // darken diffuse light a bit
+        lit_material.s.set_vec3("light.specular", glm::vec3{1.0f, 1.0f, 1.0f});
 
         for(auto& go : game_objects){
             go.update(delta_time);
