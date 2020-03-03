@@ -110,11 +110,6 @@ int main() {
         game_objects.push_back(Gameobject{lit_material, cube_mesh, model});
     }
 
-    Shader light_source_shader{"light_source.vert", "light_source.frag"};
-    Material light_source_material{light_source_shader, {}};
-
-    Gameobject light_source{light_source_material, cube_mesh, glm::mat4(1.0)};
-
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
@@ -145,44 +140,52 @@ int main() {
             100.0f
         ));
 
-        // move light source
-        float light_speed = 1;
-        float light_radius = 3;
-        glm::vec3 light_pos{
-            light_radius * sin(glfwGetTime() * light_speed),
-            0,
-            light_radius* cos(glfwGetTime() * light_speed)
-        };
-        light_source.set_model(
-            glm::translate(glm::mat4(1.0), light_pos)
-        );
-        // light_source.draw();
-
-        //
         lit_material.use();
-        lit_material.s.set_vec3("view_pos", camera.get_position());
+        lit_material.s.set_vec3("camera_pos", camera.get_position());
 
         // set lit material color reflection properties.
         lit_material.s.set_float("material.shininess", 32.0f);
 
         // Pass light source stuff to lit material.
-        glm::vec3 light_color{
-            // sin(glfwGetTime() * 2.0f), sin(glfwGetTime() * 0.7f), sin(glfwGetTime() * 1.3f)
-            1, 1, 1
+        glm::vec3 random_color{
+            sin(glfwGetTime() * 2.0f), sin(glfwGetTime() * 0.7f), sin(glfwGetTime() * 1.3f)
+            // 1, 1, 1
         };
-        // lit_material.s.set_vec3("light.position", light_pos);
-        lit_material.s.set_vec3("light.position",  camera.get_position());
-        lit_material.s.set_vec3("light.direction", camera.get_front());
-        // Don't want to have to do acos inside fragment shader.
-        lit_material.s.set_float("light.inner_cutoff",   glm::cos(glm::radians(12.5f)));
-        lit_material.s.set_float("light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
+        glm::vec3 white_light {1, 1, 1};
 
-        lit_material.s.set_vec3("light.ambient",  light_color * 0.5f * 0.2f);
-        lit_material.s.set_vec3("light.diffuse",  light_color * 0.5f); // darken diffuse light a bit
-        lit_material.s.set_vec3("light.specular", glm::vec3{1.0f, 1.0f, 1.0f});
-        lit_material.s.set_float("light.constant",  1.0f);
-        lit_material.s.set_float("light.linear",    0.09f);
-        lit_material.s.set_float("light.quadratic", 0.032f);
+        // dir light
+        lit_material.s.set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
+        lit_material.s.set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
+        lit_material.s.set_vec3("dir_light.specular", white_light);
+        lit_material.s.set_vec3("dir_light.direction", {0.2, -.3, -1});
+
+        glm::vec3 point_light_positions[] = {
+            glm::vec3( 0.7f,  0.2f,  2.0f),
+            glm::vec3( 2.3f, -3.3f, -4.0f),
+            glm::vec3(-4.0f,  2.0f, -12.0f),
+            glm::vec3( 0.0f,  0.0f, -3.0f)
+        };
+
+        // point lights
+        for(int i = 0; i < 4; ++i){
+            std::string i_str = std::to_string(i);
+            lit_material.s.set_vec3( "point_lights[" + i_str + "].ambient",  white_light * 0.5f * 0.2f);
+            lit_material.s.set_vec3( "point_lights[" + i_str + "].diffuse",  white_light * 0.5f); // darken diffuse light a bit
+            lit_material.s.set_vec3( "point_lights[" + i_str + "].specular", white_light);
+            lit_material.s.set_vec3( "point_lights[" + i_str + "].position", point_light_positions[i]);
+            lit_material.s.set_float("point_lights[" + i_str + "].constant", 1.0f);
+            lit_material.s.set_float("point_lights[" + i_str + "].linear", 0.09f);
+            lit_material.s.set_float("point_lights[" + i_str + "].quadratic", 0.032f);
+        }
+
+        // spot light
+        lit_material.s.set_vec3("spot_light.ambient",  white_light * 0.5f * 0.2f);
+        lit_material.s.set_vec3("spot_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
+        lit_material.s.set_vec3("spot_light.specular", white_light);
+        lit_material.s.set_vec3("spot_light.position",  camera.get_position());
+        lit_material.s.set_vec3("spot_light.direction", camera.get_front());
+        lit_material.s.set_float("spot_light.inner_cutoff",   glm::cos(glm::radians(12.5f)));  // Don't want acos in frag shader.
+        lit_material.s.set_float("spot_light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
 
         for(auto& go : game_objects){
             go.update(delta_time);
