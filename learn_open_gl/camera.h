@@ -34,6 +34,9 @@ public:
     const glm::vec3& get_position() const {
         return position;
     }
+    const glm::vec3& get_front() const {
+        return front;
+    }
 
 private:
 

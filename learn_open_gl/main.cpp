@@ -156,7 +156,7 @@ int main() {
         light_source.set_model(
             glm::translate(glm::mat4(1.0), light_pos)
         );
-        light_source.draw();
+        // light_source.draw();
 
         //
         lit_material.use();
@@ -170,7 +170,13 @@ int main() {
             // sin(glfwGetTime() * 2.0f), sin(glfwGetTime() * 0.7f), sin(glfwGetTime() * 1.3f)
             1, 1, 1
         };
-        lit_material.s.set_vec3("light.position", light_pos);
+        // lit_material.s.set_vec3("light.position", light_pos);
+        lit_material.s.set_vec3("light.position",  camera.get_position());
+        lit_material.s.set_vec3("light.direction", camera.get_front());
+        // Don't want to have to do acos inside fragment shader.
+        lit_material.s.set_float("light.inner_cutoff",   glm::cos(glm::radians(12.5f)));
+        lit_material.s.set_float("light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
+
         lit_material.s.set_vec3("light.ambient",  light_color * 0.5f * 0.2f);
         lit_material.s.set_vec3("light.diffuse",  light_color * 0.5f); // darken diffuse light a bit
         lit_material.s.set_vec3("light.specular", glm::vec3{1.0f, 1.0f, 1.0f});
