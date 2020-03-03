@@ -174,6 +174,9 @@ int main() {
         lit_material.s.set_vec3("light.ambient",  light_color * 0.5f * 0.2f);
         lit_material.s.set_vec3("light.diffuse",  light_color * 0.5f); // darken diffuse light a bit
         lit_material.s.set_vec3("light.specular", glm::vec3{1.0f, 1.0f, 1.0f});
+        lit_material.s.set_float("light.constant",  1.0f);
+        lit_material.s.set_float("light.linear",    0.09f);
+        lit_material.s.set_float("light.quadratic", 0.032f);
 
         for(auto& go : game_objects){
             go.update(delta_time);

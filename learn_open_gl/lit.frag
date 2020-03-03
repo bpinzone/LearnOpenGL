@@ -22,6 +22,10 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
 uniform Light light;
 
@@ -53,6 +57,15 @@ void main() {
 
     // vec3 total_light = ambient + diffuse + specular + emission;
     vec3 total_light = ambient + diffuse + specular;
+
+    float distance = length(light_to_frag);
+    float attenuation = 1.0 / (
+        light.constant +
+        light.linear * distance +
+        light.quadratic * (distance * distance)
+    );
+
+    total_light *= attenuation;
 
     FragColor = vec4(total_light, 1.0);
 
