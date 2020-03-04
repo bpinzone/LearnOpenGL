@@ -22,7 +22,6 @@ public:
     const mat4& get_projection() const;
     const mat4& get_normal() const;
 
-
 private:
     Shader_globals();
 

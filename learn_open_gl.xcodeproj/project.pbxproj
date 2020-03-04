@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		130AD50B23F9E66D00BED868 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */; };
+		13233EA9240F7ED100FBD612 /* model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13233EA8240F7ED100FBD612 /* model.cpp */; };
 		132BA32C23F9D4AB00DF94F0 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31D23F9D4AA00DF94F0 /* texture.cpp */; };
 		132BA32D23F9D4AB00DF94F0 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31E23F9D4AA00DF94F0 /* material.cpp */; };
 		132BA32E23F9D4AB00DF94F0 /* stb_image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31F23F9D4AA00DF94F0 /* stb_image.cpp */; };
@@ -17,6 +18,8 @@
 		132BA33223F9D4AB00DF94F0 /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = 132BA32723F9D4AA00DF94F0 /* glad.c */; };
 		132BA33323F9D4AB00DF94F0 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA32B23F9D4AB00DF94F0 /* camera.cpp */; };
 		132BA33823F9D5CD00DF94F0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA33723F9D5CD00DF94F0 /* main.cpp */; };
+		13A5F6D0240EFE860069913A /* libassimp.3.1.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A5F6CD240EFA410069913A /* libassimp.3.1.1.dylib */; };
+		13A5F6D3240F2D220069913A /* vertex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13A5F6D1240F2D220069913A /* vertex.cpp */; };
 		13FF8895240C560300D01E70 /* shader_globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13FF8893240C560300D01E70 /* shader_globals.cpp */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +37,8 @@
 
 /* Begin PBXFileReference section */
 		130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../graphics_project_include_lib/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
+		13233EA7240F7ED100FBD612 /* model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = model.h; path = learn_open_gl/model.h; sourceTree = "<group>"; };
+		13233EA8240F7ED100FBD612 /* model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = model.cpp; path = learn_open_gl/model.cpp; sourceTree = "<group>"; };
 		132BA31D23F9D4AA00DF94F0 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = texture.cpp; path = learn_open_gl/texture.cpp; sourceTree = "<group>"; };
 		132BA31E23F9D4AA00DF94F0 /* material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = material.cpp; path = learn_open_gl/material.cpp; sourceTree = "<group>"; };
 		132BA31F23F9D4AA00DF94F0 /* stb_image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stb_image.cpp; path = learn_open_gl/stb_image.cpp; sourceTree = "<group>"; };
@@ -51,6 +56,9 @@
 		132BA32B23F9D4AB00DF94F0 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = learn_open_gl/camera.cpp; sourceTree = "<group>"; };
 		132BA33523F9D55800DF94F0 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../Desktop/graphics_project_include_lib/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		132BA33723F9D5CD00DF94F0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = learn_open_gl/main.cpp; sourceTree = "<group>"; };
+		13A5F6CD240EFA410069913A /* libassimp.3.1.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.3.1.1.dylib; path = ../../../../graphics_project_include_lib/lib/libassimp.3.1.1.dylib; sourceTree = "<group>"; };
+		13A5F6D1240F2D220069913A /* vertex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vertex.cpp; path = learn_open_gl/vertex.cpp; sourceTree = "<group>"; };
+		13A5F6D2240F2D220069913A /* vertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vertex.h; path = learn_open_gl/vertex.h; sourceTree = "<group>"; };
 		13F0928123F9D452001D4461 /* learn_open_gl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = learn_open_gl; sourceTree = BUILT_PRODUCTS_DIR; };
 		13FF8893240C560300D01E70 /* shader_globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shader_globals.cpp; path = learn_open_gl/shader_globals.cpp; sourceTree = "<group>"; };
 		13FF8894240C560300D01E70 /* shader_globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shader_globals.h; path = learn_open_gl/shader_globals.h; sourceTree = "<group>"; };
@@ -61,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13A5F6D0240EFE860069913A /* libassimp.3.1.1.dylib in Frameworks */,
 				130AD50B23F9E66D00BED868 /* libglfw.3.3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,6 +80,7 @@
 		132BA33423F9D55800DF94F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				13A5F6CD240EFA410069913A /* libassimp.3.1.1.dylib */,
 				130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */,
 				132BA33523F9D55800DF94F0 /* libglfw.3.3.dylib */,
 			);
@@ -80,6 +90,10 @@
 		13F0927823F9D452001D4461 = {
 			isa = PBXGroup;
 			children = (
+				13233EA8240F7ED100FBD612 /* model.cpp */,
+				13233EA7240F7ED100FBD612 /* model.h */,
+				13A5F6D1240F2D220069913A /* vertex.cpp */,
+				13A5F6D2240F2D220069913A /* vertex.h */,
 				13FF8893240C560300D01E70 /* shader_globals.cpp */,
 				13FF8894240C560300D01E70 /* shader_globals.h */,
 				132BA33723F9D5CD00DF94F0 /* main.cpp */,
@@ -176,7 +190,9 @@
 				132BA33323F9D4AB00DF94F0 /* camera.cpp in Sources */,
 				132BA32D23F9D4AB00DF94F0 /* material.cpp in Sources */,
 				132BA32C23F9D4AB00DF94F0 /* texture.cpp in Sources */,
+				13A5F6D3240F2D220069913A /* vertex.cpp in Sources */,
 				132BA33223F9D4AB00DF94F0 /* glad.c in Sources */,
+				13233EA9240F7ED100FBD612 /* model.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

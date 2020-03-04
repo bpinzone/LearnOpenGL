@@ -20,13 +20,13 @@ Gameobject::Gameobject(Material material_in, Mesh mesh_in, const glm::mat4& mode
 
 void Gameobject::draw() const {
 
-    Shader_globals::get_instance().set_model(model);
-    Shader_globals::get_instance().set_normal(normal);
+    // Shader_globals::get_instance().set_model(model);
+    // Shader_globals::get_instance().set_normal(normal);
 
-    material.use(); // sets up shading.
-    mesh.use();  // binds vao
+    // material.use(); // sets up shading.
+    // mesh.use();  // binds vao
 
-    glDrawElements(GL_TRIANGLES, mesh.get_indices_size(), GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_TRIANGLES, mesh.get_indices_size(), GL_UNSIGNED_INT, 0);
 }
 
 void Gameobject::update(float delta_time) {

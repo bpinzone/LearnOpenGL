@@ -1,36 +1,35 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "vertex.h"
+#include "shader.h"
+#include "texture.h"
+
 #include <vector>
 
-// Mesh data. Vertices have Position and UV.
+// A single drawable object.
 class Mesh {
 public:
 
-    enum class Primitive {
-        Cube
-    };
+    //  Mesh Data
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture> textures;
 
-    Mesh(Primitive p);
-    Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
+    Mesh(
+        const std::vector<Vertex>& vertices_in,
+        const std::vector<unsigned int>& indices_in,
+        const std::vector<Texture>& textures_in
+    );
 
-    // Bind the vertex array.
-    void use() const;
-
-    int get_indices_size() const;
-
-    ~Mesh();
+    void draw(Shader shader);
 
 private:
 
-    unsigned int vao;
-    unsigned int vbo;
-    unsigned int ebo;
+    unsigned int vao, vbo, ebo;
 
-    int indices_size;
+    void setup_mesh();
 
-    void construct_cube();
-    void generate_vao(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
 };
 
 #endif

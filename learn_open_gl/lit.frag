@@ -8,8 +8,8 @@ uniform vec3 camera_pos;
 
 struct Material {
     // colors reflected for each light component
-    sampler2D diffuse;  // serves as diffuse AND ambient color.
-    sampler2D specular;
+    sampler2D diffuse1;  // serves as diffuse AND ambient color.
+    sampler2D specular1;
     sampler2D emission;
     float shininess;
 };
@@ -72,9 +72,9 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     vec3 light_ref = normalize(reflect(dir_light.direction, normal_n));
     float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
 
-    vec3 ambient  = dir_light.ambient  *        vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = dir_light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = dir_light.specular * spec * vec3(texture(material.diffuse, TexCoords));
+    vec3 ambient  = dir_light.ambient  *        vec3(texture(material.diffuse1, TexCoords));
+    vec3 diffuse  = dir_light.diffuse  * diff * vec3(texture(material.diffuse1, TexCoords));
+    vec3 specular = dir_light.specular * spec * vec3(texture(material.specular1, TexCoords));
     return ambient + diffuse + specular;
 }
 
@@ -95,9 +95,9 @@ vec3 calc_point_light(Point_light point_light, vec3 normal_n, vec3 frag_to_camer
         point_light.linear * distance +
         point_light.quadratic * (distance * distance)
     );
-    vec3 ambient  = point_light.ambient  *        vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = point_light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = point_light.specular * spec * vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = point_light.ambient  *        vec3(texture(material.diffuse1, TexCoords));
+    vec3 diffuse  = point_light.diffuse  * diff * vec3(texture(material.diffuse1, TexCoords));
+    vec3 specular = point_light.specular * spec * vec3(texture(material.specular1, TexCoords));
 
     return (ambient + diffuse + specular) * attenuation;
 }
@@ -124,9 +124,9 @@ vec3 calc_spot_light(Spot_light spot_light, vec3 normal_n, vec3 frag_to_camera_n
     // into the inner ring.
     float intensity = clamp((spot_alignment - spot_light.outer_cutoff) / epsilon, 0.0, 1.0);
 
-    vec3 ambient  = spot_light.ambient  *                    vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = spot_light.diffuse  * diff * intensity * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = spot_light.specular * spec * intensity * vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = spot_light.ambient  *                    vec3(texture(material.diffuse1, TexCoords));
+    vec3 diffuse  = spot_light.diffuse  * diff * intensity * vec3(texture(material.diffuse1, TexCoords));
+    vec3 specular = spot_light.specular * spec * intensity * vec3(texture(material.specular1, TexCoords));
 
     return ambient + diffuse + specular;
 }
@@ -143,16 +143,16 @@ void main() {
 
     // point
     for(int i = 0; i < NR_POINT_LIGHTS; ++i){
-        result += calc_point_light(point_lights[i], norm, frag_to_camera_n);
+        // result += calc_point_light(point_lights[i], norm, frag_to_camera_n);
     }
 
     // spot
-    result += calc_spot_light(spot_light, norm, frag_to_camera_n);
+    // result += calc_spot_light(spot_light, norm, frag_to_camera_n);
 
     FragColor = vec4(result, 1.0);
 
     // emission
-    // vec3 specular_pixel = vec3(texture(material.specular, TexCoords));
+    // vec3 specular_pixel = vec3(texture(material.specular1, TexCoords));
     // float specular_distance = specular_pixel.x - 0.5f;
     // specular_distance *= -1;
     // vec3 emission = 0.6f *
