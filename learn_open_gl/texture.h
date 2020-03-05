@@ -8,21 +8,23 @@
 #include <utility>
 #include <string>
 
-// basic texture class.
-// Has lots of default settings chosen for you.
+// Done
 class Texture {
 public:
 
-    Texture(const std::string& image_path, const std::string& type_in, const std::string& file_name_in);
+    enum class Type {
+        DIFFUSE, SPECULAR
+    };
+
+    Texture(const std::string& path_in, Type type_in);
 
     unsigned int texture_id;
 
-    // One of "diffuse", "specular"
-    std::string type;
+    // Relative to dir main is in. Includes the file name.
+    std::string path;
 
-    // Not a full path????
-    // This might actually be a path?
-    std::string file_name;
+    // One of "diffuse", "specular"
+    Type type;
 };
 
 #endif

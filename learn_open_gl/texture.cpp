@@ -5,14 +5,10 @@
 #include <sstream>
 
 using std::string;
-using std::ostringstream;
 using std::runtime_error;
 
-Texture::Texture(
-    const string& image_path,
-    const string& type_in,
-    const string& file_name_in)
-    : type{type_in}, file_name{file_name_in} {
+Texture::Texture(const std::string& path_in, Type type_in)
+    : path{path_in}, type{type_in} {
 
     glGenTextures(1, &texture_id);
 
@@ -20,10 +16,10 @@ Texture::Texture(
     // stbi_set_flip_vertically_on_load(true);
 
     int width, height, num_color_channels;
-    unsigned char* data = stbi_load(image_path.c_str(), &width, &height, &num_color_channels, 0);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &num_color_channels, 0);
     if(!data){
         stbi_image_free(data);
-        throw runtime_error{"Could not load texture at: " + image_path};
+        throw runtime_error{"Could not load texture at: " + path};
     }
 
     GLenum format;

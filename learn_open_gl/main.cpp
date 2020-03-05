@@ -120,7 +120,11 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
-    Model figure{"./nanosuit/nanosuit.obj"};
+    Shader sphere_shader("sphere.vert", "sphere.frag");
+
+    Model figure{lit_shader, "./nanosuit/nanosuit.obj"};
+    // Model sphere{"./globe-sphere/globe-sphere.obj"};
+    // Model sphere{"./my-sphere/untitled.obj"};
 
     glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it to. See the call to glClear() below.
 
@@ -167,7 +171,7 @@ int main() {
         lit_shader.set_vec3("dir_light.ambient",  white_light);
         lit_shader.set_vec3("dir_light.diffuse",  white_light); // darken diffuse light a bit
         lit_shader.set_vec3("dir_light.specular", white_light);
-        lit_shader.set_vec3("dir_light.direction", {0.2, -.3, 10});
+        lit_shader.set_vec3("dir_light.direction", {0, 0, 20});
 
         glm::vec3 point_light_positions[] = {
             glm::vec3( 0.7f,  0.2f,  2.0f),
@@ -198,9 +202,12 @@ int main() {
         lit_shader.set_float("spot_light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
 
         Shader_globals::get_instance().set_model(glm::mat4(1));
+        Shader_globals::get_instance().set_normal(glm::mat3(glm::transpose(glm::inverse(glm::mat4(1)))));
 
-        lit_shader.use();
-        figure.draw(lit_shader);
+        // lit_shader.use();
+        // sphere_shader.use();
+        // sphere.draw(lit_shader);
+        figure.draw();
 
         // for(auto& go : game_objects){
         //     go.update(delta_time);

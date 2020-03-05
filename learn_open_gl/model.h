@@ -7,7 +7,7 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include <assimp/postprocess.h>  // gen smooth normals
 
 #include <string>
 #include <vector>
@@ -15,21 +15,17 @@
 class Model {
 public:
 
-    Model(const std::string& path);
-    void draw(Shader shader);
+    Model(std::vector<Mesh> meshes_in);
+    Model(Shader shader, const std::string& model_path);
+
+    void draw();
 
 private:
 
+    void load_meshes(aiNode* node, const aiScene* scene, Shader shader);
+
     std::vector<Mesh> meshes;
     std::string directory;
-
-    void load_model(const std::string& path);
-    void process_node(aiNode* node, const aiScene* scene);
-    Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
-
-    // type_name is "diffuse" or "specular"
-    std::vector<Texture> load_material_textures(aiMaterial* mat, aiTextureType type, std::string type_name);
-
     std::vector<Texture> textures_loaded;
 };
 

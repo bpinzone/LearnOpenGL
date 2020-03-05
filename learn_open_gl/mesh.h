@@ -4,31 +4,53 @@
 #include "vertex.h"
 #include "shader.h"
 #include "texture.h"
+#include "material.h"
+
+#include <assimp/scene.h>
 
 #include <vector>
 
 // A single drawable object.
+// Has it's structural data and a material.
 class Mesh {
 public:
 
     //  Mesh Data
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
+    Material material;
 
     Mesh(
-        const std::vector<Vertex>& vertices_in,
-        const std::vector<unsigned int>& indices_in,
-        const std::vector<Texture>& textures_in
+        const std::vector<Vertex> vertices_in,
+        const std::vector<unsigned int> indices_in,
+        Material material_in
     );
 
-    void draw(Shader shader);
+    Mesh(
+        Shader shader,
+        aiMesh* mesh, const aiScene* scene,
+        const std::string& model_dir,
+        std::vector<Texture>& loaded_textures
+    );
+
+    void draw();
+
+    // TODO dtor, sometime:
+    // glDeleteVertexArrays(1, &vao);
+    // glDeleteBuffers(1, &vbo);
+    // glDeleteBuffers(1, &ebo);
 
 private:
 
+    void load_vertex_data(aiMesh* mesh, const aiScene* scene);
+    Material load_material(
+        Shader shader, aiMesh* mesh, const aiScene* scene,
+        const std::string& model_dir, std::vector<Texture>& loaded_textures
+    );
+
     unsigned int vao, vbo, ebo;
 
-    void setup_mesh();
+    void setup_vao();
 
 };
 

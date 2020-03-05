@@ -9,6 +9,7 @@
 class Shader {
 public:
 
+    // Paths relative to main's dir.
     Shader(const char* vertex_path, const char* fragment_path);
 
     void use() const;
