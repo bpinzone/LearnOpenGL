@@ -13,6 +13,9 @@ Gameobject::Gameobject(
 
 void Gameobject::draw() {
 
+    Shader_globals::get_instance().set_model(transform_model);
+    Shader_globals::get_instance().set_normal(normal);
+
     model.draw();
 }
 

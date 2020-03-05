@@ -1,5 +1,3 @@
-// Broken...
-
 #include <glad/glad.h>
 #include <glfw3.h>
 
@@ -199,9 +197,6 @@ int main() {
         lit_shader.set_float("spot_light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
 
 
-        // lit_shader.use();
-        // sphere_shader.use();
-        // sphere.draw(lit_shader);
         figure_object.draw();
 
         // for(auto& go : game_objects){
