@@ -72,56 +72,15 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    // Texture face_texture{"awesomeface.png"};
-    // Texture wood_texture{"wood_container.jpg"};
-    // Shader basic_image_shader{"basic_texture.vert", "basic_texture.frag"};
-    // Material basic_image_material{
-    //     basic_image_shader,
-    //     {
-    //         {"primary", wood_texture},
-    //         {"secondary", face_texture}
-    //     }
-    // };
-
-    // Texture box_texture{"box.png"};
-    // Texture box_specular_texture{"box_specular.png"};
-    // Texture box_emission_texture{"box_emission_texture.png"};
-    Shader lit_shader{"lit.vert", "lit.frag"};
-    // Material lit_material{lit_shader, {
-    //     {"material.diffuse", box_texture},
-    //     {"material.specular", box_specular_texture},
-    //     {"material.emission", box_emission_texture}
-    // }};
-
-    // Mesh cube_mesh {Mesh::Primitive::Cube};
-
-    // vector<glm::vec3> cube_positions = {
-    //     { 0.0f,  0.0f,  -0.0f}, { 2.0f,  5.0f, -15.0f},
-    //     {-1.5f, -2.2f, -2.5f}, {-3.8f, -2.0f, -12.3f},
-    //     { 2.4f, -0.4f, -3.5f}, {-1.7f,  3.0f, -7.5f},
-    //     { 1.3f, -2.0f, -2.5f}, { 1.5f,  2.0f, -2.5f},
-    //     { 1.5f,  0.2f, -1.5f}, {-1.3f,  1.0f, -1.5f}
-    // };
-
-    // vector<Gameobject> game_objects;
-    // for(const auto& pos : cube_positions){
-    //     glm::mat4 model = glm::mat4(1.0);
-    //     model = glm::translate(model, pos);
-    //     game_objects.push_back(Gameobject{lit_material, cube_mesh, model});
-    // }
+    glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it to. See the call to glClear() below.
 
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
-    // Shader sphere_shader("sphere.vert", "sphere.frag");
-
+    Shader lit_shader{"lit.vert", "lit.frag"};
     Model figure{lit_shader, "./nanosuit/nanosuit.obj"};
     Gameobject figure_object{glm::mat4(1), figure};
-    // Model sphere{"./globe-sphere/globe-sphere.obj"};
-    // Model sphere{"./my-sphere/untitled.obj"};
-
-    glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it to. See the call to glClear() below.
 
     // render loop
     // -----------
@@ -147,45 +106,12 @@ int main() {
             100.0f
         ));
 
-        // lit_material.use();
         lit_shader.set_vec3("camera_pos", camera.get_position());
 
         // set lit material color reflection properties.
         lit_shader.set_float("material.shininess", 32.0f);
 
-        // Pass light source stuff to lit material.
-        glm::vec3 random_color{
-            sin(glfwGetTime() * 2.0f), sin(glfwGetTime() * 0.7f), sin(glfwGetTime() * 1.3f)
-            // 1, 1, 1
-        };
         glm::vec3 white_light {1, 1, 1};
-
-        // dir light
-        // lit_shader.set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
-        // lit_shader.set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
-        lit_shader.set_vec3("dir_light.ambient",  white_light);
-        lit_shader.set_vec3("dir_light.diffuse",  white_light); // darken diffuse light a bit
-        lit_shader.set_vec3("dir_light.specular", white_light);
-        lit_shader.set_vec3("dir_light.direction", {0, 0, 20});
-
-        glm::vec3 point_light_positions[] = {
-            glm::vec3( 0.7f,  0.2f,  2.0f),
-            glm::vec3( 2.3f, -3.3f, -4.0f),
-            glm::vec3(-4.0f,  2.0f, -12.0f),
-            glm::vec3( 0.0f,  0.0f, -3.0f)
-        };
-
-        // point lights
-        for(int i = 0; i < 4; ++i){
-            std::string i_str = std::to_string(i);
-            lit_shader.set_vec3( "point_lights[" + i_str + "].ambient",  white_light * 0.5f * 0.2f);
-            lit_shader.set_vec3( "point_lights[" + i_str + "].diffuse",  white_light * 0.5f); // darken diffuse light a bit
-            lit_shader.set_vec3( "point_lights[" + i_str + "].specular", white_light);
-            lit_shader.set_vec3( "point_lights[" + i_str + "].position", point_light_positions[i]);
-            lit_shader.set_float("point_lights[" + i_str + "].constant", 1.0f);
-            lit_shader.set_float("point_lights[" + i_str + "].linear", 0.09f);
-            lit_shader.set_float("point_lights[" + i_str + "].quadratic", 0.032f);
-        }
 
         // spot light
         lit_shader.set_vec3("spot_light.ambient",  white_light * 0.5f * 0.2f);
@@ -198,11 +124,6 @@ int main() {
 
 
         figure_object.draw();
-
-        // for(auto& go : game_objects){
-        //     go.update(delta_time);
-        //     go.draw();
-        // }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

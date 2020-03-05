@@ -139,11 +139,11 @@ void main() {
     vec3 result = vec3(0);
 
     // dir
-    result += calc_dir_light(dir_light, norm, frag_to_camera_n);
+    // result += calc_dir_light(dir_light, norm, frag_to_camera_n);
 
     // point
     for(int i = 0; i < NR_POINT_LIGHTS; ++i){
-        result += calc_point_light(point_lights[i], norm, frag_to_camera_n);
+        // result += calc_point_light(point_lights[i], norm, frag_to_camera_n);
     }
 
     // spot
