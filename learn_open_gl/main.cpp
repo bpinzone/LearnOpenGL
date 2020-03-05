@@ -1,8 +1,4 @@
-/*
-Design:
-    Either the model provides a material, or someone else does.
-
-*/
+// Broken...
 
 #include <glad/glad.h>
 #include <glfw3.h>
@@ -120,9 +116,10 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
-    Shader sphere_shader("sphere.vert", "sphere.frag");
+    // Shader sphere_shader("sphere.vert", "sphere.frag");
 
     Model figure{lit_shader, "./nanosuit/nanosuit.obj"};
+    Gameobject figure_object{glm::mat4(1), figure};
     // Model sphere{"./globe-sphere/globe-sphere.obj"};
     // Model sphere{"./my-sphere/untitled.obj"};
 
@@ -201,13 +198,11 @@ int main() {
         lit_shader.set_float("spot_light.inner_cutoff",   glm::cos(glm::radians(12.5f)));  // Don't want acos in frag shader.
         lit_shader.set_float("spot_light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
 
-        Shader_globals::get_instance().set_model(glm::mat4(1));
-        Shader_globals::get_instance().set_normal(glm::mat3(glm::transpose(glm::inverse(glm::mat4(1)))));
 
         // lit_shader.use();
         // sphere_shader.use();
         // sphere.draw(lit_shader);
-        figure.draw();
+        figure_object.draw();
 
         // for(auto& go : game_objects){
         //     go.update(delta_time);

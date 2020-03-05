@@ -3,29 +3,26 @@
 
 #include <glm.hpp>
 
-#include "material.h"
-#include "mesh.h"
+#include "model.h"
 
 class Gameobject{
 public:
 
-    Gameobject(Material material_in, Mesh mesh_in, const glm::mat4& model_in);
+    Gameobject(const glm::mat4& transform_model_in, Model model_in);
 
-    void draw() const;
+    void draw();
 
     void update(float delta_time);
 
-    void set_model(const glm::mat4 model_in);
+    void set_transform_model(const glm::mat4 transform_model_in);
 
 private:
 
-    Material material;
-    Mesh mesh;
-    glm::mat4 model;
+    glm::mat4 transform_model;
     glm::mat3 normal;
 
-    glm::vec3 rotation_axis;
-    float rotation_speed;
+    Model model;
+
 
 };
 
