@@ -78,9 +78,26 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
-    Shader lit_shader{"lit.vert", "lit.frag"};
-    Model figure{lit_shader, "./nanosuit/nanosuit.obj"};
-    Gameobject figure_object{glm::mat4(1), figure};
+    Shader sphere_shader{"sphere.vert", "sphere.frag"};
+    Material sphere_material{
+        sphere_shader,
+        {
+            Texture{"blue.png", Texture::Type::DIFFUSE},
+            Texture{"gray.png", Texture::Type::SPECULAR}
+        }
+    };
+
+    Model sphere_model{sphere_shader, "./my-sphere/untitled.obj"};
+    sphere_model.set_materials(sphere_material);
+    Gameobject sphere_object{glm::mat4(1), sphere_model};
+
+    // Set up static lighting
+    glm::vec3 white_light {1, 1, 1};
+    sphere_shader.set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
+    sphere_shader.set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
+    sphere_shader.set_vec3("dir_light.specular", white_light);
+    sphere_shader.set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
+    sphere_shader.set_float("material.shininess", 32.0f);
 
     // render loop
     // -----------
@@ -106,24 +123,9 @@ int main() {
             100.0f
         ));
 
-        lit_shader.set_vec3("camera_pos", camera.get_position());
+        sphere_shader.set_vec3("camera_pos", camera.get_position());
 
-        // set lit material color reflection properties.
-        lit_shader.set_float("material.shininess", 32.0f);
-
-        glm::vec3 white_light {1, 1, 1};
-
-        // spot light
-        lit_shader.set_vec3("spot_light.ambient",  white_light * 0.5f * 0.2f);
-        lit_shader.set_vec3("spot_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
-        lit_shader.set_vec3("spot_light.specular", white_light);
-        lit_shader.set_vec3("spot_light.position",  camera.get_position());
-        lit_shader.set_vec3("spot_light.direction", camera.get_front());
-        lit_shader.set_float("spot_light.inner_cutoff",   glm::cos(glm::radians(12.5f)));  // Don't want acos in frag shader.
-        lit_shader.set_float("spot_light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
-
-
-        figure_object.draw();
+        sphere_object.draw();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

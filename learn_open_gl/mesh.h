@@ -33,6 +33,10 @@ public:
         std::vector<Texture>& loaded_textures
     );
 
+    void set_material(Material material_in){
+        material = material_in;
+    }
+
     void draw();
 
     // TODO dtor, sometime:

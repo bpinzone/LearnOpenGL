@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "mesh.h"
 #include "texture.h"
+#include "material.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -17,6 +18,12 @@ public:
 
     Model(std::vector<Mesh> meshes_in);
     Model(Shader shader, const std::string& model_path);
+
+    void set_materials(Material material){
+        for(auto& mesh : meshes){
+            mesh.set_material(material);
+        }
+    }
 
     void draw();
 
