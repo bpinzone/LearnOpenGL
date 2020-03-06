@@ -86,10 +86,30 @@ int main() {
             Texture{"gray.png", Texture::Type::SPECULAR}
         }
     };
+    Material cube_material{
+        sphere_shader,
+        {
+            Texture{"red.png", Texture::Type::DIFFUSE},
+            Texture{"gray.png", Texture::Type::SPECULAR}
+        }
+    }
 
     Model sphere_model{sphere_shader, "./my-sphere/untitled.obj"};
     sphere_model.set_materials(sphere_material);
-    Gameobject sphere_object{glm::mat4(1), sphere_model};
+
+    Model cube_model{sphere_shader, "./my-cube/cube.obj"};
+    cube_model.set_materials(cube_material);
+
+    vector<Gameobject> sphere_objects;
+    int num_spheres = 10;
+    for(int i = 0; i < num_spheres; ++i){
+        sphere_objects.push_back(Gameobject{glm::mat4(1), sphere_model, i * 2.0, 10});
+    }
+    vector<Gameobject> cube_objects;
+    for(int i = 0; i < num_spheres - 1; ++i){
+        // here. Yeah should make derived classes...
+        cube_objects.push_back(Gameobject{glm::mat4(1), cube_model, i, 10});
+    }
 
     // Set up static lighting
     glm::vec3 white_light {1, 1, 1};
@@ -125,7 +145,10 @@ int main() {
 
         sphere_shader.set_vec3("camera_pos", camera.get_position());
 
-        sphere_object.draw();
+        for(auto& go : sphere_objects){
+            go.update(delta_time);
+            go.draw();
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
