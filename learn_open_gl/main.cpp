@@ -75,7 +75,7 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it to. See the call to glClear() below.
+    glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it too. See the call to glClear() below.
 
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -95,7 +95,6 @@ int main() {
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
 
-
     vector<shared_ptr<Gameobject>> sphere_objects;
     int num_spheres = 10;
     for(int i = 0; i < num_spheres; ++i){
@@ -104,19 +103,14 @@ int main() {
         sphere_objects.push_back(new_object);
     }
 
-    // === Nano suit ===
-    shared_ptr<Shader> lit_shader = make_shared<Shader>("./shaders/lit.vert", "./shaders/lit.frag");
-    shared_ptr<Model> nano_model = make_shared<Model>(lit_shader, "./nanosuit/nanosuit.obj");
-    shared_ptr<Gameobject> nano_object = make_shared<Gameobject>();
-    nano_object->add_component(make_shared<Model_renderer>(nano_model));
-
     // === Lighting constants ===
 
     glm::vec3 white_light {1, 1, 1};
 
-
     // Directional shader
-    directional_shader->use(); // Yes, you need this! TODO: why again?
+    // Really, makes the dir_shader the active program, and populates the uniforms.
+    // The uniforms belong to the shader program.
+    // So if you switch to another shader and back, you DON'T need to populate uniforms again if they haven't changed.
     directional_shader->set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
     directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
     directional_shader->set_vec3("dir_light.specular", white_light);
@@ -128,7 +122,6 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
 
         Time::get_instance().update_delta_time();
-
 
         // input
         // -----
@@ -148,58 +141,9 @@ int main() {
 
         directional_shader->set_vec3("camera_pos", camera.get_position());
 
-        /// hmm
-
-
-    // Lit shader
-
-    lit_shader->use();
-    lit_shader->set_vec3("camera_pos", camera.get_position());
-    lit_shader->set_vec3("dir_light.ambient",  white_light);
-    lit_shader->set_vec3("dir_light.diffuse",  white_light); // darken diffuse light a bit
-    lit_shader->set_vec3("dir_light.specular", white_light);
-    lit_shader->set_vec3("dir_light.direction", {0, 0, 20});
-
-    glm::vec3 point_light_positions[] = {
-        glm::vec3( 0.7f,  0.2f,  2.0f),
-        glm::vec3( 2.3f, -3.3f, -4.0f),
-        glm::vec3(-4.0f,  2.0f, -12.0f),
-        glm::vec3( 0.0f,  0.0f, -3.0f)
-    };
-
-    // point lights
-    for(int i = 0; i < 4; ++i){
-        std::string i_str = std::to_string(i);
-        lit_shader->set_vec3( "point_lights[" + i_str + "].ambient",  white_light * 0.5f * 0.2f);
-        lit_shader->set_vec3( "point_lights[" + i_str + "].diffuse",  white_light * 0.5f); // darken diffuse light a bit
-        lit_shader->set_vec3( "point_lights[" + i_str + "].specular", white_light);
-        lit_shader->set_vec3( "point_lights[" + i_str + "].position", point_light_positions[i]);
-        lit_shader->set_float("point_lights[" + i_str + "].constant", 1.0f);
-        lit_shader->set_float("point_lights[" + i_str + "].linear", 0.09f);
-        lit_shader->set_float("point_lights[" + i_str + "].quadratic", 0.032f);
-    }
-
-    // spot light
-    lit_shader->set_vec3("spot_light.ambient",  white_light * 0.5f * 0.2f);
-    lit_shader->set_vec3("spot_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
-    lit_shader->set_vec3("spot_light.specular", white_light);
-    lit_shader->set_vec3("spot_light.position",  camera.get_position());
-    lit_shader->set_vec3("spot_light.direction", camera.get_front());
-    lit_shader->set_float("spot_light.inner_cutoff",   glm::cos(glm::radians(12.5f)));  // Don't want acos in frag shader.
-    lit_shader->set_float("spot_light.outer_cutoff",   glm::cos(glm::radians(17.5f)));
-    lit_shader->set_float("material.shininess", 32.0f);
-
-    // end lit shader
-
-        /// hmmm
-
-        // set lit material color reflection properties.
-
         for(auto& go : sphere_objects){
             go->update();
         }
-
-        nano_object->update();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

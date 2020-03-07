@@ -25,6 +25,7 @@ Material::Material(
 
 void Material::use() {
     shader->use();
+    shader->forward_shader_globals_to_uniforms();
     assign_texture_unit_uniforms();
     // Would push other uniform data into shader here...
     bind_textures_to_units();
@@ -32,8 +33,6 @@ void Material::use() {
 
 // Set the shader's uniform variables to the correct texture unit number.
 void Material::assign_texture_unit_uniforms() {
-
-    glUseProgram(shader->program_id);
 
     // Sampler names are diffuse1, diffuse2..., specular1, specular2...
     // Map sampler names to texture units.
