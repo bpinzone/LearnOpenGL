@@ -52,6 +52,7 @@ Shader::Shader(const char* vertex_path, const char* fragment_path){
     glDeleteShader(fragment_id);
 }
 
+// Put shader globals into this shader's uniforms.
 void Shader::use() const {
 
     glUseProgram(program_id);

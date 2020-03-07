@@ -6,6 +6,6 @@
 #include <utility>
 #include <vector>
 
-std::vector<std::pair>> mst(std::vector<Gameobject>& game_objects);
+// std::vector<std::pair>> mst(std::vector<Gameobject>& game_objects);
 
 #endif

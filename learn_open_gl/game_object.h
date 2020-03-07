@@ -1,35 +1,38 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
+#include "transform.h"
+
+class Component;
+
 #include <glm.hpp>
 
-#include "model.h"
+#include <vector>
+#include <optional>
+#include <memory>
 
-class Gameobject{
+class Gameobject : public std::enable_shared_from_this<Gameobject> {
 public:
 
-    Gameobject(const glm::mat4& transform_model_in, Model model_in, double radius_in, double speed_in);
+    Gameobject();
+    Gameobject(const glm::mat4& transform_in);
 
-    void draw();
+    Transform& get_transform();
 
-    void update(float delta_time);
+    // TODO: Sets new_component's game_object to be this.
+    void add_component(std::shared_ptr<Component> new_component);
 
-    void set_transform_model(const glm::mat4 transform_model_in);
-
-    glm::vec3 get_position();
+    // Calls start and update on all components.
+    // Models get called last.
+    void start();
+    void update();
 
 private:
 
-    glm::mat4 transform_model;
-    glm::mat3 normal;
+    Transform transform;
 
-    Model model;
-
-    double radius;
-    double speed;
-
-    double degrees;
-
+    std::vector<std::shared_ptr<Component>> components;
+    std::optional<std::shared_ptr<Component>> render_component;
 
 };
 

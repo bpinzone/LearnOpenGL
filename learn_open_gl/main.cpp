@@ -11,14 +11,20 @@
 #include "game_object.h"
 #include "shader_globals.h"
 #include "model.h"
+#include "utility.h"
+#include "model_renderer.h"
+#include "component.h"
 
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <memory>
 
 using std::vector;
 using std::cout; using std::endl;
 using std::sin;
+using std::shared_ptr;
+using std::make_shared;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
@@ -27,9 +33,6 @@ void processInput(GLFWwindow *window);
 
 static int window_width = 1600;
 static int window_height = 1200;
-
-float delta_time = 0.0f;
-float last_frame_start_time = 0.0f;  // The time when the last frame started rendering.
 
 Camera camera;
 
@@ -78,54 +81,44 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
-    Shader sphere_shader{"sphere.vert", "sphere.frag"};
-    Material sphere_material{
-        sphere_shader,
-        {
-            Texture{"blue.png", Texture::Type::DIFFUSE},
-            Texture{"gray.png", Texture::Type::SPECULAR}
-        }
-    };
-    Material cube_material{
-        sphere_shader,
-        {
-            Texture{"red.png", Texture::Type::DIFFUSE},
-            Texture{"gray.png", Texture::Type::SPECULAR}
-        }
-    }
+    // === SPHERES ===
+    shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE);
+    shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR);
 
-    Model sphere_model{sphere_shader, "./my-sphere/untitled.obj"};
-    sphere_model.set_materials(sphere_material);
+    shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
 
-    Model cube_model{sphere_shader, "./my-cube/cube.obj"};
-    cube_model.set_materials(cube_material);
+    shared_ptr<Material> blue_material = make_shared<Material>(
+        directional_shader,
+        Material::Textures_t{ blue_diffuse, gray_specular }
+    );
 
-    vector<Gameobject> sphere_objects;
+    shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
+    sphere_model->set_materials(blue_material);
+
+
+    vector<shared_ptr<Gameobject>> sphere_objects;
     int num_spheres = 10;
     for(int i = 0; i < num_spheres; ++i){
-        sphere_objects.push_back(Gameobject{glm::mat4(1), sphere_model, i * 2.0, 10});
-    }
-    vector<Gameobject> cube_objects;
-    for(int i = 0; i < num_spheres - 1; ++i){
-        // here. Yeah should make derived classes...
-        cube_objects.push_back(Gameobject{glm::mat4(1), cube_model, i, 10});
+        shared_ptr<Gameobject> new_object = make_shared<Gameobject>(glm::translate(glm::mat4(1), glm::vec3{2*i, 0, 0}));
+        new_object->add_component(make_shared<Model_renderer>(sphere_model));
+        sphere_objects.push_back(new_object);
     }
 
     // Set up static lighting
     glm::vec3 white_light {1, 1, 1};
-    sphere_shader.set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
-    sphere_shader.set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
-    sphere_shader.set_vec3("dir_light.specular", white_light);
-    sphere_shader.set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
-    sphere_shader.set_float("material.shininess", 32.0f);
+    directional_shader->use(); // Yes, you need this!
+    directional_shader->set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
+    directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
+    directional_shader->set_vec3("dir_light.specular", white_light);
+    directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
+    directional_shader->set_float("material.shininess", 32.0f);
 
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
 
-        float current_frame_start_time = glfwGetTime();
-        delta_time = current_frame_start_time - last_frame_start_time;
-        last_frame_start_time = current_frame_start_time;
+        Time::get_instance().update_delta_time();
+
 
         // input
         // -----
@@ -143,11 +136,10 @@ int main() {
             100.0f
         ));
 
-        sphere_shader.set_vec3("camera_pos", camera.get_position());
+        directional_shader->set_vec3("camera_pos", camera.get_position());
 
         for(auto& go : sphere_objects){
-            go.update(delta_time);
-            go.draw();
+            go->update();
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -161,6 +153,11 @@ int main() {
     // ------------------------------------------------------------------
     glfwTerminate();
 
+    GLenum error = glGetError();
+    if(error != 0){
+        cout << "Exiting main with error code: " << error << endl;
+    }
+
     return 0;
 }
 
@@ -173,16 +170,16 @@ void processInput(GLFWwindow *window) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::FORWARD, delta_time);
+        camera.ProcessKeyboard(Camera::Movement::FORWARD, Time::get_instance().get_delta_time());
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::BACKWARD, delta_time);
+        camera.ProcessKeyboard(Camera::Movement::BACKWARD, Time::get_instance().get_delta_time());
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::LEFT, delta_time);
+        camera.ProcessKeyboard(Camera::Movement::LEFT, Time::get_instance().get_delta_time());
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::RIGHT, delta_time);
+        camera.ProcessKeyboard(Camera::Movement::RIGHT, Time::get_instance().get_delta_time());
     }
 
 }

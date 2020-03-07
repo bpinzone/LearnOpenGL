@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "learn_open_gl/model.cpp"
-            timestampString = "605080208.791535"
+            timestampString = "605307461.658777"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "39"
@@ -26,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "learn_open_gl/model.cpp"
-            timestampString = "605080208.793317"
+            timestampString = "605307461.658846"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "26"
             endingLineNumber = "26"
-            landmarkName = "Model::Model(Shader shader, const string&amp; model_path)"
+            landmarkName = "Model::Model(shared_ptr&lt;Shader&gt; shader, const string&amp; model_path)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,7 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "learn_open_gl/model.cpp"
-            timestampString = "605080208.793469"
+            timestampString = "605307461.658897"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "57"

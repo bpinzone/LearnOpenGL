@@ -1,10 +1,5 @@
 #include "shader_globals.h"
 
-Shader_globals& Shader_globals::get_instance() {
-    static Shader_globals sg;
-    return sg;
-}
-
 void Shader_globals::set_model(const mat4& model_in) {
     model = model_in;
 }
@@ -30,8 +25,4 @@ const glm::mat4& Shader_globals::get_projection() const {
 }
 const glm::mat4& Shader_globals::get_normal() const {
     return normal;
-}
-
-Shader_globals::Shader_globals() {
-
 }

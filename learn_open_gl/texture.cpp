@@ -3,12 +3,19 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <cassert>
 
 using std::string;
 using std::runtime_error;
+using std::set;
+using std::shared_ptr;
+
+set<shared_ptr<Texture>, Texture_comp> Texture::loaded_textures;
 
 Texture::Texture(const std::string& path_in, Type type_in)
     : path{path_in}, type{type_in} {
+
+    assert(loaded_textures.find(path) == loaded_textures.end());
 
     glGenTextures(1, &texture_id);
 

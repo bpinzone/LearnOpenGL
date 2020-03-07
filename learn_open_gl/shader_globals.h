@@ -10,7 +10,10 @@ public:
 
     using mat4 = glm::mat4;
 
-    static Shader_globals& get_instance();
+    static Shader_globals& get_instance(){
+        static Shader_globals sg;
+        return sg;
+    }
 
     void set_model(const mat4& model_in);
     void set_view(const mat4& view_in);
@@ -22,8 +25,15 @@ public:
     const mat4& get_projection() const;
     const mat4& get_normal() const;
 
+	Shader_globals(const Shader_globals&) = delete;
+	Shader_globals(Shader_globals&&) = delete;
+	Shader_globals& operator= (const Shader_globals&)  = delete;
+	Shader_globals& operator= (Shader_globals&&) = delete;
+
 private:
-    Shader_globals();
+
+    Shader_globals(){
+    }
 
     mat4 model;
     mat4 view;

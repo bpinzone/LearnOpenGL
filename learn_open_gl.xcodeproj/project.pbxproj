@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		130437FF24143547009B331E /* transform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 130437F524143546009B331E /* transform.cpp */; };
+		1304380024143547009B331E /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 130437F624143546009B331E /* utility.cpp */; };
+		1304380124143547009B331E /* model_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 130437F724143546009B331E /* model_renderer.cpp */; };
+		1304380224143547009B331E /* component.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 130437FC24143547009B331E /* component.cpp */; };
+		1304380324143547009B331E /* mst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 130437FE24143547009B331E /* mst.cpp */; };
 		130AD50B23F9E66D00BED868 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */; };
 		13233EA9240F7ED100FBD612 /* model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13233EA8240F7ED100FBD612 /* model.cpp */; };
 		132BA32C23F9D4AB00DF94F0 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 132BA31D23F9D4AA00DF94F0 /* texture.cpp */; };
@@ -36,6 +41,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		130437F524143546009B331E /* transform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = transform.cpp; path = learn_open_gl/transform.cpp; sourceTree = "<group>"; };
+		130437F624143546009B331E /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utility.cpp; path = learn_open_gl/utility.cpp; sourceTree = "<group>"; };
+		130437F724143546009B331E /* model_renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = model_renderer.cpp; path = learn_open_gl/model_renderer.cpp; sourceTree = "<group>"; };
+		130437F824143546009B331E /* component.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = component.h; path = learn_open_gl/component.h; sourceTree = "<group>"; };
+		130437F924143546009B331E /* transform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transform.h; path = learn_open_gl/transform.h; sourceTree = "<group>"; };
+		130437FA24143546009B331E /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utility.h; path = learn_open_gl/utility.h; sourceTree = "<group>"; };
+		130437FB24143547009B331E /* mst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mst.h; path = learn_open_gl/mst.h; sourceTree = "<group>"; };
+		130437FC24143547009B331E /* component.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = component.cpp; path = learn_open_gl/component.cpp; sourceTree = "<group>"; };
+		130437FD24143547009B331E /* model_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = model_renderer.h; path = learn_open_gl/model_renderer.h; sourceTree = "<group>"; };
+		130437FE24143547009B331E /* mst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mst.cpp; path = learn_open_gl/mst.cpp; sourceTree = "<group>"; };
 		130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../graphics_project_include_lib/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		13233EA7240F7ED100FBD612 /* model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = model.h; path = learn_open_gl/model.h; sourceTree = "<group>"; };
 		13233EA8240F7ED100FBD612 /* model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = model.cpp; path = learn_open_gl/model.cpp; sourceTree = "<group>"; };
@@ -90,6 +105,16 @@
 		13F0927823F9D452001D4461 = {
 			isa = PBXGroup;
 			children = (
+				130437FC24143547009B331E /* component.cpp */,
+				130437F824143546009B331E /* component.h */,
+				130437F724143546009B331E /* model_renderer.cpp */,
+				130437FD24143547009B331E /* model_renderer.h */,
+				130437FE24143547009B331E /* mst.cpp */,
+				130437FB24143547009B331E /* mst.h */,
+				130437F524143546009B331E /* transform.cpp */,
+				130437F924143546009B331E /* transform.h */,
+				130437F624143546009B331E /* utility.cpp */,
+				130437FA24143546009B331E /* utility.h */,
 				13233EA8240F7ED100FBD612 /* model.cpp */,
 				13233EA7240F7ED100FBD612 /* model.h */,
 				13A5F6D1240F2D220069913A /* vertex.cpp */,
@@ -182,7 +207,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				132BA33023F9D4AB00DF94F0 /* shader.cpp in Sources */,
+				1304380224143547009B331E /* component.cpp in Sources */,
 				132BA32F23F9D4AB00DF94F0 /* game_object.cpp in Sources */,
+				1304380324143547009B331E /* mst.cpp in Sources */,
+				1304380124143547009B331E /* model_renderer.cpp in Sources */,
 				132BA33823F9D5CD00DF94F0 /* main.cpp in Sources */,
 				132BA33123F9D4AB00DF94F0 /* mesh.cpp in Sources */,
 				132BA32E23F9D4AB00DF94F0 /* stb_image.cpp in Sources */,
@@ -191,8 +219,10 @@
 				132BA32D23F9D4AB00DF94F0 /* material.cpp in Sources */,
 				132BA32C23F9D4AB00DF94F0 /* texture.cpp in Sources */,
 				13A5F6D3240F2D220069913A /* vertex.cpp in Sources */,
+				1304380024143547009B331E /* utility.cpp in Sources */,
 				132BA33223F9D4AB00DF94F0 /* glad.c in Sources */,
 				13233EA9240F7ED100FBD612 /* model.cpp in Sources */,
+				130437FF24143547009B331E /* transform.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +343,7 @@
 		13F0928923F9D452001D4461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/BenPinzone/Documents/graphics_project_include_lib/**";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Documents/graphics_project_include_lib/lib;
@@ -324,6 +355,7 @@
 		13F0928A23F9D452001D4461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/BenPinzone/Documents/graphics_project_include_lib/**";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = /Users/BenPinzone/Documents/graphics_project_include_lib/lib;

@@ -1,5 +1,7 @@
 #include "game_object.h"
 #include "shader_globals.h"
+#include "component.h"
+#include "model_renderer.h"
 
 #include <glfw3.h>
 #include <glm.hpp>
@@ -8,41 +10,60 @@
 #include <cmath>
 #include <functional>
 
-Gameobject::Gameobject(
-        const glm::mat4& transform_model_in, Model model_in, double radius_in, double speed_in)
-    : model{model_in}, radius{radius_in}, speed{speed_in}, degrees{0} {
+using std::shared_ptr;
 
-    set_transform_model(transform_model_in);
+Gameobject::Gameobject()
+    : Gameobject(glm::mat4(1)){
 }
 
-void Gameobject::draw() {
-
-    Shader_globals::get_instance().set_model(transform_model);
-    Shader_globals::get_instance().set_normal(normal);
-
-    model.draw();
+Gameobject::Gameobject(const glm::mat4& transform_in)
+    : transform{transform_in} {
 }
 
-void Gameobject::update(float delta_time) {
-
-    double angular_speed = speed / radius;
-    degrees += angular_speed * delta_time;
-
-    set_transform_model(glm::translate(
-        glm::mat4(1),
-        glm::vec3(
-            cos(degrees) * radius,
-            sin(degrees) * radius,
-            0
-        )
-    ));
+Transform& Gameobject::get_transform(){
+    return transform;
 }
 
-void Gameobject::set_transform_model(const glm::mat4 transform_model_in) {
-    transform_model = transform_model_in;
-    normal = glm::mat3(glm::transpose(glm::inverse(transform_model)));
+void Gameobject::add_component(shared_ptr<Component> new_component){
+    new_component->set_game_object(shared_from_this());
+    if(std::dynamic_pointer_cast<Model_renderer>(new_component)){
+        render_component = new_component;
+    }
+    else{
+        components.push_back(new_component);
+    }
 }
 
-glm::vec3 Gameobject::get_position(){
-    return transform_model[3].xyz;
+void Gameobject::start(){
+    for(auto& comp : components){
+        comp->start();
+    }
+    if(render_component){
+        (*render_component)->start();
+    }
 }
+
+void Gameobject::update(){
+    for(auto& comp : components){
+        comp->update();
+    }
+    if(render_component){
+        (*render_component)->update();
+    }
+}
+
+// void Gameobject::update(float delta_time) {
+
+//     // double angular_speed = speed / radius;
+//     // degrees += angular_speed * delta_time;
+
+//     // set_transform_model(glm::translate(
+//     //     glm::mat4(1),
+//     //     glm::vec3(
+//     //         cos(degrees) * radius,
+//     //         sin(degrees) * radius,
+//     //         0
+//     //     )
+//     // ));
+// }
+

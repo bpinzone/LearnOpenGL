@@ -5,55 +5,44 @@
 
 using std::vector;
 using std::string;
+using std::shared_ptr;
+using std::make_shared;
 
 Material::Material(
-        Shader shader_in,
-        const std::vector<Texture>& textures_in)
+        shared_ptr<Shader> shader_in,
+        const Textures_t& textures_in)
     : shader{shader_in}, textures{textures_in} {
-    assign_textures_to_units();
 }
 
 Material::Material(
-        Shader shader_in,
+        shared_ptr<Shader> shader_in,
         aiMaterial* mat,
-        const std::string& model_dir,
-        std::vector<Texture>& loaded_textures)
+        const std::string& model_dir)
     : shader{shader_in} {
 
-    load_textures(mat, model_dir, loaded_textures);
-    assign_textures_to_units();
+    load_textures(mat, model_dir);
 }
 
-void Material::use() const {
-
-    shader.use();
-
-    int texture_unit = 0;
-    for(const auto& texture : textures){
-        // Populate (numbered) texture units with desired textures.
-        // Activate unit, then bind the texture to it. Repeat.
-
-        // Normally arg is "GL_TEXTUREi"
-        glActiveTexture(GL_TEXTURE0 + texture_unit);
-        glBindTexture(GL_TEXTURE_2D, texture.texture_id);
-        ++texture_unit;
-    }
-
-    // After activating a texture unit, a subsequent glBindTexture call will bind that texture to the currently active texture unit. Texture unit GL_TEXTURE0 is always by default activated, so we didn't have to activate any texture units in the previous example when using glBindTexture.
+void Material::use() {
+    shader->use();
+    assign_texture_unit_uniforms();
+    // Would push other uniform data into shader here...
+    bind_textures_to_units();
 }
 
-void Material::assign_textures_to_units() {
+// Set the shader's uniform variables to the correct texture unit number.
+void Material::assign_texture_unit_uniforms() {
 
-    glUseProgram(shader.program_id);
+    glUseProgram(shader->program_id);
 
     // Sampler names are diffuse1, diffuse2..., specular1, specular2...
     // Map sampler names to texture units.
     int diffuse_seen = 0;
     int specular_seen = 0;
     int next_tex_unit_to_assign = 0;
-    for(const auto& texture : textures){
+    for(const auto& texture_sp : textures){
         string uni_sampler_name{"material."};
-        switch(texture.type){
+        switch(texture_sp->type){
             case Texture::Type::DIFFUSE:
                 ++diffuse_seen;
                 uni_sampler_name += "diffuse" + std::to_string(diffuse_seen);
@@ -63,26 +52,35 @@ void Material::assign_textures_to_units() {
                 uni_sampler_name += "specular" + std::to_string(specular_seen);
                 break;
         }
-        shader.set_int(uni_sampler_name, next_tex_unit_to_assign);
+        shader->set_int(uni_sampler_name, next_tex_unit_to_assign);
         ++next_tex_unit_to_assign;
     }
 }
 
-void Material::load_textures(
-        aiMaterial* mat,
-        const std::string& model_dir,
-        std::vector<Texture>& loaded_textures){
+// Put our textures into the appropriate texture unit.
+void Material::bind_textures_to_units(){
+    int texture_unit = 0;
+    for(const auto& texture : textures){
+        // Populate (numbered) texture units with desired textures.
+        // Activate unit, then bind the texture to it. Repeat.
+        glActiveTexture(GL_TEXTURE0 + texture_unit);
+        glBindTexture(GL_TEXTURE_2D, texture->texture_id);
+        ++texture_unit;
+    }
 
-    load_textures_of_type(mat, Texture::Type::DIFFUSE, model_dir, loaded_textures);
-    load_textures_of_type(mat, Texture::Type::SPECULAR, model_dir, loaded_textures);
+    // After activating a texture unit, a subsequent glBindTexture call will bind that texture to the currently active texture unit. Texture unit GL_TEXTURE0 is always by default activated, so we didn't have to activate any texture units in the previous example when using glBindTexture.
+}
+
+void Material::load_textures(aiMaterial* mat, const std::string& model_dir){
+    load_textures_of_type(mat, Texture::Type::DIFFUSE, model_dir);
+    load_textures_of_type(mat, Texture::Type::SPECULAR, model_dir);
 }
 
 // Requires: model_dir has trailing "/"
 void Material::load_textures_of_type(
         aiMaterial* mat,
         Texture::Type type,
-        const std::string& model_dir,
-        std::vector<Texture>& loaded_textures) {
+        const std::string& model_dir){
 
     aiTextureType ai_type;
     switch(type){
@@ -105,17 +103,15 @@ void Material::load_textures_of_type(
         mat->GetTexture(ai_type, i, &ai_path);
         string texture_path = model_dir + string(ai_path.C_Str());
 
-        bool skip = false;
-        for(const auto& loaded_texture : loaded_textures){
-            if(loaded_texture.path == texture_path){
-                textures.push_back(loaded_texture);
-                skip = true;
-                break;
-            }
+        auto tex_it = Texture::loaded_textures.find(texture_path);
+        if(tex_it != Texture::loaded_textures.end()){
+            // We already loaded this.
+            textures.push_back(*tex_it);
         }
-        if(!skip){
-            Texture texture{texture_path, type};
-            loaded_textures.push_back(texture);
+        else{
+            // Load it now.
+            shared_ptr<Texture> texture = make_shared<Texture>(texture_path, type);
+            Texture::loaded_textures.insert(texture);
             textures.push_back(texture);
         }
     }

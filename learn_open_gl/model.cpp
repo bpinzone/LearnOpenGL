@@ -8,12 +8,14 @@
 
 using std::string;
 using std::vector;
+using std::shared_ptr;
+using std::make_shared;
 
-Model::Model(vector<Mesh> meshes_in)
+Model::Model(const Meshes_t& meshes_in)
     : meshes{meshes_in}{
 }
 
-Model::Model(Shader shader, const string& model_path) {
+Model::Model(shared_ptr<Shader> shader, const string& model_path) {
 
     directory = model_path.substr(0, model_path.find_last_of('/')) + "/";
 
@@ -36,17 +38,15 @@ Model::Model(Shader shader, const string& model_path) {
 
 void Model::draw(){
     for(auto& mesh : meshes){
-        mesh.draw();
+        mesh->draw();
     }
 }
 
-void Model::load_meshes(aiNode* node, const aiScene* scene, Shader shader) {
+void Model::load_meshes(aiNode* node, const aiScene* scene, shared_ptr<Shader> shader) {
 
     for(unsigned int i = 0; i < node->mNumMeshes; ++i){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(
-            Mesh{shader, mesh, scene, directory, textures_loaded}
-        );
+        meshes.push_back(make_shared<Mesh>(shader, mesh, scene, directory));
     }
 
     for(unsigned int i = 0; i < node->mNumChildren; ++i){

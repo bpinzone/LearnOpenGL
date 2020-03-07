@@ -9,6 +9,7 @@
 #include <assimp/scene.h>
 
 #include <vector>
+#include <memory>
 
 // A single drawable object.
 // Has it's structural data and a material.
@@ -18,25 +19,26 @@ public:
     //  Mesh Data
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    Material material;
+    std::shared_ptr<Material> material;
 
     Mesh(
-        const std::vector<Vertex> vertices_in,
-        const std::vector<unsigned int> indices_in,
-        Material material_in
+        const std::vector<Vertex>& vertices_in,
+        const std::vector<unsigned int>& indices_in,
+        std::shared_ptr<Material> material_in
     );
 
     Mesh(
-        Shader shader,
+        std::shared_ptr<Shader> shader,
         aiMesh* mesh, const aiScene* scene,
-        const std::string& model_dir,
-        std::vector<Texture>& loaded_textures
+        const std::string& model_dir
     );
 
-    void set_material(Material material_in){
+   void set_material(std::shared_ptr<Material> material_in){
         material = material_in;
     }
 
+    // Calls use on the material.
+    // Draws elements using our vao generated from vertex data.
     void draw();
 
     // TODO dtor, sometime:
@@ -47,9 +49,9 @@ public:
 private:
 
     void load_vertex_data(aiMesh* mesh, const aiScene* scene);
-    Material load_material(
-        Shader shader, aiMesh* mesh, const aiScene* scene,
-        const std::string& model_dir, std::vector<Texture>& loaded_textures
+    std::shared_ptr<Material> load_material(
+        std::shared_ptr<Shader> shader,
+        aiMesh* mesh, const aiScene* scene, const std::string& model_dir
     );
 
     unsigned int vao, vbo, ebo;

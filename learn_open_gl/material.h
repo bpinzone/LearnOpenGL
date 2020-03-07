@@ -9,42 +9,60 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 
-// A shader and textures.
+/*
+Consists of two things generally.
+(1) A shader
+(2) All the uniform data the material is responsible for loading into the shader.
+    Texture data
+    Other uniforms
+
+A material can have however many textures you want, but it should match the shader used.
+This material will decide on an arbitrary texture slot mapping and keep it consistent.
+*/
 class Material {
 public:
 
-    // Constructor philosophy:
-    // Give me what I need directly,
-    // or a way to manually generate everything.
+    using Textures_t = std::vector<std::shared_ptr<Texture>>;
 
     Material(
-        Shader shader_in,
-        const std::vector<Texture>& textures_in
+        std::shared_ptr<Shader> shader_in,
+        const Textures_t& textures_in
     );
 
     Material(
-        Shader shader_in,
+        std::shared_ptr<Shader> shader_in,
         aiMaterial* mat,
-        const std::string& model_dir,
-        std::vector<Texture>& loaded_textures
+        const std::string& model_dir
     );
 
-    void use() const;
+    /*
+    Calls use on the shader.
+    Binds our textures to the appropriate texture units.
+    Puts any uniform data we are responsible for into the shader.
+        INCLUDES texture unit assignments! Other materials may have different unit orders for names!
+    */
+    void use();
 
-    Shader shader;
+    std::shared_ptr<Shader> shader;
+
+    // Class may be extended later.
+    virtual ~Material() = default;
 
 private:
 
-    void assign_textures_to_units();
+    void assign_texture_unit_uniforms();
 
-    void load_textures(aiMaterial* mat, const std::string& model_dir, std::vector<Texture>& loaded_textures);
+    void bind_textures_to_units();
 
-    void load_textures_of_type(aiMaterial* mat, Texture::Type type, const std::string& model_dir, std::vector<Texture>& loaded_textures);
+    void load_textures(aiMaterial* mat, const std::string& model_dir);
+
+    void load_textures_of_type(aiMaterial* mat, Texture::Type type, const std::string& model_dir);
 
     // Idx = Tex unit it will be mapped to.
-    std::vector<Texture> textures;
+    Textures_t textures;
 };
 
 #endif

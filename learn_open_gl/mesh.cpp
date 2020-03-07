@@ -9,32 +9,32 @@
 using std::move;
 using std::string;
 using std::vector;
+using std::shared_ptr;
+using std::make_shared;
 
 Mesh::Mesh(
-        const std::vector<Vertex> vertices_in,
-        const std::vector<unsigned int> indices_in,
-        Material material_in)
+        const std::vector<Vertex>& vertices_in,
+        const std::vector<unsigned int>& indices_in,
+        shared_ptr<Material> material_in)
     : vertices{vertices_in}, indices{indices_in}, material{material_in}{
 
     setup_vao();
 }
 
 Mesh::Mesh(
-        Shader shader,
+        shared_ptr<Shader> shader,
         aiMesh* mesh, const aiScene* scene,
-        const std::string& model_dir,
-        std::vector<Texture>& loaded_textures)
-        : material {load_material(shader, mesh, scene, model_dir, loaded_textures)} {
+        const string& model_dir) {
 
+    material = load_material(shader, mesh, scene, model_dir);
     load_vertex_data(mesh, scene);
     setup_vao();
 }
 
 void Mesh::draw() {
 
-    material.use();
+    material->use();
     glBindVertexArray(vao);
-
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
@@ -77,21 +77,19 @@ void Mesh::load_vertex_data(aiMesh* mesh, const aiScene* scene){
     }
 }
 
-Material Mesh::load_material(
-        Shader shader, aiMesh* mesh, const aiScene* scene,
-        const string& model_dir, vector<Texture>& loaded_textures){
+shared_ptr<Material> Mesh::load_material(
+        shared_ptr<Shader> shader,
+        aiMesh* mesh, const aiScene* scene, const string& model_dir){
 
     // Mesh only contains an index to a single material object.
     // Of course, one material may have multiple textures.
     if(mesh->mMaterialIndex >= 0){
 
         aiMaterial* ai_material = scene->mMaterials[mesh->mMaterialIndex];
-        return Material(shader, ai_material, model_dir, loaded_textures);
+        return make_shared<Material>(shader, ai_material, model_dir);
     }
-    else{
-        return Material(shader, {});
-    }
-
+    // This can't deduce {} as the second param?
+    return make_shared<Material>(shader, Material::Textures_t());
 }
 
 void Mesh::setup_vao(){
@@ -127,7 +125,6 @@ void Mesh::setup_vao(){
     // Position attribute.
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, position)));
-    // NOTE TODO: These are now flipped.
     // Normal attribute.
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
