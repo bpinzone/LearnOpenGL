@@ -51,19 +51,3 @@ void Gameobject::update(){
         (*render_component)->update();
     }
 }
-
-// void Gameobject::update(float delta_time) {
-
-//     // double angular_speed = speed / radius;
-//     // degrees += angular_speed * delta_time;
-
-//     // set_transform_model(glm::translate(
-//     //     glm::mat4(1),
-//     //     glm::vec3(
-//     //         cos(degrees) * radius,
-//     //         sin(degrees) * radius,
-//     //         0
-//     //     )
-//     // ));
-// }
-

@@ -12,8 +12,10 @@
 #include "shader_globals.h"
 #include "model.h"
 #include "utility.h"
-#include "model_renderer.h"
+
 #include "component.h"
+#include "circular_path.h"
+#include "model_renderer.h"
 
 #include <iostream>
 #include <vector>
@@ -100,6 +102,10 @@ int main() {
     for(int i = 0; i < num_spheres; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>(glm::translate(glm::mat4(1), glm::vec3{2*i, 0, 0}));
         new_object->add_component(make_shared<Model_renderer>(sphere_model));
+        new_object->add_component(make_shared<Circular_path>(
+            glm::vec3(0, 0, 0),
+            0, static_cast<double>(2 * i), 5
+        ));
         sphere_objects.push_back(new_object);
     }
 
@@ -116,6 +122,10 @@ int main() {
     directional_shader->set_vec3("dir_light.specular", white_light);
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
     directional_shader->set_float("material.shininess", 32.0f);
+
+    for(auto& go : sphere_objects){
+        go->start();
+    }
 
     // render loop
     // -----------

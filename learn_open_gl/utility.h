@@ -18,6 +18,7 @@ public:
         last_frame_start_time = current_frame_start_time;
     }
 
+    // In seconds
     double get_delta_time() const {
         return delta_time;
     }
