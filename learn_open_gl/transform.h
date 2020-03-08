@@ -21,9 +21,9 @@ public:
 
     void load_into_shader_global();
 
-private:
-
     void set_transform(const glm::mat4& transform_in);
+
+private:
 
     glm::mat4 transform;
     glm::mat3 normal;

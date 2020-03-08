@@ -25,6 +25,7 @@ Model::Model(shared_ptr<Shader> shader, const string& model_path) {
     const aiScene* scene = importer.ReadFile(
         model_path,
         aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals
+        // aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals
     );
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){

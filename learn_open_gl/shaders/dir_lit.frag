@@ -45,6 +45,12 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
 void main() {
 
     vec3 norm = normalize(Normal);
+
+    // Normal debugging
+    FragColor = vec4(norm * 0.5 + 0.5, 1);
+    FragColor = vec4(WorldPos * 0.01 + 0.5, 1);
+    return;
+
     vec3 frag_to_camera_n = normalize(camera_pos - WorldPos);
 
     vec3 result = calc_dir_light(dir_light, norm, frag_to_camera_n);

@@ -16,6 +16,8 @@
 #include "component.h"
 #include "circular_path.h"
 #include "model_renderer.h"
+#include "connector.h"
+#include "mst.h"
 
 #include <iostream>
 #include <vector>
@@ -83,31 +85,57 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
-    // === SPHERES ===
+    // Textures
     shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE);
+    shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE);
     shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR);
 
+    // Shaders
     shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
 
+    // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
         directional_shader,
         Material::Textures_t{ blue_diffuse, gray_specular }
     );
+    shared_ptr<Material> red_material = make_shared<Material>(
+        directional_shader,
+        Material::Textures_t{ red_diffuse, gray_specular }
+    );
 
+    // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
 
+    shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
+    cube_model->set_materials(red_material);
+
+    // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
-    int num_spheres = 10;
+    int num_spheres = 150;
     for(int i = 0; i < num_spheres; ++i){
-        shared_ptr<Gameobject> new_object = make_shared<Gameobject>(glm::translate(glm::mat4(1), glm::vec3{2*i, 0, 0}));
+        shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
         new_object->add_component(make_shared<Model_renderer>(sphere_model));
         new_object->add_component(make_shared<Circular_path>(
             glm::vec3(0, 0, 0),
-            0, static_cast<double>(2 * i), 5
+            0, static_cast<double>((i + 2)), 50
         ));
         sphere_objects.push_back(new_object);
     }
+
+    // Cube objects
+    vector<shared_ptr<Gameobject>> cube_objects;
+    for(int i = 0; i < num_spheres - 1; ++i){
+        shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
+        new_object->add_component(make_shared<Model_renderer>(cube_model));
+        new_object->add_component(make_shared<Connector>(
+            sphere_objects[i], sphere_objects[i + 1]
+        ));
+        cube_objects.push_back(new_object);
+    }
+
+    // MST Coordinator
+    MST_coordinator mst_c{sphere_objects, cube_objects};
 
     // === Lighting constants ===
 
@@ -124,6 +152,10 @@ int main() {
     directional_shader->set_float("material.shininess", 32.0f);
 
     for(auto& go : sphere_objects){
+        go->start();
+    }
+    mst_c.coordinate();
+    for(auto& go : cube_objects){
         go->start();
     }
 
@@ -146,12 +178,16 @@ int main() {
         Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
             static_cast<float>(window_width) / window_height, 0.1f,
-            100.0f
+            400.0f
         ));
 
         directional_shader->set_vec3("camera_pos", camera.get_position());
 
         for(auto& go : sphere_objects){
+            go->update();
+        }
+        mst_c.coordinate();
+        for(auto& go : cube_objects){
             go->update();
         }
 

@@ -39,7 +39,7 @@ void Gameobject::start(){
         comp->start();
     }
     if(render_component){
-        (*render_component)->start();
+        render_component->start();
     }
 }
 
@@ -48,6 +48,6 @@ void Gameobject::update(){
         comp->update();
     }
     if(render_component){
-        (*render_component)->update();
+        render_component->update();
     }
 }
