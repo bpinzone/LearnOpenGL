@@ -12,12 +12,7 @@
 
 using std::shared_ptr;
 
-Gameobject::Gameobject()
-    : Gameobject(glm::mat4(1)){
-}
-
-Gameobject::Gameobject(const glm::mat4& transform_in)
-    : transform{transform_in} {
+Gameobject::Gameobject(){
 }
 
 Transform& Gameobject::get_transform(){

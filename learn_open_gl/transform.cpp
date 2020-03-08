@@ -3,30 +3,45 @@
 
 #include "shader_globals.h"
 
-Transform::Transform(){
-    set_transform(glm::mat4(1.0));
-}
+Transform::Transform()
+    : translation{glm::mat4(1.0)}, rotation{glm::mat4(1.0)},
+    scale{glm::mat4(1.0)} {
 
-Transform::Transform(const glm::mat4& transform_in) {
-    set_transform(transform_in);
+    recalculate_transform();
 }
 
 void Transform::translate(const glm::vec3& differential){
-    set_transform(glm::translate(transform, differential));
+
+    translation = glm::translate(
+        translation, differential
+    );
+    recalculate_transform();
 }
 
-// TODO: Don't overwrite rotation.
 void Transform::set_position(const glm::vec3& position){
-    set_transform(glm::translate(glm::mat4(1.0), position));
+    translation = glm::mat4(1.0);
+    translate(position);
 }
 
 glm::vec3 Transform::get_position() {
-    return glm::vec3(transform[3]);
+    return glm::vec3(translation[3]);
 }
 
-void Transform::rotate(float angle, const glm::vec3& axis){
-   set_transform(glm::rotate(transform, angle, axis));
+void Transform::set_translation(const glm::mat4 translation_in){
+    translation = translation_in;
+    recalculate_transform();
 }
+
+void Transform::set_rotation(const glm::mat4 rotation_in){
+    rotation = rotation_in;
+    recalculate_transform();
+}
+
+void Transform::set_scale(const glm::mat4 scale_in){
+    scale = scale_in;
+    recalculate_transform();
+}
+
 
 void Transform::load_into_shader_global() {
 
@@ -34,7 +49,7 @@ void Transform::load_into_shader_global() {
     Shader_globals::get_instance().set_normal(normal);
 }
 
-void Transform::set_transform(const glm::mat4& transform_in) {
-    transform = transform_in;
+void Transform::recalculate_transform(){
+    transform = translation * rotation * scale;
     normal = glm::mat3(glm::transpose(glm::inverse(transform)));
 }

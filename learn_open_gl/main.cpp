@@ -118,7 +118,7 @@ int main() {
         new_object->add_component(make_shared<Model_renderer>(sphere_model));
         new_object->add_component(make_shared<Circular_path>(
             glm::vec3(0, 0, 0),
-            0, static_cast<double>((i + 2)), 50
+            0, static_cast<double>((i + 2)), 25
         ));
         sphere_objects.push_back(new_object);
     }
@@ -145,8 +145,8 @@ int main() {
     // Really, makes the dir_shader the active program, and populates the uniforms.
     // The uniforms belong to the shader program.
     // So if you switch to another shader and back, you DON'T need to populate uniforms again if they haven't changed.
-    directional_shader->set_vec3("dir_light.ambient",  white_light * 0.5f * 0.2f);
-    directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.5f); // darken diffuse light a bit
+    directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.2f);
+    directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
     directional_shader->set_vec3("dir_light.specular", white_light);
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
     directional_shader->set_float("material.shininess", 32.0f);

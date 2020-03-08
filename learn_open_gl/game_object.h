@@ -14,7 +14,6 @@ class Gameobject : public std::enable_shared_from_this<Gameobject> {
 public:
 
     Gameobject();
-    Gameobject(const glm::mat4& transform_in);
 
     Transform& get_transform();
 

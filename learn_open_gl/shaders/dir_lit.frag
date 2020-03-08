@@ -46,10 +46,10 @@ void main() {
 
     vec3 norm = normalize(Normal);
 
-    // Normal debugging
-    FragColor = vec4(norm * 0.5 + 0.5, 1);
-    FragColor = vec4(WorldPos * 0.01 + 0.5, 1);
-    return;
+    // // Normal debugging
+    // FragColor = vec4(norm * 0.5 + 0.5, 1);
+    // FragColor = vec4(WorldPos * 0.01 + 0.5, 1);
+    // return;
 
     vec3 frag_to_camera_n = normalize(camera_pos - WorldPos);
 
