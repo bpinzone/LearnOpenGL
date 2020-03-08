@@ -112,13 +112,13 @@ int main() {
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
-    int num_spheres = 150;
+    int num_spheres = 250;
     for(int i = 0; i < num_spheres; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
         new_object->add_component(make_shared<Model_renderer>(sphere_model));
         new_object->add_component(make_shared<Circular_path>(
-            glm::vec3(0, 0, 0),
-            0, static_cast<double>((i + 2)), 25
+            glm::vec3(0, 0, pow(-1, i % 2) * i),
+            0, static_cast<double>((i + 1)) * 0.5, 25
         ));
         sphere_objects.push_back(new_object);
     }
@@ -145,7 +145,7 @@ int main() {
     // Really, makes the dir_shader the active program, and populates the uniforms.
     // The uniforms belong to the shader program.
     // So if you switch to another shader and back, you DON'T need to populate uniforms again if they haven't changed.
-    directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.2f);
+    directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
     directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
     directional_shader->set_vec3("dir_light.specular", white_light);
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
@@ -178,7 +178,7 @@ int main() {
         Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
             static_cast<float>(window_width) / window_height, 0.1f,
-            400.0f
+            800.0f
         ));
 
         directional_shader->set_vec3("camera_pos", camera.get_position());

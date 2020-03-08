@@ -42,19 +42,21 @@ void MST_coordinator::coordinate(){
         locations[sphere_i] = spheres[sphere_i]->get_transform().get_position();
     }
 
-
     // Find MST edges
     insertions[0].completed = true;
     update_neighbors(0);
     for(size_t spheres_added = 1; spheres_added < spheres.size(); ++spheres_added){
 
-        const auto& min_it = min_element(insertions.begin(), insertions.end(), [](auto& i1, auto& i2){
+        const auto& min_it = min_element(
+            insertions.begin(), insertions.end(),
+            [](auto& i1, auto& i2){
 
-            if(i1.completed != i2.completed){
-                return !i1.completed;
+                if(i1.completed != i2.completed){
+                    return !i1.completed;
+                }
+                return i1.cost < i2.cost;
             }
-            return i1.cost < i2.cost;
-        });
+        );
 
         size_t min_idx = distance(insertions.begin(), min_it);
         edges[spheres_added - 1].first = min_idx;
@@ -90,5 +92,5 @@ double calc_sq_distance(const glm::vec3& v1, const glm::vec3& v2){
     float x_diff = v1.x - v2.x;
     float y_diff = v1.y - v2.y;
     float z_diff = v1.z - v2.z;
-    return (x_diff * x_diff) + (y_diff * y_diff) + (z_diff + z_diff);
+    return (x_diff * x_diff) + (y_diff * y_diff) + (z_diff * z_diff);
 }

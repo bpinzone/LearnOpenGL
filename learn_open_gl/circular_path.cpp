@@ -28,6 +28,6 @@ void Circular_path::update(){
     double degrees_differential = Time::get_instance().get_delta_time() * angular_speed;
     degrees += degrees_differential;
     game_object->get_transform().set_position(glm::vec3(
-        cos(degrees) * radius, sin(degrees) * radius, 0
+        cos(degrees) * radius, sin(degrees) * radius, center.z
     ));
 }
