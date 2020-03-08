@@ -116,9 +116,13 @@ int main() {
     for(int i = 0; i < num_spheres; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
         new_object->add_component(make_shared<Model_renderer>(sphere_model));
+
+        glm::vec3 start_pos = glm::vec3{0, 0, pow(-1, i % 2) * i};
+        double start_degs = 0;
+        double radius = (i + 1) * 0.5;
+        double speed = 0.005 * pow(i, 2);
         new_object->add_component(make_shared<Circular_path>(
-            glm::vec3(0, 0, pow(-1, i % 2) * i),
-            0, static_cast<double>((i + 1)) * 0.5, 25
+            start_pos, start_degs, radius, speed
         ));
         sphere_objects.push_back(new_object);
     }
@@ -174,11 +178,13 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        static const float near_clip = 10.0f;
+        static const float far_clip = 800.0f;
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
         Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
-            static_cast<float>(window_width) / window_height, 0.1f,
-            800.0f
+            static_cast<float>(window_width) / window_height,
+            near_clip, far_clip
         ));
 
         directional_shader->set_vec3("camera_pos", camera.get_position());
