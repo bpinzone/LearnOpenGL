@@ -19,6 +19,7 @@ public:
     //  Mesh Data
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+
     std::shared_ptr<Material> material;
 
     Mesh(

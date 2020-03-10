@@ -1,4 +1,3 @@
-I'm not doing physics, so screw using meshes for that purpose!
 Construction philosophy:
     Give me everything I need directly.
     or

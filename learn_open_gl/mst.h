@@ -36,6 +36,7 @@ private:
     Game_objects_t& spheres;
     std::vector<std::shared_ptr<Connector>> connectors;
 
+    // Scratch data
     std::vector<Insertion> insertions;
     std::vector<glm::vec3> locations;
     std::vector<std::pair<size_t, size_t>> edges;

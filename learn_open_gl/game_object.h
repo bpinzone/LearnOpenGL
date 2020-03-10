@@ -17,7 +17,6 @@ public:
 
     Transform& get_transform();
 
-    // TODO: Sets new_component's game_object to be this.
     void add_component(std::shared_ptr<Component> new_component);
 
     template<typename T>
