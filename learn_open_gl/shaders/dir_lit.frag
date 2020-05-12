@@ -1,5 +1,7 @@
 #version 330 core
 
+// The screen space coordinates relate directly to the viewport defined by OpenGL's glViewport function and can be accessed via GLSL's built-in gl_FragCoord variable in the fragment shader
+
 in vec3 Normal;
 in vec3 WorldPos;
 in vec2 TexCoords;
@@ -42,7 +44,29 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     return ambient + diffuse + specular;
 }
 
+// LinearizeDepth(gl_FragCoord.z) / far, gives number in [0, 1]
+float LinearizeDepth(float depth) {
+    /*
+    We can however, transform the non-linear depth values of the fragment back to its linear sibling
+    float ndc = depth * 2.0 - 1.0;  // normalized device coordinate element of [-1, 1]
+    float linearDepth = (2.0 * near * far) / (far + near - ndc * (far - near));
+    Returning depth values between near and far.
+    */
+
+    float z = depth * 2.0 - 1.0; // back to NDC
+    // dummy values
+    float near = 999;
+    float far = 999;
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
 void main() {
+
+    // gl_FragCoord.z is a depth value. Just like this, it is NON linear wrt the frustum.
+    // To linearize it, see the function above.
+    // FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
+    // FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z) / 800.0), 1.0);
+    // return;
 
     vec3 norm = normalize(Normal);
 

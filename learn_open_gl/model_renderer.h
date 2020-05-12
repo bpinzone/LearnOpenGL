@@ -15,7 +15,7 @@ public:
 
     void update() override;
 
-private:
+protected:
 
     std::shared_ptr<Model> model;
 };

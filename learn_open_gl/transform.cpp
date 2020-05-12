@@ -42,6 +42,17 @@ void Transform::set_scale(const glm::mat4 scale_in){
     recalculate_transform();
 }
 
+void Transform::set_scale(const glm::vec3 scale_in){
+    scale = glm::scale(glm::mat4(1.0), scale_in);
+    recalculate_transform();
+}
+
+glm::vec3 Transform::get_scale() const {
+    return glm::vec3(
+        scale[0][0], scale[1][1], scale[2][2]
+    );
+}
+
 
 void Transform::load_into_shader_global() {
 

@@ -23,6 +23,13 @@ public:
 
     Model(std::shared_ptr<Shader> shader, const std::string& model_path);
 
+    std::shared_ptr<Material> get_material() const {
+        if(meshes.empty()){
+            return nullptr;
+        }
+        return meshes.front()->material;
+    }
+
     void set_materials(std::shared_ptr<Material> material){
         for(auto& mesh : meshes){
             mesh->set_material(material);

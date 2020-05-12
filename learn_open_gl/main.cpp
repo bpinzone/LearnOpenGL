@@ -16,6 +16,7 @@
 #include "component.h"
 #include "circular_path.h"
 #include "model_renderer.h"
+#include "outline_model_renderer.h"
 #include "connector.h"
 #include "mst.h"
 
@@ -79,8 +80,25 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
+    // === Stencil test ===
+    // Default: On, Writable, always passes.
+    glEnable(GL_STENCIL_TEST);
+    // mask is and'd with the stencil value of fragment.
+    glStencilMask(0xFF); // each bit is written to the stencil buffer as is
+    // glStencilMask(0x00); // each bit ends up as 0 in the stencil buffer (disabling writes)
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+
+    // === Depth test ===
     glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it too. See the call to glClear() below.
 
+    // OpenGL allows us to disable writing to the depth buffer by setting its depth mask to GL_FALSE:
+    // glDepthMask(GL_FALSE);
+
+    //  We can set the comparison operator (or depth function) by calling glDepthFunc:
+    // glDepthFunc(GL_LESS);  //default
+    // glDepthFunc(GL_ALWAYS);
+
+    // === Polygon drawing ===
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
@@ -92,15 +110,17 @@ int main() {
 
     // Shaders
     shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
+    shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
-        directional_shader,
-        Material::Textures_t{ blue_diffuse, gray_specular }
+        directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
     );
     shared_ptr<Material> red_material = make_shared<Material>(
-        directional_shader,
-        Material::Textures_t{ red_diffuse, gray_specular }
+        directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
+    );
+    shared_ptr<Material> color_material = make_shared<Material>(
+        color_shader, Material::Textures_t{}
     );
 
     // Models
@@ -115,7 +135,7 @@ int main() {
     int num_spheres = 250;
     for(int i = 0; i < num_spheres; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
-        new_object->add_component(make_shared<Model_renderer>(sphere_model));
+        new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
 
         glm::vec3 start_pos = glm::vec3{0, 0, pow(-1, i % 2) * i};
         double start_degs = 0;
@@ -176,7 +196,7 @@ int main() {
         // render
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         static const float near_clip = 10.0f;
         static const float far_clip = 800.0f;
