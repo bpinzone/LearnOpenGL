@@ -21,6 +21,8 @@ public:
 
     // This class is NOT responsible for managing this. (Would require shared_from_this in ctor.)
     // Although, our ctor will assert that a texture that is about to constructed is not already here.
+    // NOTE: Could make a static factory function, and manage this ourselves. Then client would call
+    // factory instead of Ctor, which we could make private.
     static std::set<std::shared_ptr<Texture>, Texture_comp> loaded_textures;
 
 
