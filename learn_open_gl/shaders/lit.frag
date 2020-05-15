@@ -72,6 +72,7 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     vec3 light_ref = normalize(reflect(dir_light.direction, normal_n));
     float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
 
+    // todo: again, stop casting for vector 3 if you want transparency.
     vec3 ambient  = dir_light.ambient  *        vec3(texture(material.diffuse1, TexCoords));
     vec3 diffuse  = dir_light.diffuse  * diff * vec3(texture(material.diffuse1, TexCoords));
     vec3 specular = dir_light.specular * spec * vec3(texture(material.specular1, TexCoords));
@@ -95,6 +96,7 @@ vec3 calc_point_light(Point_light point_light, vec3 normal_n, vec3 frag_to_camer
         point_light.linear * distance +
         point_light.quadratic * (distance * distance)
     );
+    // todo: again, stop casting to vector 3 if you want transparency.
     vec3 ambient  = point_light.ambient  *        vec3(texture(material.diffuse1, TexCoords));
     vec3 diffuse  = point_light.diffuse  * diff * vec3(texture(material.diffuse1, TexCoords));
     vec3 specular = point_light.specular * spec * vec3(texture(material.specular1, TexCoords));
@@ -124,6 +126,7 @@ vec3 calc_spot_light(Spot_light spot_light, vec3 normal_n, vec3 frag_to_camera_n
     // into the inner ring.
     float intensity = clamp((spot_alignment - spot_light.outer_cutoff) / epsilon, 0.0, 1.0);
 
+    // todo: again, stop casting to vector 3 if you want transparency.
     vec3 ambient  = spot_light.ambient  *                    vec3(texture(material.diffuse1, TexCoords));
     vec3 diffuse  = spot_light.diffuse  * diff * intensity * vec3(texture(material.diffuse1, TexCoords));
     vec3 specular = spot_light.specular * spec * intensity * vec3(texture(material.specular1, TexCoords));
@@ -154,6 +157,7 @@ void main() {
     FragColor = vec4(result, 1.0);
 
     // emission
+    // todo: again, stop casting to vector 3 if you want transparency.
     // vec3 specular_pixel = vec3(texture(material.specular1, TexCoords));
     // float specular_distance = specular_pixel.x - 0.5f;
     // specular_distance *= -1;

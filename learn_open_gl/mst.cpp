@@ -33,6 +33,14 @@ MST_coordinator::MST_coordinator(
     edges.resize(spheres.size() - 1);
 }
 
+void MST_coordinator::start() {
+    coordinate();
+}
+
+void MST_coordinator::update() {
+    coordinate();
+}
+
 void MST_coordinator::coordinate(){
 
     // Reset scratch data.

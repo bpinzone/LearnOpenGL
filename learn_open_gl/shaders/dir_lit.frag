@@ -38,6 +38,12 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     vec3 light_ref = normalize(reflect(dir_light.direction, normal_n));
     float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
 
+    // todo: don't cast to vec3 if you want transparency.
+    /*
+    example, this vs this
+    // FragColor = vec4(vec3(texture(texture1, TexCoords)), 1.0);
+    // FragColor = texture(texture1, TexCoords);
+    */
     vec3 ambient  = dir_light.ambient  *        vec3(texture(material.diffuse1, TexCoords));
     vec3 diffuse  = dir_light.diffuse  * diff * vec3(texture(material.diffuse1, TexCoords));
     vec3 specular = dir_light.specular * spec * vec3(texture(material.specular1, TexCoords));

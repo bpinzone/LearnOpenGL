@@ -10,7 +10,7 @@
 #include <vector>
 #include <memory>
 
-class MST_coordinator {
+class MST_coordinator : public Component {
 public:
 
     using Game_objects_t =
@@ -20,6 +20,9 @@ public:
         Game_objects_t& spheres_in,
         Game_objects_t& cubes_in
     );
+
+    void start() override;
+    void update() override;
 
     // Calculate the MST and make assignments for the
     // cubes' Connector components.

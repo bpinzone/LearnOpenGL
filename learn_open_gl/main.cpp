@@ -24,12 +24,16 @@
 #include <vector>
 #include <cmath>
 #include <memory>
+#include <algorithm>
+#include <iterator>
 
 using std::vector;
 using std::cout; using std::endl;
 using std::sin;
 using std::shared_ptr;
 using std::make_shared;
+using std::copy;
+using std::back_inserter;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
@@ -158,8 +162,15 @@ int main() {
         cube_objects.push_back(new_object);
     }
 
-    // MST Coordinator
-    MST_coordinator mst_c{sphere_objects, cube_objects};
+    // Coordinator object
+    shared_ptr<Gameobject> coordinator_object = make_shared<Gameobject>();
+    coordinator_object->add_component(make_shared<MST_coordinator>(sphere_objects, cube_objects));
+
+    // All objects. Put them in container in order you want them updated/started.
+    vector<shared_ptr<Gameobject>> game_objects;
+    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(game_objects));
+    game_objects.push_back(coordinator_object);
+    copy(cube_objects.begin(), cube_objects.end(), back_inserter(game_objects));
 
     // === Lighting constants ===
 
@@ -175,11 +186,7 @@ int main() {
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
     directional_shader->set_float("material.shininess", 32.0f);
 
-    for(auto& go : sphere_objects){
-        go->start();
-    }
-    mst_c.coordinate();
-    for(auto& go : cube_objects){
+    for(auto& go : game_objects){
         go->start();
     }
 
@@ -209,11 +216,7 @@ int main() {
 
         directional_shader->set_vec3("camera_pos", camera.get_position());
 
-        for(auto& go : sphere_objects){
-            go->update();
-        }
-        mst_c.coordinate();
-        for(auto& go : cube_objects){
+        for(auto& go : game_objects){
             go->update();
         }
 
