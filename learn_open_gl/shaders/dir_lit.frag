@@ -68,6 +68,10 @@ float LinearizeDepth(float depth) {
 
 void main() {
 
+    // Visualize UV
+    // FragColor = vec4(TexCoords.x, TexCoords.y, 0, 1);
+    // return;
+
     // gl_FragCoord.z is a depth value. Just like this, it is NON linear wrt the frustum.
     // To linearize it, see the function above.
     // FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
@@ -84,6 +88,12 @@ void main() {
     vec3 frag_to_camera_n = normalize(camera_pos - WorldPos);
 
     vec3 result = calc_dir_light(dir_light, norm, frag_to_camera_n);
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, texture(material.diffuse1, TexCoords).a);
+
+    // How to discard. (Before learned blending)
+    // if(FragColor.a < 0.1){
+    //     discard;
+    // }
+
     return;
 }

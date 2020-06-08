@@ -60,6 +60,12 @@ int main() {
 
     // glfw window creation
     // --------------------
+    /*
+    This line is causing:
+        2020-06-08 14:29:23.998296-0400 learn_open_gl[1722:19555] Metal API Validation Enabled
+        2020-06-08 14:29:24.034033-0400 learn_open_gl[1722:19857] flock failed to lock maps file: errno = 35
+        2020-06-08 14:29:24.034781-0400 learn_open_gl[1722:19857] flock failed to lock maps file: errno = 35
+    */
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "LearnOpenGL", nullptr, nullptr);
     if (!window) {
         cout << "Failed to create GLFW window" << endl;
@@ -83,6 +89,11 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+
+    // Enable blending
+    // The glBlendFunc(GLenum sfactor, GLenum dfactor) function expects two parameters ...
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // === Stencil test ===
     // Default: On, Writable, always passes.
@@ -112,6 +123,10 @@ int main() {
     shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE);
     shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR);
 
+    shared_ptr<Texture> grass_diffuse = make_shared<Texture>("./textures/grass.png", Texture::Type::DIFFUSE);
+    shared_ptr<Texture> window_diffuse = make_shared<Texture>("./textures/window.png", Texture::Type::DIFFUSE);
+    shared_ptr<Texture> black_specular = make_shared<Texture>("./textures/black.png", Texture::Type::SPECULAR);
+
     // Shaders
     shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
     shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
@@ -127,12 +142,26 @@ int main() {
         color_shader, Material::Textures_t{}
     );
 
+    shared_ptr<Material> grass_material = make_shared<Material>(
+        directional_shader, Material::Textures_t{grass_diffuse, black_specular}
+    );
+
+    shared_ptr<Material> window_material = make_shared<Material>(
+        directional_shader, Material::Textures_t{window_diffuse, black_specular}
+    );
+
     // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
 
     shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
     cube_model->set_materials(red_material);
+
+    shared_ptr<Model> grass_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
+    grass_model->set_materials(grass_material);
+
+    shared_ptr<Model> window_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
+    window_model->set_materials(window_material);
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
@@ -166,11 +195,51 @@ int main() {
     shared_ptr<Gameobject> coordinator_object = make_shared<Gameobject>();
     coordinator_object->add_component(make_shared<MST_coordinator>(sphere_objects, cube_objects));
 
-    // All objects. Put them in container in order you want them updated/started.
-    vector<shared_ptr<Gameobject>> game_objects;
-    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(game_objects));
-    game_objects.push_back(coordinator_object);
-    copy(cube_objects.begin(), cube_objects.end(), back_inserter(game_objects));
+    // Grass
+    shared_ptr<Gameobject> grass_object = make_shared<Gameobject>();
+    grass_object->add_component(make_shared<Model_renderer>(grass_model));
+    grass_object->get_transform().set_scale(glm::vec3(4, 4, 4));
+    // NOTE: documentation is wrong? It takes radians.
+    grass_object->get_transform().set_rotation(glm::rotate(
+        glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
+    ));
+
+    // Windows
+    vector<glm::vec3> window_positions{
+        {-15.0f,  0.0f, -5.0f}, { 15.0f,  0.0f,  51.0f},
+        { 0.0f,  0.0f,  7.0f}, {-3.0f,  0.0f, -23.0f}, { 5.0f,  0.0f, -6.0f}
+    };
+    vector<shared_ptr<Gameobject>> window_objects;
+    for(const auto& pos : window_positions){
+        shared_ptr<Gameobject> window_object = make_shared<Gameobject>();
+        window_object->add_component(make_shared<Model_renderer>(window_model));
+        window_object->get_transform().set_scale(glm::vec3(4, 4, 4));
+        // NOTE: documentation is wrong? It takes radians.
+        window_object->get_transform().set_rotation(glm::rotate(
+            glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
+        ));
+        window_object->get_transform().set_position(pos);
+        window_objects.push_back(window_object);
+    }
+
+    // Extremely simple blending
+    // Less = Rendered First = Farthur away.
+    static const auto blend_sorter = [](shared_ptr<Gameobject> go1, shared_ptr<Gameobject> go2){
+        float go1_distance = glm::distance(go1->get_transform().get_position(), camera.get_position());
+        float go2_distance = glm::distance(go2->get_transform().get_position(), camera.get_position());
+        return go1_distance > go2_distance;
+    };
+
+    // Opaque objects
+    vector<shared_ptr<Gameobject>> opaque_objects;
+    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
+    opaque_objects.push_back(coordinator_object);
+    copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
+
+    // transparent objects
+    vector<shared_ptr<Gameobject>> transparent_objects;
+    transparent_objects.push_back(grass_object);
+    copy(window_objects.begin(), window_objects.end(), back_inserter(transparent_objects));
 
     // === Lighting constants ===
 
@@ -186,7 +255,11 @@ int main() {
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
     directional_shader->set_float("material.shininess", 32.0f);
 
-    for(auto& go : game_objects){
+    sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
+    for(auto& go : opaque_objects){
+        go->start();
+    }
+    for(auto& go : transparent_objects){
         go->start();
     }
 
@@ -205,7 +278,7 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        static const float near_clip = 10.0f;
+        static const float near_clip = 3.0f;
         static const float far_clip = 800.0f;
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
         Shader_globals::get_instance().set_projection(glm::perspective(
@@ -216,7 +289,11 @@ int main() {
 
         directional_shader->set_vec3("camera_pos", camera.get_position());
 
-        for(auto& go : game_objects){
+        sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
+        for(auto& go : opaque_objects){
+            go->update();
+        }
+        for(auto& go : transparent_objects){
             go->update();
         }
 

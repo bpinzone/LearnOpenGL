@@ -19,6 +19,7 @@ public:
     void set_position(const glm::vec3& position);
 
     // Rotation
+    // todo: stupid, these should be references.
     void set_rotation(const glm::mat4 rotation_in);
 
     // Scale
