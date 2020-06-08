@@ -90,6 +90,14 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
+    // Face Culling
+    // potential problem: My vertex data in correct CCW winding order?
+    glEnable(GL_CULL_FACE);
+    // Define front as CCW.
+    glFrontFace(GL_CCW);
+    // DO not render back faces.
+    glCullFace(GL_BACK);
+
     // Enable blending
     // The glBlendFunc(GLenum sfactor, GLenum dfactor) function expects two parameters ...
     glEnable(GL_BLEND);
