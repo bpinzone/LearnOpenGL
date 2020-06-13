@@ -81,3 +81,7 @@ Texture::Texture(const std::string& path_in, Type type_in)
     // free data given by stbi_load
     stbi_image_free(data);
 }
+
+Texture::Texture(unsigned int completed_texture_id, Type type_in)
+    : texture_id{completed_texture_id}, type{type_in} {
+}

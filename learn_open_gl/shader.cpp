@@ -68,8 +68,9 @@ void Shader::forward_shader_globals_to_uniforms() const {
 void Shader::set_bool(const string& name, bool value) const {
 
     // NOTE Example on why you call use first:
-    // glUniform<> sets the uniform on the currently active shader program.
-    // The uniform location does NOT specify a shader program.
+    // glUniform<> gets the uniform on the currently active shader program.
+    // You need to make it the active program first.
+    // The program_id passed is only used for the uni location.
     use();
     glUniform1i(glGetUniformLocation(program_id, name.c_str()), static_cast<int>(value));
 }

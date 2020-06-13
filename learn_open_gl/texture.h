@@ -27,6 +27,7 @@ public:
 
 
     Texture(const std::string& path_in, Type type_in);
+    Texture(unsigned int completed_texture_id, Type type_in);
 
     unsigned int texture_id;
 

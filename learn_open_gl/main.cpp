@@ -34,6 +34,7 @@ using std::shared_ptr;
 using std::make_shared;
 using std::copy;
 using std::back_inserter;
+using std::transform;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
@@ -126,6 +127,42 @@ int main() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
 
+
+    // === Render to a texture ===
+    unsigned int framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    // generate texture (color attachment)
+    unsigned int texColorBuffer;
+    glGenTextures(1, &texColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // allocate.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    // attach it to currently bound framebuffer object
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+
+    // generate render buffer attachment for depth and stencil test.
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window_width, window_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    // attach it to the currently bound frame buffer object
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    // Make sure frameBuffer is complete
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+    }
+    // unbind the frame buffer we just made.
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
+
     // Textures
     shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE);
     shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE);
@@ -135,9 +172,12 @@ int main() {
     shared_ptr<Texture> window_diffuse = make_shared<Texture>("./textures/window.png", Texture::Type::DIFFUSE);
     shared_ptr<Texture> black_specular = make_shared<Texture>("./textures/black.png", Texture::Type::SPECULAR);
 
+    shared_ptr<Texture> portal_texture = make_shared<Texture>(texColorBuffer, Texture::Type::DIFFUSE);
+
     // Shaders
     shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
     shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
+    shared_ptr<Shader> portal_shader = make_shared<Shader>("./shaders/from_texture.vert", "./shaders/from_texture.frag");
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
@@ -158,6 +198,10 @@ int main() {
         directional_shader, Material::Textures_t{window_diffuse, black_specular}
     );
 
+    shared_ptr<Material> portal_material = make_shared<Material>(
+        portal_shader, Material::Textures_t{portal_texture}
+    );
+
     // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
@@ -170,6 +214,9 @@ int main() {
 
     shared_ptr<Model> window_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
     window_model->set_materials(window_material);
+
+    shared_ptr<Model> portal_model = make_shared<Model>(portal_shader, "./primitive_models/quad.obj");
+    portal_model->set_materials(portal_material);
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
@@ -218,17 +265,19 @@ int main() {
         { 0.0f,  0.0f,  7.0f}, {-3.0f,  0.0f, -23.0f}, { 5.0f,  0.0f, -6.0f}
     };
     vector<shared_ptr<Gameobject>> window_objects;
-    for(const auto& pos : window_positions){
-        shared_ptr<Gameobject> window_object = make_shared<Gameobject>();
-        window_object->add_component(make_shared<Model_renderer>(window_model));
-        window_object->get_transform().set_scale(glm::vec3(4, 4, 4));
-        // NOTE: documentation is wrong? It takes radians.
-        window_object->get_transform().set_rotation(glm::rotate(
-            glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
-        ));
-        window_object->get_transform().set_position(pos);
-        window_objects.push_back(window_object);
-    }
+    transform(window_positions.begin(), window_positions.end(), back_inserter(window_objects),
+        [&window_model](const auto& pos){
+
+            shared_ptr<Gameobject> window_object = make_shared<Gameobject>();
+            window_object->add_component(make_shared<Model_renderer>(window_model));
+            window_object->get_transform().set_scale(glm::vec3(4, 4, 4));
+            // NOTE: documentation is wrong? It takes radians.
+            window_object->get_transform().set_rotation(glm::rotate(
+                glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
+            ));
+            window_object->get_transform().set_position(pos);
+            return window_object;
+    });
 
     // Extremely simple blending
     // Less = Rendered First = Farthur away.
@@ -237,6 +286,15 @@ int main() {
         float go2_distance = glm::distance(go2->get_transform().get_position(), camera.get_position());
         return go1_distance > go2_distance;
     };
+
+    // quad object (scene will be drawn onto this object.)
+    shared_ptr<Gameobject> portal_object = make_shared<Gameobject>();
+    portal_object->add_component(make_shared<Model_renderer>(portal_model));
+    portal_object->get_transform().set_scale(glm::vec3(40, 40, 40));
+    portal_object->get_transform().set_rotation(
+        glm::rotate(glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0))
+    );
+    portal_object->get_transform().set_position(glm::vec3(0, 0, -10));
 
     // Opaque objects
     vector<shared_ptr<Gameobject>> opaque_objects;
@@ -264,12 +322,15 @@ int main() {
     directional_shader->set_float("material.shininess", 32.0f);
 
     sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
+
     for(auto& go : opaque_objects){
         go->start();
     }
     for(auto& go : transparent_objects){
         go->start();
     }
+
+    portal_object->start();
 
     // render loop
     // -----------
@@ -283,9 +344,6 @@ int main() {
 
         // render
         // ------
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
         static const float near_clip = 3.0f;
         static const float far_clip = 800.0f;
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
@@ -294,9 +352,15 @@ int main() {
             static_cast<float>(window_width) / window_height,
             near_clip, far_clip
         ));
-
         directional_shader->set_vec3("camera_pos", camera.get_position());
+        portal_shader->set_vec3("camera_pos", camera.get_position());
 
+        // Render to framebuffer with texture.
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // Draw
         sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
         for(auto& go : opaque_objects){
             go->update();
@@ -304,6 +368,13 @@ int main() {
         for(auto& go : transparent_objects){
             go->update();
         }
+
+        // Render to window using quad textured with last render buffer texture.
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
+        portal_object->update();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
