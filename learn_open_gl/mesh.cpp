@@ -5,12 +5,14 @@
 
 #include <string>
 #include <utility>
+#include <algorithm>
 
 using std::move;
 using std::string;
 using std::vector;
 using std::shared_ptr;
 using std::make_shared;
+using std::reverse;
 
 Mesh::Mesh(
         const std::vector<Vertex>& vertices_in,
@@ -37,6 +39,17 @@ void Mesh::draw() {
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void Mesh::reverse_winding_order(){
+    reverse(indices.begin(), indices.end());
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        // indices.size() * sizeof(unsigned int),
+        indices.size() * sizeof(decltype(indices)::value_type),
+        indices.data(), GL_STATIC_DRAW
+    );
 }
 
 void Mesh::load_vertex_data(aiMesh* mesh, const aiScene* scene){
@@ -115,7 +128,8 @@ void Mesh::setup_vao(){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        indices.size() * sizeof(unsigned int),
+        indices.size() * sizeof(decltype(indices)::value_type),
+        // indices.size() * sizeof(unsigned int),
         indices.data(), GL_STATIC_DRAW
     );
 

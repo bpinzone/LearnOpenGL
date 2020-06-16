@@ -26,6 +26,7 @@
 #include <memory>
 #include <algorithm>
 #include <iterator>
+#include <string>
 
 using std::vector;
 using std::cout; using std::endl;
@@ -35,6 +36,7 @@ using std::make_shared;
 using std::copy;
 using std::back_inserter;
 using std::transform;
+using std::string;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
@@ -114,6 +116,8 @@ int main() {
 
     // === Depth test ===
     glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it too. See the call to glClear() below.
+    // For skybox testing. Because depth values start at 1, I think.
+    glDepthFunc(GL_LEQUAL);
 
     // OpenGL allows us to disable writing to the depth buffer by setting its depth mask to GL_FALSE:
     // glDepthMask(GL_FALSE);
@@ -162,7 +166,6 @@ int main() {
 
 
 
-
     // Textures
     shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE);
     shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE);
@@ -174,10 +177,19 @@ int main() {
 
     shared_ptr<Texture> portal_texture = make_shared<Texture>(texColorBuffer, Texture::Type::DIFFUSE);
 
+    shared_ptr<Texture> skybox_texture = make_shared<Texture>(
+        vector<string>{
+            "./textures/skybox/right.jpg", "./textures/skybox/left.jpg", "./textures/skybox/top.jpg",
+            "./textures/skybox/bottom.jpg", "./textures/skybox/back.jpg", "./textures/skybox/front.jpg"
+        },
+        Texture::Type::CUBE
+    );
+
     // Shaders
     shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
     shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
     shared_ptr<Shader> portal_shader = make_shared<Shader>("./shaders/from_texture.vert", "./shaders/from_texture.frag");
+    shared_ptr<Shader> skybox_shader = make_shared<Shader>("./shaders/skybox.vert", "./shaders/skybox.frag");
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
@@ -202,6 +214,10 @@ int main() {
         portal_shader, Material::Textures_t{portal_texture}
     );
 
+    shared_ptr<Material> skybox_material = make_shared<Material>(
+        skybox_shader, Material::Textures_t{skybox_texture}
+    );
+
     // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
@@ -217,6 +233,12 @@ int main() {
 
     shared_ptr<Model> portal_model = make_shared<Model>(portal_shader, "./primitive_models/quad.obj");
     portal_model->set_materials(portal_material);
+
+    shared_ptr<Model> skybox_model = make_shared<Model>(skybox_shader, "./primitive_models/cube.obj");
+    skybox_model->set_materials(skybox_material);
+    // Cull the outside, instead of the inside.
+    // NOTE: Also, switched front and back images of skybox as a result of this too.
+    skybox_model->reverse_all_mesh_winding_orders();
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
@@ -254,10 +276,14 @@ int main() {
     shared_ptr<Gameobject> grass_object = make_shared<Gameobject>();
     grass_object->add_component(make_shared<Model_renderer>(grass_model));
     grass_object->get_transform().set_scale(glm::vec3(4, 4, 4));
-    // NOTE: documentation is wrong? It takes radians.
+    // NOTE: Looking at wrong documentation? It takes radians.
     grass_object->get_transform().set_rotation(glm::rotate(
         glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
     ));
+
+    // skybox
+    shared_ptr<Gameobject> skybox_object = make_shared<Gameobject>();
+    skybox_object->add_component(make_shared<Model_renderer>(skybox_model));
 
     // Windows
     vector<glm::vec3> window_positions{
@@ -298,9 +324,11 @@ int main() {
 
     // Opaque objects
     vector<shared_ptr<Gameobject>> opaque_objects;
+    // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(coordinator_object);
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
+    opaque_objects.push_back(skybox_object);
 
     // transparent objects
     vector<shared_ptr<Gameobject>> transparent_objects;
@@ -354,9 +382,12 @@ int main() {
         ));
         directional_shader->set_vec3("camera_pos", camera.get_position());
         portal_shader->set_vec3("camera_pos", camera.get_position());
+        skybox_shader->set_vec3("camera_pos", camera.get_position());
 
+        // toggle comment for quad rendering
         // Render to framebuffer with texture.
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
         // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -369,12 +400,14 @@ int main() {
             go->update();
         }
 
+        // toggle block comment for quad rendering
         // Render to window using quad textured with last render buffer texture.
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-        portal_object->update();
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // glDisable(GL_DEPTH_TEST);
+        // portal_object->update();
+        // glEnable(GL_DEPTH_TEST);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

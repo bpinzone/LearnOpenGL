@@ -16,10 +16,6 @@
 class Mesh {
 public:
 
-    //  Mesh Data
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-
     std::shared_ptr<Material> material;
 
     Mesh(
@@ -42,6 +38,8 @@ public:
     // Draws elements using our vao generated from vertex data.
     void draw();
 
+    void reverse_winding_order();
+
     // TODO dtor, sometime:
     // glDeleteVertexArrays(1, &vao);
     // glDeleteBuffers(1, &vbo);
@@ -54,6 +52,10 @@ private:
         std::shared_ptr<Shader> shader,
         aiMesh* mesh, const aiScene* scene, const std::string& model_dir
     );
+
+    //  Mesh Data
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
 
     unsigned int vao, vbo, ebo;
 

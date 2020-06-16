@@ -1,3 +1,5 @@
+TODO: Proper OOP. Make members private.
+
 Construction philosophy:
     Give me everything I need directly.
     or

@@ -9,6 +9,7 @@ using std::string;
 using std::runtime_error;
 using std::set;
 using std::shared_ptr;
+using std::vector;
 
 set<shared_ptr<Texture>, Texture_comp> Texture::loaded_textures;
 
@@ -16,6 +17,9 @@ Texture::Texture(const std::string& path_in, Type type_in)
     : path{path_in}, type{type_in} {
 
     assert(loaded_textures.find(path) == loaded_textures.end());
+
+    // TODO: Poor design.
+    assert(type == Type::DIFFUSE || type == Type::SPECULAR);
 
     glGenTextures(1, &texture_id);
 
@@ -80,6 +84,37 @@ Texture::Texture(const std::string& path_in, Type type_in)
     // Bound texture object now has the data in it.
     // free data given by stbi_load
     stbi_image_free(data);
+}
+
+Texture::Texture(const vector<string> paths, Type type_in)
+    : path{"from many paths of cube"}, type{type_in} {
+
+    // TODO: Poor design
+    assert(type_in == Type::CUBE);
+
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+
+    for(GLuint i = 0; i < paths.size(); ++i) {
+        int width, height, num_color_channels;
+        unsigned char* data;
+        data = stbi_load(paths[i].c_str(), &width, &height, &num_color_channels, 0);
+        if(!data){
+            stbi_image_free(data);
+            throw std::runtime_error{"Failed to load texture: " + paths[i]};
+        }
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+        );
+        stbi_image_free(data);
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 Texture::Texture(unsigned int completed_texture_id, Type type_in)

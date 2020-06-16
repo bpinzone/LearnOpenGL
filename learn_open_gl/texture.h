@@ -15,8 +15,10 @@ struct Texture_comp;
 class Texture {
 public:
 
+    // Texture units in shaders should be NAMED: <lowercase type name>#
+    // Example: "diffuse1", "specular2"
     enum class Type {
-        DIFFUSE, SPECULAR
+        DIFFUSE, SPECULAR, CUBE
     };
 
     // This class is NOT responsible for managing this. (Would require shared_from_this in ctor.)
@@ -26,12 +28,20 @@ public:
     static std::set<std::shared_ptr<Texture>, Texture_comp> loaded_textures;
 
 
+    // Make a diffuse or specular texture. Type must be DIFFUSE or SPECULAR.
     Texture(const std::string& path_in, Type type_in);
+
+    // Make a cube map texture. Type must be CUBE.
+    // Paths must be in this open gl defined ordered:
+    // POSITIVE_X Right, NEGATIVE_X Left, POSITIVE_Y Top, NEGATIVE_Y Bottom, POSITIVE_Z Back, NEGATIVE_Z Front
+    Texture(const std::vector<std::string> paths, Type type_in);
+
     Texture(unsigned int completed_texture_id, Type type_in);
 
     unsigned int texture_id;
 
     // Relative to dir main is in. Includes the file name.
+    // empty for cube maps.
     const std::string path;
 
     // One of "diffuse", "specular"

@@ -36,6 +36,12 @@ public:
         }
     }
 
+    void reverse_all_mesh_winding_orders(){
+        for(auto& mesh : meshes){
+            mesh->reverse_winding_order();
+        }
+    }
+
     // Calls draw on every mesh in this model.
     void draw();
 

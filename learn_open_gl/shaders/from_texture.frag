@@ -31,6 +31,12 @@ void main() {
     );
 
     float kernel[c_kernel_size] = float[](
+
+        // normal
+        0, 0, 0,
+        0, 1, 0,
+        0, 0, 0
+
         // sharpen
         // -1, -1, -1,
         // -1,  9, -1,
@@ -42,9 +48,9 @@ void main() {
         // 1.0 / 16, 2.0 / 16, 1.0 / 16
 
         // edge detection
-        1, 1, 1,
-        1, -8, 1,
-        1, 1, 1
+        // 1, 1, 1,
+        // 1, -8, 1,
+        // 1, 1, 1
 
         // does this make any sense?
         // -1, -1, -1,

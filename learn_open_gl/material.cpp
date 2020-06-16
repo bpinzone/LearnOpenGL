@@ -38,6 +38,7 @@ void Material::assign_texture_unit_uniforms() {
     // Map sampler names to texture units.
     int diffuse_seen = 0;
     int specular_seen = 0;
+    int cube_seen = 0;
     int next_tex_unit_to_assign = 0;
     for(const auto& texture_sp : textures){
         string uni_sampler_name{"material."};
@@ -50,6 +51,11 @@ void Material::assign_texture_unit_uniforms() {
                 ++specular_seen;
                 uni_sampler_name += "specular" + std::to_string(specular_seen);
                 break;
+            case Texture::Type::CUBE:
+                ++cube_seen;
+                uni_sampler_name += "cube" + std::to_string(cube_seen);
+                break;
+            default: assert(false);
         }
         shader->set_int(uni_sampler_name, next_tex_unit_to_assign);
         ++next_tex_unit_to_assign;
@@ -89,7 +95,7 @@ void Material::load_textures_of_type(
         case Texture::Type::SPECULAR:
             ai_type = aiTextureType_SPECULAR;
             break;
-        default: return;
+        default: assert(false);
     }
 
     for(unsigned int i = 0; i < mat->GetTextureCount(ai_type); ++i){
