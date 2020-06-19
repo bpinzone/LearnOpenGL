@@ -115,7 +115,7 @@ void Material::load_textures_of_type(
         }
         else{
             // Load it now.
-            shared_ptr<Texture> texture = make_shared<Texture>(texture_path, type);
+            shared_ptr<Texture> texture = make_shared<Texture>(texture_path, type, true);
             Texture::loaded_textures.insert(texture);
             textures.push_back(texture);
         }

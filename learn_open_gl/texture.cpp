@@ -13,7 +13,7 @@ using std::vector;
 
 set<shared_ptr<Texture>, Texture_comp> Texture::loaded_textures;
 
-Texture::Texture(const std::string& path_in, Type type_in)
+Texture::Texture(const std::string& path_in, Type type_in, bool flip_vertically)
     : path{path_in}, type{type_in} {
 
     assert(loaded_textures.find(path) == loaded_textures.end());
@@ -23,8 +23,9 @@ Texture::Texture(const std::string& path_in, Type type_in)
 
     glGenTextures(1, &texture_id);
 
-    // Upside down image? This happens because OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis. Luckily for us, stb_image.h can flip the y-axis during image loading by adding the following statment before loading any image:
-    // stbi_set_flip_vertically_on_load(true);
+    // Upside down image? This happens because OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis. Luckily for us, stb_image.h can flip the y-axis during image loading by adding the following statement before loading any image:
+    // potential problem:
+    stbi_set_flip_vertically_on_load(flip_vertically);
 
     int width, height, num_color_channels;
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &num_color_channels, 0);
@@ -94,6 +95,10 @@ Texture::Texture(const vector<string> paths, Type type_in)
 
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+
+    // Upside down image? This happens because OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis. Luckily for us, stb_image.h can flip the y-axis during image loading by adding the following statment before loading any image:
+    // potential problem:
+    stbi_set_flip_vertically_on_load(false);
 
     for(GLuint i = 0; i < paths.size(); ++i) {
         int width, height, num_color_channels;

@@ -29,7 +29,8 @@ public:
 
 
     // Make a diffuse or specular texture. Type must be DIFFUSE or SPECULAR.
-    Texture(const std::string& path_in, Type type_in);
+    // TODO: Poor design. Switching variable
+    Texture(const std::string& path_in, Type type_in, bool flip_vertically);
 
     // Make a cube map texture. Type must be CUBE.
     // Paths must be in this open gl defined ordered:

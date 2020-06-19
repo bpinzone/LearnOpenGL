@@ -164,16 +164,15 @@ int main() {
     // unbind the frame buffer we just made.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-
     // Textures
-    shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE);
-    shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE);
-    shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR);
+    // TODO: Poor design. Bool switch on flipping vertically.
+    shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE, false);
+    shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE, false);
+    shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR, false);
 
-    shared_ptr<Texture> grass_diffuse = make_shared<Texture>("./textures/grass.png", Texture::Type::DIFFUSE);
-    shared_ptr<Texture> window_diffuse = make_shared<Texture>("./textures/window.png", Texture::Type::DIFFUSE);
-    shared_ptr<Texture> black_specular = make_shared<Texture>("./textures/black.png", Texture::Type::SPECULAR);
+    shared_ptr<Texture> grass_diffuse = make_shared<Texture>("./textures/grass.png", Texture::Type::DIFFUSE, false);
+    shared_ptr<Texture> window_diffuse = make_shared<Texture>("./textures/window.png", Texture::Type::DIFFUSE, false);
+    shared_ptr<Texture> black_specular = make_shared<Texture>("./textures/black.png", Texture::Type::SPECULAR, false);
 
     shared_ptr<Texture> portal_texture = make_shared<Texture>(texColorBuffer, Texture::Type::DIFFUSE);
 
@@ -190,6 +189,7 @@ int main() {
     shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
     shared_ptr<Shader> portal_shader = make_shared<Shader>("./shaders/from_texture.vert", "./shaders/from_texture.frag");
     shared_ptr<Shader> skybox_shader = make_shared<Shader>("./shaders/skybox.vert", "./shaders/skybox.frag");
+    shared_ptr<Shader> reflect_shader = make_shared<Shader>("./shaders/reflect.vert", "./shaders/reflect.frag");
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
@@ -218,27 +218,40 @@ int main() {
         skybox_shader, Material::Textures_t{skybox_texture}
     );
 
+    shared_ptr<Material> reflect_material = make_shared<Material>(
+        reflect_shader, Material::Textures_t{skybox_texture}
+    );
+
+
     // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
+    // TOGGLE
+    sphere_model->set_materials(reflect_material);
 
     shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
     cube_model->set_materials(red_material);
+    // TOGGLE
+    // cube_model->set_materials(reflect_material);
 
     shared_ptr<Model> grass_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
     grass_model->set_materials(grass_material);
 
     shared_ptr<Model> window_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
     window_model->set_materials(window_material);
+    // window_model->set_materials(reflect_material);
 
     shared_ptr<Model> portal_model = make_shared<Model>(portal_shader, "./primitive_models/quad.obj");
     portal_model->set_materials(portal_material);
 
     shared_ptr<Model> skybox_model = make_shared<Model>(skybox_shader, "./primitive_models/cube.obj");
     skybox_model->set_materials(skybox_material);
-    // Cull the outside, instead of the inside.
+    // Effectively cull the outside, instead of the inside.
     // NOTE: Also, switched front and back images of skybox as a result of this too.
     skybox_model->reverse_all_mesh_winding_orders();
+
+    shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
+    // TOGGLE
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
@@ -322,15 +335,21 @@ int main() {
     );
     portal_object->get_transform().set_position(glm::vec3(0, 0, -10));
 
-    // Opaque objects
+    shared_ptr<Gameobject> backpack_object = make_shared<Gameobject>();
+    backpack_object->add_component(make_shared<Model_renderer>(backpack_model));
+    backpack_object->get_transform().translate(glm::vec3(20, 0, 0));
+    backpack_object->get_transform().set_scale(glm::vec3(4, 4, 4));
+
+    // Copy all Opaque objects
     vector<shared_ptr<Gameobject>> opaque_objects;
     // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(coordinator_object);
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
+    opaque_objects.push_back(backpack_object);
     opaque_objects.push_back(skybox_object);
 
-    // transparent objects
+    // copy all transparent objects
     vector<shared_ptr<Gameobject>> transparent_objects;
     transparent_objects.push_back(grass_object);
     copy(window_objects.begin(), window_objects.end(), back_inserter(transparent_objects));
@@ -383,13 +402,13 @@ int main() {
         directional_shader->set_vec3("camera_pos", camera.get_position());
         portal_shader->set_vec3("camera_pos", camera.get_position());
         skybox_shader->set_vec3("camera_pos", camera.get_position());
+        reflect_shader->set_vec3("camera_pos", camera.get_position());
 
         // toggle comment for quad rendering
         // Render to framebuffer with texture.
         // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         // Draw
         sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
