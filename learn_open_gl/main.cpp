@@ -250,7 +250,7 @@ int main() {
     // NOTE: Also, switched front and back images of skybox as a result of this too.
     skybox_model->reverse_all_mesh_winding_orders();
 
-    shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
+    shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./nanosuit/nanosuit.obj");
     // TOGGLE
 
     // Sphere objects
@@ -337,22 +337,14 @@ int main() {
 
     shared_ptr<Gameobject> backpack_object = make_shared<Gameobject>();
     backpack_object->add_component(make_shared<Model_renderer>(backpack_model));
-    backpack_object->get_transform().translate(glm::vec3(20, 0, 0));
-    backpack_object->get_transform().set_scale(glm::vec3(4, 4, 4));
 
     // Copy all Opaque objects
     vector<shared_ptr<Gameobject>> opaque_objects;
     // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
-    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(coordinator_object);
-    copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(backpack_object);
-    opaque_objects.push_back(skybox_object);
 
     // copy all transparent objects
     vector<shared_ptr<Gameobject>> transparent_objects;
-    transparent_objects.push_back(grass_object);
-    copy(window_objects.begin(), window_objects.end(), back_inserter(transparent_objects));
 
     // === Lighting constants ===
 
