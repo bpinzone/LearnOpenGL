@@ -190,6 +190,7 @@ int main() {
     shared_ptr<Shader> portal_shader = make_shared<Shader>("./shaders/from_texture.vert", "./shaders/from_texture.frag");
     shared_ptr<Shader> skybox_shader = make_shared<Shader>("./shaders/skybox.vert", "./shaders/skybox.frag");
     shared_ptr<Shader> reflect_shader = make_shared<Shader>("./shaders/reflect.vert", "./shaders/reflect.frag");
+    shared_ptr<Shader> refract_shader = make_shared<Shader>("./shaders/refract.vert", "./shaders/refract.frag");
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
@@ -222,6 +223,10 @@ int main() {
         reflect_shader, Material::Textures_t{skybox_texture}
     );
 
+    shared_ptr<Material> refract_material = make_shared<Material>(
+        refract_shader, Material::Textures_t{skybox_texture}
+    );
+
 
     // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
@@ -251,6 +256,7 @@ int main() {
     skybox_model->reverse_all_mesh_winding_orders();
 
     shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
+    backpack_model->set_materials(refract_material);
     // TOGGLE
 
     // Sphere objects
@@ -403,6 +409,7 @@ int main() {
         portal_shader->set_vec3("camera_pos", camera.get_position());
         skybox_shader->set_vec3("camera_pos", camera.get_position());
         reflect_shader->set_vec3("camera_pos", camera.get_position());
+        refract_shader->set_vec3("camera_pos", camera.get_position());
 
         // toggle comment for quad rendering
         // Render to framebuffer with texture.
