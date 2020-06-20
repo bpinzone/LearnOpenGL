@@ -1,10 +1,18 @@
 #version 330 core
 
+/*
+More useful built in variables.
+https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+*/
+
 // The screen space coordinates relate directly to the viewport defined by OpenGL's glViewport function and can be accessed via GLSL's built-in gl_FragCoord variable in the fragment shader
 
-in vec3 Normal;
-in vec3 WorldPos;
-in vec2 TexCoords;
+in VS_OUT {
+    vec3 Normal;
+    vec3 WorldPos;
+    vec2 TexCoords;
+} fs_in;
+
 
 uniform vec3 camera_pos;
 
@@ -41,12 +49,12 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     // todo: don't cast to vec3 if you want transparency.
     /*
     example, this vs this
-    // FragColor = vec4(vec3(texture(texture1, TexCoords)), 1.0);
-    // FragColor = texture(texture1, TexCoords);
+    // FragColor = vec4(vec3(texture(texture1, fs_in.TexCoords)), 1.0);
+    // FragColor = texture(texture1, fs_in.TexCoords);
     */
-    vec3 ambient  = dir_light.ambient  *        vec3(texture(material.diffuse1, TexCoords));
-    vec3 diffuse  = dir_light.diffuse  * diff * vec3(texture(material.diffuse1, TexCoords));
-    vec3 specular = dir_light.specular * spec * vec3(texture(material.specular1, TexCoords));
+    vec3 ambient  = dir_light.ambient  *        vec3(texture(material.diffuse1, fs_in.TexCoords));
+    vec3 diffuse  = dir_light.diffuse  * diff * vec3(texture(material.diffuse1, fs_in.TexCoords));
+    vec3 specular = dir_light.specular * spec * vec3(texture(material.specular1, fs_in.TexCoords));
     return ambient + diffuse + specular;
 }
 
@@ -69,7 +77,7 @@ float LinearizeDepth(float depth) {
 void main() {
 
     // Visualize UV
-    // FragColor = vec4(TexCoords.x, TexCoords.y, 0, 1);
+    // FragColor = vec4(fs_in.TexCoords.x, fs_in.TexCoords.y, 0, 1);
     // return;
 
     // gl_FragCoord.z is a depth value. Just like this, it is NON linear wrt the frustum.
@@ -78,17 +86,17 @@ void main() {
     // FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z) / 800.0), 1.0);
     // return;
 
-    vec3 norm = normalize(Normal);
+    vec3 norm = normalize(fs_in.Normal);
 
     // // Normal debugging
     // FragColor = vec4(norm * 0.5 + 0.5, 1);
-    // FragColor = vec4(WorldPos * 0.01 + 0.5, 1);
+    // FragColor = vec4(fs_in.WorldPos * 0.01 + 0.5, 1);
     // return;
 
-    vec3 frag_to_camera_n = normalize(camera_pos - WorldPos);
+    vec3 frag_to_camera_n = normalize(camera_pos - fs_in.WorldPos);
 
     vec3 result = calc_dir_light(dir_light, norm, frag_to_camera_n);
-    FragColor = vec4(result, texture(material.diffuse1, TexCoords).a);
+    FragColor = vec4(result, texture(material.diffuse1, fs_in.TexCoords).a);
 
     // How to discard. (Before learned blending)
     // if(FragColor.a < 0.1){

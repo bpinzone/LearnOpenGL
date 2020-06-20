@@ -98,6 +98,11 @@ void Shader::set_vec3(const std::string& name, const glm::vec3& value) const{
 
 void Shader::set_mat4fv(const string& name, const glm::mat4& value) const {
 
+    // NOTE: I don't like this compared to this pattern for uniform blocks
+    /*
+        unsigned int lights_index = glGetUniformBlockIndex(shaderA.ID, "Lights");
+        glUniformBlockBinding(shaderA.ID, lights_index, 2);
+    */
     use();
     glUniformMatrix4fv(glGetUniformLocation(program_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }

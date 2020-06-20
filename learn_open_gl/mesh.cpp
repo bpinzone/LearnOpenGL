@@ -147,4 +147,14 @@ void Mesh::setup_vao(){
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tex_coord)));
 
     glBindVertexArray(0);
+
+    /*
+    More advanced buffer manipulation
+    https://learnopengl.com/Advanced-OpenGL/Advanced-Data
+
+    Manipulate buffer through a mapped pointer.
+    Write to subsections of a buffer
+    Copy buffers
+    Alternate vertex attribute configuration.
+    */
 }

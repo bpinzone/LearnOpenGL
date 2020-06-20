@@ -8,13 +8,15 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat3 normal;
 
-out vec3 Normal;
-out vec3 WorldPos;
-out vec2 TexCoords;
+out VS_OUT {
+    vec3 Normal;
+    vec3 WorldPos;
+    vec2 TexCoords;
+} vs_out;
 
 void main() {
     gl_Position = projection * view * model * vec4(aPos, 1.0);
-    Normal = normal * aNormal;
-    WorldPos = vec3(model * vec4(aPos, 1.0));
-    TexCoords = aTexCoord;
+    vs_out.Normal = normal * aNormal;
+    vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.TexCoords = aTexCoord;
 }
