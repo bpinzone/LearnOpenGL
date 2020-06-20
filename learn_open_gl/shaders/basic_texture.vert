@@ -5,6 +5,8 @@ layout (location = 2) in vec3 aNormal;
 
 out vec2 TexCoord;
 
+// potential problem: has no normal.
+// potential problem: Does not use the uniform buffer
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;

@@ -50,6 +50,9 @@ Shader::Shader(const char* vertex_path, const char* fragment_path){
 
     glDeleteShader(vertex_id);
     glDeleteShader(fragment_id);
+
+    set_constant_uniforms();
+
 }
 
 void Shader::use() const {
@@ -60,8 +63,6 @@ void Shader::use() const {
 void Shader::forward_shader_globals_to_uniforms() const {
 
     set_mat4fv("model", Shader_globals::get_instance().get_model());
-    set_mat4fv("view", Shader_globals::get_instance().get_view());
-    set_mat4fv("projection", Shader_globals::get_instance().get_projection());
     set_mat3fv("normal", Shader_globals::get_instance().get_normal());
 }
 
@@ -111,6 +112,27 @@ void Shader::set_mat3fv(const string& name, const glm::mat3& value) const {
 
     use();
     glUniformMatrix3fv(glGetUniformLocation(program_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::set_constant_uniforms(){
+
+    // For now, the only constant uniform is a uniform block binding for less-freq-changing matrices.
+
+    // matrices_uniform_block_idx is NOT the same as: static const int c_matrices_uniform_block_binding_point;
+    // c_matrices... is a binding point, which the shader instance and shader_globals both need to know.
+    // matrices_uni_idx is an idx wrt this specific shader.
+
+    // String must match declaration in: layout (std140) uniform matrices {
+    // matrices point of maintenance.
+    unsigned int matrices_uniform_block_idx = glGetUniformBlockIndex(program_id, "matrices");
+    if(matrices_uniform_block_idx != GL_INVALID_INDEX){
+        glUniformBlockBinding(
+            program_id, matrices_uniform_block_idx,
+            Shader_globals::get_instance().c_matrices_uniform_block_binding_point);
+        // set_mat4fv("view", Shader_globals::get_instance().get_view());
+        // set_mat4fv("projection", Shader_globals::get_instance().get_projection());
+    }
+
 }
 
 // Returns a string representing the entire file.

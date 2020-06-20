@@ -23,6 +23,10 @@ public:
     void set_mat3fv(const std::string& name, const glm::mat3& value) const;
 
     unsigned int program_id;
+
+private:
+
+    void set_constant_uniforms();
 };
 
 #endif

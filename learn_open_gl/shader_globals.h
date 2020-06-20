@@ -10,6 +10,10 @@ public:
 
     using mat4 = glm::mat4;
 
+    // similar idea to a texture unit number.
+    // matrices point of maintenance.
+    const int c_matrices_uniform_block_binding_point = 0;
+
     static Shader_globals& get_instance(){
         static Shader_globals sg;
         return sg;
@@ -32,15 +36,20 @@ public:
 
 private:
 
-    Shader_globals(){
-    }
+    Shader_globals();
 
     mat4 model;
+    mat4 normal;
+
+    // matrices point of maintenance.
     mat4 view;
     mat4 projection;
 
-    mat4 normal;
-
+    // view and projection matrix will be pushed into here.
+    // NOT model or normal.
+    // TODO: better name?
+    // matrices point of maintenance.
+    unsigned int matrices_ubo;
 };
 
 #endif

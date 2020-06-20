@@ -1,4 +1,6 @@
 #include <glad/glad.h>
+
+// don't include this more than once?
 #include <glfw3.h>
 
 #include <glm.hpp>
@@ -232,7 +234,7 @@ int main() {
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
     // TOGGLE
-    sphere_model->set_materials(reflect_material);
+    // sphere_model->set_materials(reflect_material);
 
     shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
     cube_model->set_materials(red_material);

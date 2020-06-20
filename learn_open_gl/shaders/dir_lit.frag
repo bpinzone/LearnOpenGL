@@ -1,8 +1,16 @@
 #version 330 core
 
 /*
+
 More useful built in variables.
 https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+
+gl_PointSize
+gl_VertexID
+gl_FragCoord
+gl_FrontFacing
+gl_FragDepth
+
 */
 
 // The screen space coordinates relate directly to the viewport defined by OpenGL's glViewport function and can be accessed via GLSL's built-in gl_FragCoord variable in the fragment shader

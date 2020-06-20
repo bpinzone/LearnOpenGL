@@ -4,9 +4,13 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 uniform mat3 normal;
+// uniform block
+// matrices point of maintenance.
+layout (std140) uniform matrices {
+    mat4 view;
+    mat4 projection;
+};
 
 out vec3 Normal;
 out vec3 WorldPos;
