@@ -17,6 +17,7 @@ struct Vertex {
 
 struct GeomTestVertex {
     glm::vec2 position;
+    glm::vec3 color;
 
     static void setup_vertex_attrib_ptrs();
 };
