@@ -14,13 +14,14 @@ using std::shared_ptr;
 using std::make_shared;
 using std::reverse;
 
+template<typename V>
 Mesh::Mesh(
-        const std::vector<Vertex>& vertices_in,
+        const std::vector<V>& vertices_in,
         const std::vector<unsigned int>& indices_in,
         shared_ptr<Material> material_in)
-    : vertices{vertices_in}, indices{indices_in}, material{material_in}{
+    : indices{indices_in}, material{material_in}{
 
-    setup_vao();
+    setup_vao(vertices_in);
 }
 
 Mesh::Mesh(
@@ -29,13 +30,15 @@ Mesh::Mesh(
         const string& model_dir) {
 
     material = load_material(shader, mesh, scene, model_dir);
-    load_vertex_data(mesh, scene);
-    setup_vao();
+    auto vertices = load_vertex_and_index_data(mesh, scene);
+
+    setup_vao(vertices);
 }
 
 void Mesh::draw() {
 
     material->use();
+    // Automatically binds the ebo, where it takes the indices from.
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -52,7 +55,9 @@ void Mesh::reverse_winding_order(){
     );
 }
 
-void Mesh::load_vertex_data(aiMesh* mesh, const aiScene* scene){
+vector<Vertex> Mesh::load_vertex_and_index_data(aiMesh* mesh, const aiScene* scene){
+
+    vector<Vertex> vertices;
 
     for(size_t vert_idx = 0; vert_idx < mesh->mNumVertices; ++vert_idx){
         Vertex vertex;
@@ -88,6 +93,8 @@ void Mesh::load_vertex_data(aiMesh* mesh, const aiScene* scene){
             indices.push_back(face.mIndices[indice_idx]);
         }
     }
+
+    return vertices;
 }
 
 shared_ptr<Material> Mesh::load_material(
@@ -101,11 +108,11 @@ shared_ptr<Material> Mesh::load_material(
         aiMaterial* ai_material = scene->mMaterials[mesh->mMaterialIndex];
         return make_shared<Material>(shader, ai_material, model_dir);
     }
-    // This can't deduce {} as the second param?
     return make_shared<Material>(shader, Material::Textures_t());
 }
 
-void Mesh::setup_vao(){
+template<typename V>
+void Mesh::setup_vao(const vector<V>& vertices){
 
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glGenVertexArrays(1, &vao);
@@ -115,7 +122,7 @@ void Mesh::setup_vao(){
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(Vertex),
+        vertices.size() * sizeof(V),
         vertices.data(), GL_STATIC_DRAW
     );
 
@@ -133,18 +140,7 @@ void Mesh::setup_vao(){
         indices.data(), GL_STATIC_DRAW
     );
 
-    // About glVertexAttribPointer:
-    // (location, number things in this attribute, type, normalize?, stride (distance between vertices), offset to get to this attribute for first vertex.)
-
-    // Position attribute.
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, position)));
-    // Normal attribute.
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
-    // Texture Coords
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tex_coord)));
+    V::setup_vertex_attrib_ptrs();
 
     glBindVertexArray(0);
 
