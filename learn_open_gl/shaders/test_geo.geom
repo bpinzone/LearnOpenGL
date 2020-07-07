@@ -23,6 +23,7 @@ void build_house(vec4 position) {
     gl_Position = position + vec4( 0.2,  0.2, 0.0, 0.0);    // 4:top-right
     EmitVertex();
 
+    fColor = vec3(1.0, 1.0, 1.0);
     gl_Position = position + vec4( 0.0,  0.4, 0.0, 0.0);    // 5:top
     EmitVertex();
 
