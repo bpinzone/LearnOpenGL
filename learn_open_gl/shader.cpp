@@ -23,18 +23,29 @@ static constexpr int c_info_log_size = 512;
 static string read_file(const char* const path);
 static void compile_shader(unsigned int shader_id, const char* path);
 
-Shader::Shader(const char* vertex_path, const char* fragment_path){
+Shader::Shader(
+        const char* vertex_path, const char* fragment_path,
+        const char* geom_path){
 
     // Compile
     unsigned int vertex_id = glCreateShader(GL_VERTEX_SHADER);
     unsigned int fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
+    unsigned int geom_id;
     compile_shader(vertex_id, vertex_path);
     compile_shader(fragment_id, fragment_path);
+
+    if(geom_path){
+        geom_id = glCreateShader(GL_GEOMETRY_SHADER);
+        compile_shader(geom_id, geom_path);
+    }
 
     // Link
     program_id = glCreateProgram();
     glAttachShader(program_id, vertex_id);
     glAttachShader(program_id, fragment_id);
+    if(geom_path){
+        glAttachShader(program_id, geom_id);
+    }
     glLinkProgram(program_id);
 
     // Check Link

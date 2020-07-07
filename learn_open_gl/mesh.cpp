@@ -40,7 +40,10 @@ void Mesh::draw() {
     material->use();
     // Automatically binds the ebo, where it takes the indices from.
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_POINTS, 0, 4);
+
     glBindVertexArray(0);
 }
 
@@ -154,3 +157,21 @@ void Mesh::setup_vao(const vector<V>& vertices){
     Alternate vertex attribute configuration.
     */
 }
+
+
+// Explicit instantiations
+
+template Mesh::Mesh(
+    const vector<Vertex>& vertices_in,
+    const vector<unsigned int>& indices_in,
+    shared_ptr<Material> material_in
+);
+
+template Mesh::Mesh(
+    const vector<GeomTestVertex>& vertices_in,
+    const vector<unsigned int>& indices_in,
+    shared_ptr<Material> material_in
+);
+
+template void Mesh::setup_vao(const std::vector<Vertex>& vertices);
+template void Mesh::setup_vao(const std::vector<GeomTestVertex>& vertices);

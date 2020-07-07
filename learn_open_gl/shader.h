@@ -10,7 +10,9 @@ class Shader {
 public:
 
     // Paths relative to main's dir.
-    Shader(const char* vertex_path, const char* fragment_path);
+    Shader(
+        const char* vertex_path, const char* fragment_path,
+        const char* geom_path = nullptr);
 
     void use() const;
     void forward_shader_globals_to_uniforms() const;

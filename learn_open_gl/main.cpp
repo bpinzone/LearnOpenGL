@@ -22,6 +22,8 @@
 #include "connector.h"
 #include "mst.h"
 
+#include "manual_meshes.h"
+
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -194,6 +196,11 @@ int main() {
     shared_ptr<Shader> reflect_shader = make_shared<Shader>("./shaders/reflect.vert", "./shaders/reflect.frag");
     shared_ptr<Shader> refract_shader = make_shared<Shader>("./shaders/refract.vert", "./shaders/refract.frag");
 
+    shared_ptr<Shader> test_geo_shader = make_shared<Shader>(
+        "./shaders/test_geo.vert",
+        "./shaders/test_geo.frag",
+        "./shaders/test_geo.geom");
+
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
         directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
@@ -229,6 +236,10 @@ int main() {
         refract_shader, Material::Textures_t{skybox_texture}
     );
 
+    shared_ptr<Material> test_geo_material = make_shared<Material>(
+        test_geo_shader, Material::Textures_t{}
+    );
+
 
     // Models
     shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
@@ -260,6 +271,13 @@ int main() {
     shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
     backpack_model->set_materials(refract_material);
     // TOGGLE
+
+    auto test_geo_mesh = make_shared<Mesh>(test_geo_vertices, test_geo_indices, test_geo_material);
+
+    shared_ptr<Model> test_geo_model = make_shared<Model>(
+        Model::Meshes_t{test_geo_mesh}
+    );
+
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
@@ -348,19 +366,34 @@ int main() {
     backpack_object->get_transform().translate(glm::vec3(20, 0, 0));
     backpack_object->get_transform().set_scale(glm::vec3(4, 4, 4));
 
+    // Geo test object
+    shared_ptr<Gameobject> test_geo_object = make_shared<Gameobject>();
+    test_geo_object->add_component(make_shared<Model_renderer>(test_geo_model));
+
+    // Put objects in game loop containers.
+
+
     // Copy all Opaque objects
     vector<shared_ptr<Gameobject>> opaque_objects;
+
+    opaque_objects.push_back(test_geo_object);
+
+    /*
     // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(coordinator_object);
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(backpack_object);
     opaque_objects.push_back(skybox_object);
+    */
 
     // copy all transparent objects
     vector<shared_ptr<Gameobject>> transparent_objects;
+    /*
     transparent_objects.push_back(grass_object);
     copy(window_objects.begin(), window_objects.end(), back_inserter(transparent_objects));
+
+    */
 
     // === Lighting constants ===
 

@@ -15,4 +15,10 @@ struct Vertex {
     static void setup_vertex_attrib_ptrs();
 };
 
+struct GeomTestVertex {
+    glm::vec2 position;
+
+    static void setup_vertex_attrib_ptrs();
+};
+
 #endif

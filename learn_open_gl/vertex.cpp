@@ -20,3 +20,11 @@ void Vertex::setup_vertex_attrib_ptrs(){
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
         reinterpret_cast<void*>(offsetof(Vertex, tex_coord)));
 }
+
+void GeomTestVertex::setup_vertex_attrib_ptrs(){
+
+    // Position attribute.
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GeomTestVertex),
+        reinterpret_cast<void*>(offsetof(GeomTestVertex, position)));
+}
