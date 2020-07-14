@@ -201,6 +201,12 @@ int main() {
         "./shaders/test_geo.frag",
         "./shaders/test_geo.geom");
 
+    shared_ptr<Shader> explode_shader = make_shared<Shader>(
+        "./shaders/dir_lit.vert",
+        "./shaders/dir_lit.frag",
+        "./shaders/explode.geom"
+    );
+
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
         directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
@@ -268,8 +274,9 @@ int main() {
     // NOTE: Also, switched front and back images of skybox as a result of this too.
     skybox_model->reverse_all_mesh_winding_orders();
 
-    shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
-    backpack_model->set_materials(refract_material);
+    // shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
+    // backpack_model->set_materials(refract_material);
+    shared_ptr<Model> backpack_model = make_shared<Model>(explode_shader, "./backpack/backpack.obj");
     // TOGGLE
 
     auto test_geo_mesh = make_shared<Mesh>(test_geo_vertices, test_geo_indices, test_geo_material);
@@ -367,8 +374,8 @@ int main() {
     backpack_object->get_transform().set_scale(glm::vec3(4, 4, 4));
 
     // Geo test object
-    shared_ptr<Gameobject> test_geo_object = make_shared<Gameobject>();
-    test_geo_object->add_component(make_shared<Model_renderer>(test_geo_model));
+    // shared_ptr<Gameobject> test_geo_object = make_shared<Gameobject>();
+    // test_geo_object->add_component(make_shared<Model_renderer>(test_geo_model));
 
     // Put objects in game loop containers.
 
@@ -376,14 +383,14 @@ int main() {
     // Copy all Opaque objects
     vector<shared_ptr<Gameobject>> opaque_objects;
 
-    opaque_objects.push_back(test_geo_object);
+    // opaque_objects.push_back(test_geo_object);
 
+    opaque_objects.push_back(backpack_object);
     /*
     // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(coordinator_object);
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(backpack_object);
     opaque_objects.push_back(skybox_object);
     */
 
@@ -408,6 +415,12 @@ int main() {
     directional_shader->set_vec3("dir_light.specular", white_light);
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
     directional_shader->set_float("material.shininess", 32.0f);
+
+    explode_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
+    explode_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
+    explode_shader->set_vec3("dir_light.specular", white_light);
+    explode_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
+    explode_shader->set_float("material.shininess", 32.0f);
 
     sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
 
@@ -441,6 +454,10 @@ int main() {
             near_clip, far_clip
         ));
         directional_shader->set_vec3("camera_pos", camera.get_position());
+
+        explode_shader->set_vec3("camera_pos", camera.get_position());
+        explode_shader->set_float("time_seconds", glfwGetTime());
+
         portal_shader->set_vec3("camera_pos", camera.get_position());
         skybox_shader->set_vec3("camera_pos", camera.get_position());
         reflect_shader->set_vec3("camera_pos", camera.get_position());

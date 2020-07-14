@@ -21,7 +21,6 @@ in VS_OUT {
     vec2 TexCoords;
 } fs_in;
 
-
 uniform vec3 camera_pos;
 
 struct Material {

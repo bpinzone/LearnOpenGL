@@ -41,8 +41,9 @@ void Mesh::draw() {
     // Automatically binds the ebo, where it takes the indices from.
     glBindVertexArray(vao);
 
-    // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_POINTS, 0, 4);
+    // Potential Problem: settings for geometry shader testing.
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    // glDrawArrays(GL_POINTS, 0, 4);
 
     glBindVertexArray(0);
 }

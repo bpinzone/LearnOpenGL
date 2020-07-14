@@ -21,6 +21,7 @@ out VS_OUT {
 } vs_out;
 
 void main() {
+    // Perspective division happens BETWEEEN the geometry and fragment shader.
     gl_Position = projection * view * model * vec4(aPos, 1.0);
     vs_out.Normal = normal * aNormal;
     vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
