@@ -19,6 +19,7 @@
 #include "circular_path.h"
 #include "model_renderer.h"
 #include "outline_model_renderer.h"
+#include "vis_normal_renderer.h"
 #include "connector.h"
 #include "mst.h"
 
@@ -274,9 +275,10 @@ int main() {
     // NOTE: Also, switched front and back images of skybox as a result of this too.
     skybox_model->reverse_all_mesh_winding_orders();
 
-    // shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
+    shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
     // backpack_model->set_materials(refract_material);
-    shared_ptr<Model> backpack_model = make_shared<Model>(explode_shader, "./backpack/backpack.obj");
+
+    // shared_ptr<Model> backpack_model = make_shared<Model>(explode_shader, "./backpack/backpack.obj");
     // TOGGLE
 
     auto test_geo_mesh = make_shared<Mesh>(test_geo_vertices, test_geo_indices, test_geo_material);
@@ -291,7 +293,8 @@ int main() {
     int num_spheres = 250;
     for(int i = 0; i < num_spheres; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
-        new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
+        // new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
+        new_object->add_component(make_shared<Vis_normal_renderer>(sphere_model));
 
         glm::vec3 start_pos = glm::vec3{0, 0, pow(-1, i % 2) * i};
         double start_degs = 0;
@@ -369,7 +372,10 @@ int main() {
     portal_object->get_transform().set_position(glm::vec3(0, 0, -10));
 
     shared_ptr<Gameobject> backpack_object = make_shared<Gameobject>();
-    backpack_object->add_component(make_shared<Model_renderer>(backpack_model));
+
+    // backpack_object->add_component(make_shared<Model_renderer>(backpack_model));
+    backpack_object->add_component(make_shared<Vis_normal_renderer>(backpack_model));
+
     backpack_object->get_transform().translate(glm::vec3(20, 0, 0));
     backpack_object->get_transform().set_scale(glm::vec3(4, 4, 4));
 
@@ -386,9 +392,9 @@ int main() {
     // opaque_objects.push_back(test_geo_object);
 
     opaque_objects.push_back(backpack_object);
+    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     /*
     // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
-    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(coordinator_object);
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(skybox_object);
