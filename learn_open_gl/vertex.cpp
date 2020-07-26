@@ -1,6 +1,6 @@
 #include "vertex.h"
 
-void Vertex::setup_vertex_attrib_ptrs(){
+int Vertex::setup_vertex_attrib_ptrs(){
 
     // About glVertexAttribPointer:
     // (location, number things in this attribute, type, normalize?, stride (distance between vertices), offset to get to this attribute for first vertex.)
@@ -23,9 +23,11 @@ void Vertex::setup_vertex_attrib_ptrs(){
     glVertexAttribPointer(idx, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
         reinterpret_cast<void*>(offsetof(Vertex, tex_coord)));
     ++idx;
+
+    return idx;
 }
 
-void GeomTestVertex::setup_vertex_attrib_ptrs(){
+int GeomTestVertex::setup_vertex_attrib_ptrs(){
 
     int idx = 0;
     // Position attribute.
@@ -38,4 +40,6 @@ void GeomTestVertex::setup_vertex_attrib_ptrs(){
     glVertexAttribPointer(idx, 3, GL_FLOAT, GL_FALSE, sizeof(GeomTestVertex),
         reinterpret_cast<void*>(offsetof(GeomTestVertex, color)));
     ++idx;
+
+    return idx;
 }

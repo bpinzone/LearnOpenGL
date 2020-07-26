@@ -43,6 +43,29 @@ void Model::draw(){
     }
 }
 
+void Model::draw_instanced(int num_instances){
+    for(auto& mesh : meshes){
+        mesh->draw_instanced(num_instances);
+    }
+}
+
+// Requires: This model only has a single mesh. Binds that mesh's vao.
+// Throws: If this model doesn't have exactly one mesh.
+void Model::bind_only_mesh_vao() const {
+    if(meshes.size() != 1){
+        throw std::runtime_error{"Model has more than one mesh."};
+    }
+    meshes.front()->bind_vao();
+}
+
+// Throws: If this model doesn't have exactly one mesh.
+int Model::get_only_mesh_next_avail_vert_attrib_idx() const {
+    if(meshes.size() != 1){
+        throw std::runtime_error{"Model has more than one mesh."};
+    }
+    return meshes.front()->get_next_available_attribute_idx();
+}
+
 void Model::load_meshes(aiNode* node, const aiScene* scene, shared_ptr<Shader> shader) {
 
     for(unsigned int i = 0; i < node->mNumMeshes; ++i){

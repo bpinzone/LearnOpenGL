@@ -7,7 +7,7 @@ Transform::Transform()
     : translation{glm::mat4(1.0)}, rotation{glm::mat4(1.0)},
     scale{glm::mat4(1.0)} {
 
-    recalculate_transform();
+    recalculate_model();
 }
 
 void Transform::translate(const glm::vec3& differential){
@@ -15,7 +15,7 @@ void Transform::translate(const glm::vec3& differential){
     translation = glm::translate(
         translation, differential
     );
-    recalculate_transform();
+    recalculate_model();
 }
 
 void Transform::set_position(const glm::vec3& position){
@@ -29,22 +29,22 @@ glm::vec3 Transform::get_position() {
 
 void Transform::set_translation(const glm::mat4 translation_in){
     translation = translation_in;
-    recalculate_transform();
+    recalculate_model();
 }
 
 void Transform::set_rotation(const glm::mat4 rotation_in){
     rotation = rotation_in;
-    recalculate_transform();
+    recalculate_model();
 }
 
 void Transform::set_scale(const glm::mat4 scale_in){
     scale = scale_in;
-    recalculate_transform();
+    recalculate_model();
 }
 
 void Transform::set_scale(const glm::vec3 scale_in){
     scale = glm::scale(glm::mat4(1.0), scale_in);
-    recalculate_transform();
+    recalculate_model();
 }
 
 glm::vec3 Transform::get_scale() const {
@@ -56,11 +56,18 @@ glm::vec3 Transform::get_scale() const {
 
 void Transform::load_into_shader_global() {
 
-    Shader_globals::get_instance().set_model(transform);
+    Shader_globals::get_instance().set_model(model);
     Shader_globals::get_instance().set_normal(normal);
 }
 
-void Transform::recalculate_transform(){
-    transform = translation * rotation * scale;
-    normal = glm::mat3(glm::transpose(glm::inverse(transform)));
+const glm::mat4& Transform::get_model() const {
+    return model;
+}
+const glm::mat3& Transform::get_normal() const {
+    return normal;
+}
+
+void Transform::recalculate_model(){
+    model = translation * rotation * scale;
+    normal = glm::mat3(glm::transpose(glm::inverse(model)));
 }

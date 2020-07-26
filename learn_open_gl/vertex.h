@@ -12,14 +12,15 @@ struct Vertex {
 
     // Assumes the proper VAO is ALREADY bound!
     // Makes calls to glEnableVertexAttribArray and glVertexAttribPointer
-    static void setup_vertex_attrib_ptrs();
+    // Returns the next available vert attrib idx.
+    static int setup_vertex_attrib_ptrs();
 };
 
 struct GeomTestVertex {
     glm::vec2 position;
     glm::vec3 color;
 
-    static void setup_vertex_attrib_ptrs();
+    static int setup_vertex_attrib_ptrs();
 };
 
 #endif

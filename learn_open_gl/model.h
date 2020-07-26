@@ -44,6 +44,14 @@ public:
 
     // Calls draw on every mesh in this model.
     void draw();
+    void draw_instanced(int num_instances);
+
+    // Requires: This model only has a single mesh. Binds that mesh's vao.
+    // Throws: If this model doesn't have exactly one mesh.
+    void bind_only_mesh_vao() const;
+
+    // Throws: If this model doesn't have exactly one mesh.
+    int get_only_mesh_next_avail_vert_attrib_idx() const;
 
 private:
 

@@ -29,15 +29,18 @@ public:
 
     void load_into_shader_global();
 
+    const glm::mat4& get_model() const;
+    const glm::mat3& get_normal() const;
+
 private:
 
-    void recalculate_transform();
+    void recalculate_model();
 
     // Fundamental
     glm::mat4 translation, rotation, scale;
 
     // Cached
-    glm::mat4 transform;
+    glm::mat4 model;
     glm::mat3 normal;
 
 };

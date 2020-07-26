@@ -20,6 +20,7 @@
 #include "model_renderer.h"
 #include "outline_model_renderer.h"
 #include "vis_normal_renderer.h"
+#include "instances_renderer.h"
 #include "connector.h"
 #include "mst.h"
 
@@ -191,6 +192,7 @@ int main() {
 
     // Shaders
     shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
+    shared_ptr<Shader> instance_directional_shader = make_shared<Shader>("./shaders/instance_dir_lit.vert", "./shaders/instance_dir_lit.frag");
     shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
     shared_ptr<Shader> portal_shader = make_shared<Shader>("./shaders/from_texture.vert", "./shaders/from_texture.frag");
     shared_ptr<Shader> skybox_shader = make_shared<Shader>("./shaders/skybox.vert", "./shaders/skybox.frag");
@@ -210,7 +212,8 @@ int main() {
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
-        directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
+        // directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
+        instance_directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
     );
     shared_ptr<Material> red_material = make_shared<Material>(
         directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
@@ -249,7 +252,8 @@ int main() {
 
 
     // Models
-    shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
+    // shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
+    shared_ptr<Model> sphere_model = make_shared<Model>(instance_directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(blue_material);
     // TOGGLE
     // sphere_model->set_materials(reflect_material);
@@ -294,7 +298,7 @@ int main() {
     for(int i = 0; i < num_spheres; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
         // new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
-        new_object->add_component(make_shared<Vis_normal_renderer>(sphere_model));
+        // new_object->add_component(make_shared<Vis_normal_renderer>(sphere_model));
 
         glm::vec3 start_pos = glm::vec3{0, 0, pow(-1, i % 2) * i};
         double start_degs = 0;
@@ -305,6 +309,8 @@ int main() {
         ));
         sphere_objects.push_back(new_object);
     }
+    shared_ptr<Gameobject> sphere_instances_object = make_shared<Gameobject>();
+    sphere_instances_object->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
 
     // Cube objects
     vector<shared_ptr<Gameobject>> cube_objects;
@@ -391,8 +397,9 @@ int main() {
 
     // opaque_objects.push_back(test_geo_object);
 
-    opaque_objects.push_back(backpack_object);
+    // opaque_objects.push_back(backpack_object);
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
+    opaque_objects.push_back(sphere_instances_object);
     /*
     // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
     opaque_objects.push_back(coordinator_object);
@@ -421,6 +428,12 @@ int main() {
     directional_shader->set_vec3("dir_light.specular", white_light);
     directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
     directional_shader->set_float("material.shininess", 32.0f);
+
+    instance_directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
+    instance_directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
+    instance_directional_shader->set_vec3("dir_light.specular", white_light);
+    instance_directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
+    instance_directional_shader->set_float("material.shininess", 32.0f);
 
     explode_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
     explode_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
@@ -460,6 +473,7 @@ int main() {
             near_clip, far_clip
         ));
         directional_shader->set_vec3("camera_pos", camera.get_position());
+        instance_directional_shader->set_vec3("camera_pos", camera.get_position());
 
         explode_shader->set_vec3("camera_pos", camera.get_position());
         explode_shader->set_float("time_seconds", glfwGetTime());

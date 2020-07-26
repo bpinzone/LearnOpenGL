@@ -48,6 +48,13 @@ void Mesh::draw() {
     glBindVertexArray(0);
 }
 
+void Mesh::draw_instanced(int num_instances) {
+
+    material->use();
+    glBindVertexArray(vao);
+    glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, num_instances);
+}
+
 void Mesh::reverse_winding_order(){
     reverse(indices.begin(), indices.end());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -57,6 +64,14 @@ void Mesh::reverse_winding_order(){
         indices.size() * sizeof(decltype(indices)::value_type),
         indices.data(), GL_STATIC_DRAW
     );
+}
+
+void Mesh::bind_vao() const {
+    glBindVertexArray(vao);
+}
+
+int Mesh::get_next_available_attribute_idx() const {
+    return next_available_attribute_idx;
 }
 
 vector<Vertex> Mesh::load_vertex_and_index_data(aiMesh* mesh, const aiScene* scene){
@@ -144,7 +159,7 @@ void Mesh::setup_vao(const vector<V>& vertices){
         indices.data(), GL_STATIC_DRAW
     );
 
-    V::setup_vertex_attrib_ptrs();
+    next_available_attribute_idx = V::setup_vertex_attrib_ptrs();
 
     glBindVertexArray(0);
 

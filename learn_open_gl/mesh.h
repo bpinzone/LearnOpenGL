@@ -47,7 +47,15 @@ public:
     // Draws elements using our vao generated from vertex data.
     void draw();
 
+    void draw_instanced(int num_instances);
+
     void reverse_winding_order();
+
+    void bind_vao() const;
+
+    // During setup_vao, some vertex attributes are assigned.
+    // Returns the first unused vertex attrib (after this first set of assignments)
+    int get_next_available_attribute_idx() const;
 
     // TODO dtor, sometime:
     // glDeleteVertexArrays(1, &vao);
@@ -71,6 +79,8 @@ private:
     std::vector<unsigned int> indices;
 
     unsigned int vao, vbo, ebo;
+
+    int next_available_attribute_idx;
 
     // Requires: This V is the same as the V in constructor call, if this is called from a templated constructor.
     template<typename V>
