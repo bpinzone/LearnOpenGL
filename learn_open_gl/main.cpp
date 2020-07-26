@@ -212,12 +212,19 @@ int main() {
 
     // Materials
     shared_ptr<Material> blue_material = make_shared<Material>(
-        // directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
+        directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
+    );
+    shared_ptr<Material> instance_blue_material = make_shared<Material>(
         instance_directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
     );
+
     shared_ptr<Material> red_material = make_shared<Material>(
         directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
     );
+    shared_ptr<Material> instance_red_material = make_shared<Material>(
+        instance_directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
+    );
+
     shared_ptr<Material> color_material = make_shared<Material>(
         color_shader, Material::Textures_t{}
     );
@@ -253,13 +260,18 @@ int main() {
 
     // Models
     // shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
+    // sphere_model->set_materials(blue_material);
+
     shared_ptr<Model> sphere_model = make_shared<Model>(instance_directional_shader, "./primitive_models/sphere.obj");
-    sphere_model->set_materials(blue_material);
+    sphere_model->set_materials(instance_blue_material);
     // TOGGLE
     // sphere_model->set_materials(reflect_material);
 
-    shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
-    cube_model->set_materials(red_material);
+    // shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
+    // cube_model->set_materials(red_material);
+
+    shared_ptr<Model> cube_model = make_shared<Model>(instance_directional_shader, "./primitive_models/cube.obj");
+    cube_model->set_materials(instance_red_material);
     // TOGGLE
     // cube_model->set_materials(reflect_material);
 
@@ -316,12 +328,14 @@ int main() {
     vector<shared_ptr<Gameobject>> cube_objects;
     for(int i = 0; i < num_spheres - 1; ++i){
         shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
-        new_object->add_component(make_shared<Model_renderer>(cube_model));
+        // new_object->add_component(make_shared<Model_renderer>(cube_model));
         new_object->add_component(make_shared<Connector>(
             sphere_objects[i], sphere_objects[i + 1]
         ));
         cube_objects.push_back(new_object);
     }
+    shared_ptr<Gameobject> cube_instances_object = make_shared<Gameobject>();
+    cube_instances_object->add_component(make_shared<Instances_renderer>(cube_model, cube_objects));
 
     // Coordinator object
     shared_ptr<Gameobject> coordinator_object = make_shared<Gameobject>();
@@ -392,20 +406,25 @@ int main() {
     // Put objects in game loop containers.
 
 
-    // Copy all Opaque objects
+    /*
+    Copy all Opaque objects
+    Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
+    Instances before their instance manager
+    */
     vector<shared_ptr<Gameobject>> opaque_objects;
 
     // opaque_objects.push_back(test_geo_object);
-
     // opaque_objects.push_back(backpack_object);
+
+    // spheres
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
     opaque_objects.push_back(sphere_instances_object);
-    /*
-    // Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
+    // coord
     opaque_objects.push_back(coordinator_object);
+    // cube
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(skybox_object);
-    */
+    opaque_objects.push_back(cube_instances_object);
+    // opaque_objects.push_back(skybox_object);
 
     // copy all transparent objects
     vector<shared_ptr<Gameobject>> transparent_objects;
