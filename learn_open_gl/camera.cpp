@@ -15,7 +15,7 @@ static constexpr float c_min_pitch = -89.0f;
 static constexpr float c_max_pitch = 89.0f;
 
 // Settings
-static constexpr float c_movement_speed = 20.0f;
+static constexpr float c_movement_speed = 200.0f;
 static constexpr float c_look_sensitivity = 0.1f;
 static constexpr glm::vec3 c_world_up{0, 1, 0};
 

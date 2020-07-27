@@ -306,20 +306,27 @@ int main() {
 
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
-    int num_spheres = 250;
-    for(int i = 0; i < num_spheres; ++i){
-        shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
-        // new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
-        // new_object->add_component(make_shared<Vis_normal_renderer>(sphere_model));
+    const int spheres_per_axis = 500;
+    const int num_axes = 3;
+    const int num_spheres = spheres_per_axis * num_axes;
+    for(int axis_x = 0; axis_x < num_axes; ++axis_x){
+        for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
+            shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
+            // new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
+            // new_object->add_component(make_shared<Vis_normal_renderer>(sphere_model));
 
-        glm::vec3 start_pos = glm::vec3{0, 0, pow(-1, i % 2) * i};
-        double start_degs = 0;
-        double radius = (i + 1) * 0.5;
-        double speed = 0.005 * pow(i, 2);
-        new_object->add_component(make_shared<Circular_path>(
-            start_pos, start_degs, radius, speed
-        ));
-        sphere_objects.push_back(new_object);
+            const float sign_mult = pow(-1, sphere_x % 2);
+
+            const float depth = sign_mult * sphere_x * 0.75;
+            double start_degs = 0;
+            double radius = (sphere_x + 1) * 0.75;
+            double speed = sign_mult * 0.0075 * pow(sphere_x, 2.0);
+            new_object->add_component(make_shared<Circular_path>(
+                depth, start_degs, radius, speed,
+                static_cast<Axis>(axis_x)
+            ));
+            sphere_objects.push_back(new_object);
+        }
     }
     shared_ptr<Gameobject> sphere_instances_object = make_shared<Gameobject>();
     sphere_instances_object->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
@@ -484,7 +491,7 @@ int main() {
         // render
         // ------
         static const float near_clip = 3.0f;
-        static const float far_clip = 800.0f;
+        static const float far_clip = 2600.0f;
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
         Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
