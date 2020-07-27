@@ -307,7 +307,7 @@ int main() {
     // Sphere objects
     vector<shared_ptr<Gameobject>> sphere_objects;
     const int spheres_per_axis = 500;
-    const int num_axes = 3;
+    const int num_axes = 2;
     const int num_spheres = spheres_per_axis * num_axes;
     for(int axis_x = 0; axis_x < num_axes; ++axis_x){
         for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){

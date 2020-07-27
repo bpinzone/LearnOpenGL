@@ -37,20 +37,22 @@ void Circular_path::update(){
 
     double degrees_differential = Time::get_instance().get_delta_time() * angular_speed;
     degrees += degrees_differential;
+    const double sign = depth > 0 ? 1 : -1;
+    const double mult = sign * radius;
     switch(axis){
         case Axis::X :
             game_object->get_transform().set_position(glm::vec3(
-                depth, cos(degrees) * radius, sin(degrees) * radius
+                depth, mult * cos(degrees), mult * sin(degrees)
             ));
             break;
         case Axis::Y :
             game_object->get_transform().set_position(glm::vec3(
-                cos(degrees) * radius, depth, sin(degrees) * radius
+                mult * cos(degrees), depth, mult * sin(degrees)
             ));
             break;
         case Axis::Z :
             game_object->get_transform().set_position(glm::vec3(
-                cos(degrees) * radius, sin(degrees) * radius, depth
+                mult * cos(degrees), mult * sin(degrees), depth
             ));
             break;
 
