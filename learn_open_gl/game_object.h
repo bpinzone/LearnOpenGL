@@ -1,10 +1,10 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
-#include "transform.h"
-#include "component.h"
+#include "components/transform.h"
+#include "components/component.h"
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 #include <vector>
 #include <optional>

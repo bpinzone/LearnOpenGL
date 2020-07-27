@@ -2,8 +2,8 @@
 
 #include "utility.h"
 
-#include <glm.hpp>
-#include <matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
 Connector::Connector(Connectee_t c1, Connectee_t c2)

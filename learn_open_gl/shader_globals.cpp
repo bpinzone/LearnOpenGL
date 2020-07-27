@@ -1,7 +1,7 @@
 #include "shader_globals.h"
 
 #include <glad/glad.h>
-#include <type_ptr.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void Shader_globals::set_model(const mat4& model_in) {
     model = model_in;

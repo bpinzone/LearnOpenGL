@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 // TODO: Why did the previous rotation stuff ever work?
 class Transform {

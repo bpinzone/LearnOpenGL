@@ -2,7 +2,7 @@
 
 #include "vertex.h"
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 #include <stdexcept>
 

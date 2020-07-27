@@ -4,7 +4,7 @@
 #include "game_object.h"
 #include "connector.h"
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 #include <utility>
 #include <vector>

@@ -1,10 +1,10 @@
 #include "game_object.h"
 #include "shader_globals.h"
-#include "component.h"
-#include "model_renderer.h"
+#include "components/component.h"
+#include "components/model_renderer.h"
 
 #include <glfw3.h>
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 #include <random>
 #include <cmath>

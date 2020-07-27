@@ -5,7 +5,7 @@
 #include "game_object.h"
 #include "model.h"
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 #include <memory>
 #include <vector>

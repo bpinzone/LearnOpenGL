@@ -1,7 +1,7 @@
 #ifndef SHADER_GLOBALS_H
 #define SHADER_GLOBALS_H
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 // Singleton for global variables provided to shader
 

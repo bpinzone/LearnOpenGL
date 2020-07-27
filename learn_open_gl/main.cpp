@@ -3,8 +3,8 @@
 // don't include this more than once?
 #include <glfw3.h>
 
-#include <glm.hpp>
-#include <matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.h"
 #include "camera.h"
@@ -15,14 +15,14 @@
 #include "model.h"
 #include "utility.h"
 
-#include "component.h"
-#include "circular_path.h"
-#include "model_renderer.h"
-#include "outline_model_renderer.h"
-#include "vis_normal_renderer.h"
-#include "instances_renderer.h"
-#include "connector.h"
-#include "mst.h"
+#include "components/component.h"
+#include "components/circular_path.h"
+#include "components/model_renderer.h"
+#include "components/outline_model_renderer.h"
+#include "components/vis_normal_renderer.h"
+#include "components/instances_renderer.h"
+#include "components/connector.h"
+#include "components/mst.h"
 
 #include "manual_meshes.h"
 

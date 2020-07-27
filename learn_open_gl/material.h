@@ -4,7 +4,7 @@
 #include "shader.h"
 #include "texture.h"
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 #include <assimp/scene.h>
 
 #include <vector>

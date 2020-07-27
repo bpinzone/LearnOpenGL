@@ -1,7 +1,7 @@
 #ifndef CIRCULAR_PATH_H
 #define CIRCULAR_PATH_H
 
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 #include "component.h"
 
