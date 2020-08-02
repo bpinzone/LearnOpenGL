@@ -49,8 +49,8 @@ void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-static int window_width = 1600;
-static int window_height = 1200;
+static int window_width = 2560;
+static int window_height = 1440;
 
 Camera camera;
 
@@ -75,6 +75,8 @@ int main() {
         2020-06-08 14:29:24.034033-0400 learn_open_gl[1722:19857] flock failed to lock maps file: errno = 35
         2020-06-08 14:29:24.034781-0400 learn_open_gl[1722:19857] flock failed to lock maps file: errno = 35
     */
+    glfwWindowHint(GLFW_SAMPLES, 8);
+
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "LearnOpenGL", nullptr, nullptr);
     if (!window) {
         cout << "Failed to create GLFW window" << endl;
@@ -98,6 +100,9 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+
+    // Multi sampling
+    glEnable(GL_MULTISAMPLE);
 
     // Face Culling
     // potential problem: My vertex data in correct CCW winding order?
