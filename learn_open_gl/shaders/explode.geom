@@ -30,7 +30,16 @@ vec3 get_clip_space_normal() {
    return normalize(cross(a, b));
 }
 
-// NOTE: Tutorial is technically incorrect. W value will be incorrect because its taken as -z before this differential is added.
+/*
+NOTE: I think tutorial is technically incorrect. Final W value of some_gl_Position will be incorrect because it is assigned
+   to be -z (view space) during perspective projection. (Before this differential is added.)
+
+From the perspective projection article: http://www.songho.ca/opengl/gl_projectionmatrix.html
+"Therefore, we can set the w-component of the clip coordinates as -ze. And, the 4th of GL_PROJECTION matrix becomes (0, 0, -1, 0)."
+
+TODO: You could probably fix it with some math here, bc perspective division hasn't happened yet.
+You would need to reassign w to be the final z value in view space.
+*/
 vec4 explode_gl_position(vec4 some_gl_Position, vec3 clip_normal) {
    float magnitude = 2.0;
    vec3 differential = clip_normal * magnitude * ((sin(time_seconds) + 1.0) / 2.0);

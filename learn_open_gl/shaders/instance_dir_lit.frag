@@ -1,5 +1,7 @@
 #version 330 core
 
+// Same as dir_lit_frag. This file shouldn't really exist. Assume this one is old.
+
 /*
 
 More useful built in variables.

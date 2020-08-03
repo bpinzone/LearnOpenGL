@@ -1,9 +1,11 @@
 #version 330 core
 
+// For post processing via a quad.
+
 in vec2 TexCoords;
 
 struct Material {
-    sampler2D diffuse1;  // screen texture.
+    sampler2D diffuse1;  // screen texture. Populated from off screen frame buffer.
 };
 uniform Material material;
 

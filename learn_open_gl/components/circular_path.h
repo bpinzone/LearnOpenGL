@@ -5,11 +5,10 @@
 
 #include "component.h"
 
-enum Axis {
+enum class Axis {
     X, Y, Z
 };
 
-// NOTE: For now, always rotates around the z-axis.
 class Circular_path : public Component {
 
 public:

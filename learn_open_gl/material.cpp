@@ -27,7 +27,9 @@ void Material::use() {
     shader->use();
     shader->forward_shader_globals_to_uniforms();
     assign_texture_unit_uniforms();
-    // Would push other uniform data into shader here...
+
+    // Would push any other uniform data into shader here...
+
     bind_textures_to_units();
 }
 

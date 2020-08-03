@@ -21,10 +21,13 @@ public:
         DIFFUSE, SPECULAR, CUBE
     };
 
-    // This class is NOT responsible for managing this. (Would require shared_from_this in ctor.)
-    // Although, our ctor will assert that a texture that is about to constructed is not already here.
+    // TODO: Poor design.
+
     // NOTE: Could make a static factory function, and manage this ourselves. Then client would call
     // factory instead of Ctor, which we could make private.
+
+    // This class is NOT responsible for managing this. (Would require shared_from_this in ctor.)
+    // Although, our ctor will assert that a texture that is about to constructed is not already here.
     static std::set<std::shared_ptr<Texture>, Texture_comp> loaded_textures;
 
 
@@ -32,6 +35,7 @@ public:
     // TODO: Poor design. Switching variable
     Texture(const std::string& path_in, Type type_in, bool flip_vertically);
 
+    // TODO: Poor design. Parameter must have specific value. Yet another reason to make factory functions.
     // Make a cube map texture. Type must be CUBE.
     // Paths must be in this open gl defined ordered:
     // POSITIVE_X Right, NEGATIVE_X Left, POSITIVE_Y Top, NEGATIVE_Y Bottom, POSITIVE_Z Back, NEGATIVE_Z Front

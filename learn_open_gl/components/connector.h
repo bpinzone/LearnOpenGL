@@ -9,7 +9,7 @@
 // Assumes this is on a cube object.
 // Transforms the cube to make it look like the two other game objects are connected.
 
-// Assumes our update is called after our object's update functions.
+// Assumes our update is called after both our connectee's update functions.
 class Connector : public Component {
 public:
 

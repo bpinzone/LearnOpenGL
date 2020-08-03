@@ -1,5 +1,3 @@
-// #include <glfw3.h> // do not include this apparently.
-
 #include "outline_model_renderer.h"
 #include "transform.h"
 #include "game_object.h"

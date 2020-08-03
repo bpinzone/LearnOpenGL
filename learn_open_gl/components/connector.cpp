@@ -7,7 +7,7 @@
 #include <glm/gtx/vector_angle.hpp>
 
 Connector::Connector(Connectee_t c1, Connectee_t c2)
-: connectee_1{c1}, connectee_2{c2} {
+    : connectee_1{c1}, connectee_2{c2} {
 }
 
 void Connector::start(){

@@ -6,6 +6,9 @@ in vec2 TexCoords;
 
 uniform vec3 camera_pos;
 
+// All this lighting stuff will go into a much more generic (post processing like) shader once we do deferred shading.
+// Not going to bother cleaning it up here.
+
 struct Material {
     // colors reflected for each light component
     sampler2D diffuse1;  // serves as diffuse AND ambient color.

@@ -57,8 +57,10 @@ void Instances_renderer::update() {
         [](const auto& instance){
             return Instance_data {
                 instance->get_transform().get_model(),
-                instance->get_transform().get_normal()};
-        });
+                instance->get_transform().get_normal()
+            };
+        }
+    );
 
     // Put into buffer.
     glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);

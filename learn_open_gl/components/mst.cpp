@@ -66,7 +66,7 @@ void MST_coordinator::coordinate(){
             }
         );
 
-        size_t min_idx = distance(insertions.begin(), min_it);
+        const size_t min_idx = distance(insertions.begin(), min_it);
         edges[spheres_added - 1].first = min_idx;
         edges[spheres_added - 1].second = insertions[min_idx].connector;
         insertions[min_idx].completed = true;
@@ -87,7 +87,7 @@ void MST_coordinator::update_neighbors(size_t newly_inserted){
 
     for(size_t neighbor_idx = 0; neighbor_idx < insertions.size(); ++neighbor_idx){
         if(neighbor_idx != newly_inserted && !insertions[neighbor_idx].completed){
-            double cost = calc_sq_distance(locations[newly_inserted], locations[neighbor_idx]);
+            const double cost = calc_sq_distance(locations[newly_inserted], locations[neighbor_idx]);
             if(cost < insertions[neighbor_idx].cost){
                 insertions[neighbor_idx].cost = cost;
                 insertions[neighbor_idx].connector = newly_inserted;

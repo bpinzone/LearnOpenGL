@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 
-// don't include this more than once?
+// Include exactly once.
 #include <glfw3.h>
 
 #include <glm/glm.hpp>
@@ -17,14 +17,9 @@
 
 #include "components/component.h"
 #include "components/circular_path.h"
-#include "components/model_renderer.h"
-#include "components/outline_model_renderer.h"
-#include "components/vis_normal_renderer.h"
 #include "components/instances_renderer.h"
 #include "components/connector.h"
 #include "components/mst.h"
-
-#include "manual_meshes.h"
 
 #include <iostream>
 #include <vector>
@@ -36,22 +31,20 @@
 
 using std::vector;
 using std::cout; using std::endl;
-using std::sin;
 using std::shared_ptr;
 using std::make_shared;
 using std::copy;
 using std::back_inserter;
-using std::transform;
 using std::string;
 
+void init_open_gl_settings();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-static int window_width = 2560;
-static int window_height = 1440;
-
+int window_width = 2560;
+int window_height = 1440;
 Camera camera;
 
 int main() {
@@ -69,15 +62,16 @@ int main() {
 
     // glfw window creation
     // --------------------
+    glfwWindowHint(GLFW_SAMPLES, 8);
+
     /*
     This line is causing:
         2020-06-08 14:29:23.998296-0400 learn_open_gl[1722:19555] Metal API Validation Enabled
         2020-06-08 14:29:24.034033-0400 learn_open_gl[1722:19857] flock failed to lock maps file: errno = 35
         2020-06-08 14:29:24.034781-0400 learn_open_gl[1722:19857] flock failed to lock maps file: errno = 35
     */
-    glfwWindowHint(GLFW_SAMPLES, 8);
-
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "LearnOpenGL", nullptr, nullptr);
+
     if (!window) {
         cout << "Failed to create GLFW window" << endl;
         glfwTerminate();
@@ -94,394 +88,126 @@ int main() {
         return -1;
     }
 
-    // setup mouse input.
+    // setup mouse input
+    // -----------------
     // GLFW should hide the cursor and "capture" it. Capturing means that once the app has focus, the mouse cursor stays within the center of the window (unless app loses focus or quits.)
     // mouse won't be visible and should not leave window.
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    // Multi sampling
-    glEnable(GL_MULTISAMPLE);
-
-    // Face Culling
-    // potential problem: My vertex data in correct CCW winding order?
-    glEnable(GL_CULL_FACE);
-    // Define front as CCW.
-    glFrontFace(GL_CCW);
-    // DO not render back faces.
-    glCullFace(GL_BACK);
-
-    // Enable blending
-    // The glBlendFunc(GLenum sfactor, GLenum dfactor) function expects two parameters ...
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // === Stencil test ===
-    // Default: On, Writable, always passes.
-    glEnable(GL_STENCIL_TEST);
-    // mask is and'd with the stencil value of fragment.
-    glStencilMask(0xFF); // each bit is written to the stencil buffer as is
-    // glStencilMask(0x00); // each bit ends up as 0 in the stencil buffer (disabling writes)
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-
-    // === Depth test ===
-    glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it too. See the call to glClear() below.
-    // For skybox testing. Because depth values start at 1, I think.
-    glDepthFunc(GL_LEQUAL);
-
-    // OpenGL allows us to disable writing to the depth buffer by setting its depth mask to GL_FALSE:
-    // glDepthMask(GL_FALSE);
-
-    //  We can set the comparison operator (or depth function) by calling glDepthFunc:
-    // glDepthFunc(GL_LESS);  //default
-    // glDepthFunc(GL_ALWAYS);
-
-    // === Polygon drawing ===
-    // uncomment this call to draw in wireframe polygons.
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
+    // other settings
+    // --------------
+    init_open_gl_settings();
 
 
-    // === Render to a texture ===
-    unsigned int framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    // generate texture (color attachment)
-    unsigned int texColorBuffer;
-    glGenTextures(1, &texColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // allocate.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    // attach it to currently bound framebuffer object
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+    // ====================================================================================
+    // The rest of main essentially serves as what you would do in an actual engine editor.
+    // Put objects in scene, give them components, etc.
+    // ====================================================================================
 
-    // generate render buffer attachment for depth and stencil test.
-    unsigned int rbo;
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window_width, window_height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    // attach it to the currently bound frame buffer object
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-    // Make sure frameBuffer is complete
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-    }
-    // unbind the frame buffer we just made.
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Textures
-    // TODO: Poor design. Bool switch on flipping vertically.
+    // TODO: Poor design. Bool determines if we flip vertically on stbi load.
     shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE, false);
     shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE, false);
     shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR, false);
 
-    shared_ptr<Texture> grass_diffuse = make_shared<Texture>("./textures/grass.png", Texture::Type::DIFFUSE, false);
-    shared_ptr<Texture> window_diffuse = make_shared<Texture>("./textures/window.png", Texture::Type::DIFFUSE, false);
-    shared_ptr<Texture> black_specular = make_shared<Texture>("./textures/black.png", Texture::Type::SPECULAR, false);
-
-    shared_ptr<Texture> portal_texture = make_shared<Texture>(texColorBuffer, Texture::Type::DIFFUSE);
-
-    shared_ptr<Texture> skybox_texture = make_shared<Texture>(
-        vector<string>{
-            "./textures/skybox/right.jpg", "./textures/skybox/left.jpg", "./textures/skybox/top.jpg",
-            "./textures/skybox/bottom.jpg", "./textures/skybox/back.jpg", "./textures/skybox/front.jpg"
-        },
-        Texture::Type::CUBE
-    );
-
     // Shaders
-    shared_ptr<Shader> directional_shader = make_shared<Shader>("./shaders/dir_lit.vert", "./shaders/dir_lit.frag");
+    // Special shader for instanced rendering.
     shared_ptr<Shader> instance_directional_shader = make_shared<Shader>("./shaders/instance_dir_lit.vert", "./shaders/instance_dir_lit.frag");
-    shared_ptr<Shader> color_shader = make_shared<Shader>("./shaders/color.vert", "./shaders/color.frag");
-    shared_ptr<Shader> portal_shader = make_shared<Shader>("./shaders/from_texture.vert", "./shaders/from_texture.frag");
-    shared_ptr<Shader> skybox_shader = make_shared<Shader>("./shaders/skybox.vert", "./shaders/skybox.frag");
-    shared_ptr<Shader> reflect_shader = make_shared<Shader>("./shaders/reflect.vert", "./shaders/reflect.frag");
-    shared_ptr<Shader> refract_shader = make_shared<Shader>("./shaders/refract.vert", "./shaders/refract.frag");
-
-    shared_ptr<Shader> test_geo_shader = make_shared<Shader>(
-        "./shaders/test_geo.vert",
-        "./shaders/test_geo.frag",
-        "./shaders/test_geo.geom");
-
-    shared_ptr<Shader> explode_shader = make_shared<Shader>(
-        "./shaders/dir_lit.vert",
-        "./shaders/dir_lit.frag",
-        "./shaders/explode.geom"
-    );
 
     // Materials
-    shared_ptr<Material> blue_material = make_shared<Material>(
-        directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
-    );
     shared_ptr<Material> instance_blue_material = make_shared<Material>(
         instance_directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
-    );
-
-    shared_ptr<Material> red_material = make_shared<Material>(
-        directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
     );
     shared_ptr<Material> instance_red_material = make_shared<Material>(
         instance_directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
     );
 
-    shared_ptr<Material> color_material = make_shared<Material>(
-        color_shader, Material::Textures_t{}
-    );
-
-    shared_ptr<Material> grass_material = make_shared<Material>(
-        directional_shader, Material::Textures_t{grass_diffuse, black_specular}
-    );
-
-    shared_ptr<Material> window_material = make_shared<Material>(
-        directional_shader, Material::Textures_t{window_diffuse, black_specular}
-    );
-
-    shared_ptr<Material> portal_material = make_shared<Material>(
-        portal_shader, Material::Textures_t{portal_texture}
-    );
-
-    shared_ptr<Material> skybox_material = make_shared<Material>(
-        skybox_shader, Material::Textures_t{skybox_texture}
-    );
-
-    shared_ptr<Material> reflect_material = make_shared<Material>(
-        reflect_shader, Material::Textures_t{skybox_texture}
-    );
-
-    shared_ptr<Material> refract_material = make_shared<Material>(
-        refract_shader, Material::Textures_t{skybox_texture}
-    );
-
-    shared_ptr<Material> test_geo_material = make_shared<Material>(
-        test_geo_shader, Material::Textures_t{}
-    );
-
-
     // Models
-    // shared_ptr<Model> sphere_model = make_shared<Model>(directional_shader, "./primitive_models/sphere.obj");
-    // sphere_model->set_materials(blue_material);
-
     shared_ptr<Model> sphere_model = make_shared<Model>(instance_directional_shader, "./primitive_models/sphere.obj");
     sphere_model->set_materials(instance_blue_material);
-    // TOGGLE
-    // sphere_model->set_materials(reflect_material);
-
-    // shared_ptr<Model> cube_model = make_shared<Model>(directional_shader, "./primitive_models/cube.obj");
-    // cube_model->set_materials(red_material);
-
     shared_ptr<Model> cube_model = make_shared<Model>(instance_directional_shader, "./primitive_models/cube.obj");
     cube_model->set_materials(instance_red_material);
-    // TOGGLE
-    // cube_model->set_materials(reflect_material);
-
-    shared_ptr<Model> grass_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
-    grass_model->set_materials(grass_material);
-
-    shared_ptr<Model> window_model = make_shared<Model>(directional_shader, "./primitive_models/quad.obj");
-    window_model->set_materials(window_material);
-    // window_model->set_materials(reflect_material);
-
-    shared_ptr<Model> portal_model = make_shared<Model>(portal_shader, "./primitive_models/quad.obj");
-    portal_model->set_materials(portal_material);
-
-    shared_ptr<Model> skybox_model = make_shared<Model>(skybox_shader, "./primitive_models/cube.obj");
-    skybox_model->set_materials(skybox_material);
-    // Effectively cull the outside, instead of the inside.
-    // NOTE: Also, switched front and back images of skybox as a result of this too.
-    skybox_model->reverse_all_mesh_winding_orders();
-
-    shared_ptr<Model> backpack_model = make_shared<Model>(directional_shader, "./backpack/backpack.obj");
-    // backpack_model->set_materials(refract_material);
-
-    // shared_ptr<Model> backpack_model = make_shared<Model>(explode_shader, "./backpack/backpack.obj");
-    // TOGGLE
-
-    auto test_geo_mesh = make_shared<Mesh>(test_geo_vertices, test_geo_indices, test_geo_material);
-
-    shared_ptr<Model> test_geo_model = make_shared<Model>(
-        Model::Meshes_t{test_geo_mesh}
-    );
-
 
     // Sphere objects
+    // Arrange them such that they move to form 4 cone shapes on 2 axes.
     vector<shared_ptr<Gameobject>> sphere_objects;
-    const int spheres_per_axis = 500;
-    const int num_axes = 2;
-    const int num_spheres = spheres_per_axis * num_axes;
+    constexpr int spheres_per_axis = 500;
+    constexpr int num_axes = 2;
+    constexpr int num_spheres = spheres_per_axis * num_axes;
+    constexpr double depth_mult = 0.75;
+    constexpr double radius_mult = 0.75;
+    constexpr double speed_mult = 0.0075;
+
     for(int axis_x = 0; axis_x < num_axes; ++axis_x){
         for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
-            shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
-            // new_object->add_component(make_shared<Outline_model_renderer>(sphere_model, color_material));
-            // new_object->add_component(make_shared<Vis_normal_renderer>(sphere_model));
+            shared_ptr<Gameobject> new_sphere_object = make_shared<Gameobject>();
+            const double sign_mult = (sphere_x % 2 == 0) ? 1 : -1;
+            const double depth = sign_mult * depth_mult * sphere_x;
+            const double speed = sign_mult * speed_mult * pow(sphere_x, 2.0);
+            const double radius = radius_mult * sphere_x;
+            constexpr double start_degs = 0;
 
-            const float sign_mult = pow(-1, sphere_x % 2);
-
-            const float depth = sign_mult * sphere_x * 0.75;
-            double start_degs = 0;
-            double radius = (sphere_x + 1) * 0.75;
-            double speed = sign_mult * 0.0075 * pow(sphere_x, 2.0);
-            new_object->add_component(make_shared<Circular_path>(
+            new_sphere_object->add_component(make_shared<Circular_path>(
                 depth, start_degs, radius, speed,
-                static_cast<Axis>(axis_x)
-            ));
-            sphere_objects.push_back(new_object);
+                static_cast<Axis>(axis_x)));
+
+            sphere_objects.push_back(new_sphere_object);
         }
     }
-    shared_ptr<Gameobject> sphere_instances_object = make_shared<Gameobject>();
-    sphere_instances_object->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
+    shared_ptr<Gameobject> instanced_spheres_manager = make_shared<Gameobject>();
+    instanced_spheres_manager->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
 
     // Cube objects
     vector<shared_ptr<Gameobject>> cube_objects;
     for(int i = 0; i < num_spheres - 1; ++i){
-        shared_ptr<Gameobject> new_object = make_shared<Gameobject>();
-        // new_object->add_component(make_shared<Model_renderer>(cube_model));
-        new_object->add_component(make_shared<Connector>(
-            sphere_objects[i], sphere_objects[i + 1]
-        ));
-        cube_objects.push_back(new_object);
-    }
-    shared_ptr<Gameobject> cube_instances_object = make_shared<Gameobject>();
-    cube_instances_object->add_component(make_shared<Instances_renderer>(cube_model, cube_objects));
 
-    // Coordinator object
+        shared_ptr<Gameobject> new_cube = make_shared<Gameobject>();
+        new_cube->add_component(make_shared<Connector>(
+            sphere_objects[i], sphere_objects[i + 1]));
+        cube_objects.push_back(new_cube);
+    }
+    shared_ptr<Gameobject> instanced_cubes_manager = make_shared<Gameobject>();
+    instanced_cubes_manager->add_component(make_shared<Instances_renderer>(cube_model, cube_objects));
+
+    // MST Coordinator object
     shared_ptr<Gameobject> coordinator_object = make_shared<Gameobject>();
     coordinator_object->add_component(make_shared<MST_coordinator>(sphere_objects, cube_objects));
 
-    // Grass
-    shared_ptr<Gameobject> grass_object = make_shared<Gameobject>();
-    grass_object->add_component(make_shared<Model_renderer>(grass_model));
-    grass_object->get_transform().set_scale(glm::vec3(4, 4, 4));
-    // NOTE: Looking at wrong documentation? It takes radians.
-    grass_object->get_transform().set_rotation(glm::rotate(
-        glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
-    ));
-
-    // skybox
-    shared_ptr<Gameobject> skybox_object = make_shared<Gameobject>();
-    skybox_object->add_component(make_shared<Model_renderer>(skybox_model));
-
-    // Windows
-    vector<glm::vec3> window_positions{
-        {-15.0f,  0.0f, -5.0f}, { 15.0f,  0.0f,  51.0f},
-        { 0.0f,  0.0f,  7.0f}, {-3.0f,  0.0f, -23.0f}, { 5.0f,  0.0f, -6.0f}
-    };
-    vector<shared_ptr<Gameobject>> window_objects;
-    transform(window_positions.begin(), window_positions.end(), back_inserter(window_objects),
-        [&window_model](const auto& pos){
-
-            shared_ptr<Gameobject> window_object = make_shared<Gameobject>();
-            window_object->add_component(make_shared<Model_renderer>(window_model));
-            window_object->get_transform().set_scale(glm::vec3(4, 4, 4));
-            // NOTE: documentation is wrong? It takes radians.
-            window_object->get_transform().set_rotation(glm::rotate(
-                glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0)
-            ));
-            window_object->get_transform().set_position(pos);
-            return window_object;
-    });
-
-    // Extremely simple blending
-    // Less = Rendered First = Farthur away.
-    static const auto blend_sorter = [](shared_ptr<Gameobject> go1, shared_ptr<Gameobject> go2){
-        float go1_distance = glm::distance(go1->get_transform().get_position(), camera.get_position());
-        float go2_distance = glm::distance(go2->get_transform().get_position(), camera.get_position());
-        return go1_distance > go2_distance;
-    };
-
-    // quad object (scene will be drawn onto this object.)
-    shared_ptr<Gameobject> portal_object = make_shared<Gameobject>();
-    portal_object->add_component(make_shared<Model_renderer>(portal_model));
-    portal_object->get_transform().set_scale(glm::vec3(40, 40, 40));
-    portal_object->get_transform().set_rotation(
-        glm::rotate(glm::mat4(1), glm::radians(90.0f), glm::vec3(1, 0, 0))
-    );
-    portal_object->get_transform().set_position(glm::vec3(0, 0, -10));
-
-    shared_ptr<Gameobject> backpack_object = make_shared<Gameobject>();
-
-    // backpack_object->add_component(make_shared<Model_renderer>(backpack_model));
-    backpack_object->add_component(make_shared<Vis_normal_renderer>(backpack_model));
-
-    backpack_object->get_transform().translate(glm::vec3(20, 0, 0));
-    backpack_object->get_transform().set_scale(glm::vec3(4, 4, 4));
-
-    // Geo test object
-    // shared_ptr<Gameobject> test_geo_object = make_shared<Gameobject>();
-    // test_geo_object->add_component(make_shared<Model_renderer>(test_geo_model));
-
-    // Put objects in game loop containers.
-
 
     /*
+    Put objects in game loop containers.
     Copy all Opaque objects
-    Order matters: sphere before coordinator. Coordinator before cubes. Skybox last.
+    Order matters: sphere before coordinator. Coordinator before cubes.
     Instances before their instance manager
     */
     vector<shared_ptr<Gameobject>> opaque_objects;
 
-    // opaque_objects.push_back(test_geo_object);
-    // opaque_objects.push_back(backpack_object);
-
     // spheres
     copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(sphere_instances_object);
-    // coord
+    opaque_objects.push_back(instanced_spheres_manager);
+
+    // coordinator
     opaque_objects.push_back(coordinator_object);
+
     // cube
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(cube_instances_object);
-    // opaque_objects.push_back(skybox_object);
-
-    // copy all transparent objects
-    vector<shared_ptr<Gameobject>> transparent_objects;
-    /*
-    transparent_objects.push_back(grass_object);
-    copy(window_objects.begin(), window_objects.end(), back_inserter(transparent_objects));
-
-    */
+    opaque_objects.push_back(instanced_cubes_manager);
 
     // === Lighting constants ===
-
-    glm::vec3 white_light {1, 1, 1};
-
-    // Directional shader
-    // Really, makes the dir_shader the active program, and populates the uniforms.
-    // The uniforms belong to the shader program.
-    // So if you switch to another shader and back, you DON'T need to populate uniforms again if they haven't changed.
-    directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
-    directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
-    directional_shader->set_vec3("dir_light.specular", white_light);
-    directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
-    directional_shader->set_float("material.shininess", 32.0f);
-
+    const glm::vec3 white_light {1, 1, 1};
     instance_directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
     instance_directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
     instance_directional_shader->set_vec3("dir_light.specular", white_light);
-    instance_directional_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
+    instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
     instance_directional_shader->set_float("material.shininess", 32.0f);
-
-    explode_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
-    explode_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
-    explode_shader->set_vec3("dir_light.specular", white_light);
-    explode_shader->set_vec3("dir_light.direction",  glm::vec3(0, 0, -1));
-    explode_shader->set_float("material.shininess", 32.0f);
-
-    sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
 
     for(auto& go : opaque_objects){
         go->start();
     }
-    for(auto& go : transparent_objects){
-        go->start();
-    }
-
-    portal_object->start();
 
     // render loop
     // -----------
@@ -495,48 +221,25 @@ int main() {
 
         // render
         // ------
-        static const float near_clip = 3.0f;
-        static const float far_clip = 2600.0f;
+        static constexpr float near_clip = 3.0f;
+        static constexpr float far_clip = 2600.0f;
+
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
         Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
             static_cast<float>(window_width) / window_height,
             near_clip, far_clip
         ));
-        directional_shader->set_vec3("camera_pos", camera.get_position());
+
         instance_directional_shader->set_vec3("camera_pos", camera.get_position());
-
-        explode_shader->set_vec3("camera_pos", camera.get_position());
-        explode_shader->set_float("time_seconds", glfwGetTime());
-
-        portal_shader->set_vec3("camera_pos", camera.get_position());
-        skybox_shader->set_vec3("camera_pos", camera.get_position());
-        reflect_shader->set_vec3("camera_pos", camera.get_position());
-        refract_shader->set_vec3("camera_pos", camera.get_position());
-
-        // toggle comment for quad rendering
-        // Render to framebuffer with texture.
-        // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
         // Draw
-        sort(transparent_objects.begin(), transparent_objects.end(), blend_sorter);
         for(auto& go : opaque_objects){
             go->update();
         }
-        for(auto& go : transparent_objects){
-            go->update();
-        }
-
-        // toggle block comment for quad rendering
-        // Render to window using quad textured with last render buffer texture.
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        // glDisable(GL_DEPTH_TEST);
-        // portal_object->update();
-        // glEnable(GL_DEPTH_TEST);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -557,6 +260,50 @@ int main() {
     return 0;
 }
 
+void init_open_gl_settings(){
+
+    // Multi sampling
+    glEnable(GL_MULTISAMPLE);
+
+    // Face Culling
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);  // DO not render back faces.
+    glCullFace(GL_BACK);
+
+    // Enable blending
+    // The glBlendFunc(GLenum sfactor, GLenum dfactor) function expects two parameters ...
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // === Stencil test ===
+    // Default: On, Writable, always passes.
+    glEnable(GL_STENCIL_TEST);
+
+    // mask is and'd with the stencil value of fragment.
+    glStencilMask(0xFF); // each bit is written to the stencil buffer as is
+
+    // glStencilMask(0x00); // each bit ends up as 0 in the stencil buffer (disabling writes)
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+
+    // === Depth test ===
+    glEnable(GL_DEPTH_TEST); // if you use this, you need to clear it too. See the call to glClear() below.
+
+    // For skybox testing. Because depth values start at 1.
+    glDepthFunc(GL_LEQUAL);
+
+    // OpenGL allows us to disable writing to the depth buffer by setting its depth mask to GL_FALSE:
+    // glDepthMask(GL_FALSE);
+
+    // We can set the comparison operator (or depth function) by calling glDepthFunc:
+    // glDepthFunc(GL_LESS);  //default
+    // glDepthFunc(GL_ALWAYS);
+
+    // === Polygon drawing ===
+    // uncomment this call to draw in wireframe polygons.
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL).
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
@@ -566,25 +313,24 @@ void processInput(GLFWwindow *window) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::FORWARD, Time::get_instance().get_delta_time());
+        camera.ProcessKeyboard(Camera::Movement::FORWARD);
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::BACKWARD, Time::get_instance().get_delta_time());
+        camera.ProcessKeyboard(Camera::Movement::BACKWARD);
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::LEFT, Time::get_instance().get_delta_time());
+        camera.ProcessKeyboard(Camera::Movement::LEFT);
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        camera.ProcessKeyboard(Camera::Movement::RIGHT, Time::get_instance().get_delta_time());
+        camera.ProcessKeyboard(Camera::Movement::RIGHT);
     }
-
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
+    // make sure the viewport matches the new window dimensions;
+    // note that width and height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
     window_width = width;
     window_height = height;
@@ -613,6 +359,5 @@ void mouse_callback(GLFWwindow* window, double x_pos, double y_pos) {
 
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
-
     camera.ProcessMouseScroll(yoffset);
 }

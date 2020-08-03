@@ -13,8 +13,7 @@
 class MST_coordinator : public Component {
 public:
 
-    using Game_objects_t =
-        std::vector<std::shared_ptr<Gameobject>>;
+    using Game_objects_t = std::vector<std::shared_ptr<Gameobject>>;
 
     MST_coordinator(
         Game_objects_t& spheres_in,

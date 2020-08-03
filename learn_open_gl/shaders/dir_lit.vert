@@ -15,8 +15,10 @@ layout (std140) uniform matrices {
 
 // interface block
 out VS_OUT {
+
     // Recall: As computed below, this is the normal in world-space.
     vec3 Normal;
+
     vec3 WorldPos;
     vec2 TexCoords;
 } vs_out;

@@ -2,6 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "utility.h"
+
 // Initial values
 static constexpr glm::vec3 c_initial_position{0, 0, 1300};
 static constexpr float c_initial_yaw = 90.0f;  // angle from positive x-axis.
@@ -26,18 +28,19 @@ Camera::Camera()
     update_cache();
 }
 
-void Camera::ProcessKeyboard(Movement direction, float deltaTime) {
-    float velocity = c_movement_speed * deltaTime;
+void Camera::ProcessKeyboard(Movement direction) {
+
+    float velocity = c_movement_speed * Time::get_instance().get_delta_time();
     switch(direction){
-        case FORWARD:  position += front * velocity; break;
-        case BACKWARD: position -= front * velocity; break;
-        case RIGHT:    position += right * velocity; break;
-        case LEFT:     position -= right * velocity; break;
+        case Movement::FORWARD:  position += front * velocity; break;
+        case Movement::BACKWARD: position -= front * velocity; break;
+        case Movement::RIGHT:    position += right * velocity; break;
+        case Movement::LEFT:     position -= right * velocity; break;
     }
     update_cache();
 }
 
-// x offset positive -> mouse move right, want yaw to decrease.
+// x offset positive -> mouse moved right, want yaw to decrease.
 // y offset positive -> mouse moved down, want pitch to decrease.
 void Camera::ProcessMouseMovement(float xoffset, float yoffset) {
     yaw   -= xoffset * c_look_sensitivity;

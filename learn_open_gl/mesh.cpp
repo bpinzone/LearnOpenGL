@@ -58,6 +58,7 @@ void Mesh::draw_instanced(int num_instances) {
 void Mesh::reverse_winding_order(){
     reverse(indices.begin(), indices.end());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    // TODO: Should change to buffer sub data.
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         // indices.size() * sizeof(unsigned int),

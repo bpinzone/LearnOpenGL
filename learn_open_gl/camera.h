@@ -7,11 +7,10 @@
 class Camera {
 public:
 
-    enum Movement {
+    enum class Movement {
         FORWARD, BACKWARD, LEFT, RIGHT
     };
 
-    // Place the camera at (0, 0, 10), looking down -z.
     Camera();
 
     // Returns the view matrix for this camera.
@@ -20,7 +19,7 @@ public:
     }
 
     // Let camera process directional inputs.
-    void ProcessKeyboard(Movement direction, float deltaTime);
+    void ProcessKeyboard(Movement direction);
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset);

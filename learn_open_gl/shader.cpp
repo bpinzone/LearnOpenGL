@@ -131,7 +131,7 @@ void Shader::set_constant_uniforms(){
 
     // matrices_uniform_block_idx is NOT the same as: static const int c_matrices_uniform_block_binding_point;
     // c_matrices... is a binding point, which the shader instance and shader_globals both need to know.
-    // matrices_uni_idx is an idx wrt this specific shader.
+    // matrices_uni_idx is an idx wrt this specific shader. (similar feel to GlGetUniformLocation)
 
     // String must match declaration in: layout (std140) uniform matrices {
     // matrices point of maintenance.

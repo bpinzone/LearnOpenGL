@@ -54,6 +54,7 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
 
     // todo: don't cast to vec3 if you want transparency.
+    // Actually: This is being delt with below. (Adding transparency component)
     /*
     example, this vs this
     // FragColor = vec4(vec3(texture(texture1, fs_in.TexCoords)), 1.0);
@@ -75,7 +76,8 @@ float LinearizeDepth(float depth) {
     */
 
     float z = depth * 2.0 - 1.0; // back to NDC
-    // dummy values
+
+    // dummy values. Near Far clipping plane point of maintenance.
     float near = 999;
     float far = 999;
     return (2.0 * near * far) / (far + near - z * (far - near));

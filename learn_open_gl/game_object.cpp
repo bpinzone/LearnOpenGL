@@ -20,7 +20,9 @@ Transform& Gameobject::get_transform(){
 }
 
 void Gameobject::add_component(shared_ptr<Component> new_component){
+
     new_component->set_game_object(shared_from_this());
+
     if(std::dynamic_pointer_cast<Model_renderer>(new_component)){
         render_component = new_component;
     }

@@ -57,7 +57,7 @@ public:
     // Returns the first unused vertex attrib (after this first set of assignments)
     int get_next_available_attribute_idx() const;
 
-    // TODO dtor, sometime:
+    // TODO: dtor, sometime:
     // glDeleteVertexArrays(1, &vao);
     // glDeleteBuffers(1, &vbo);
     // glDeleteBuffers(1, &ebo);

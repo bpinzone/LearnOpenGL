@@ -24,8 +24,10 @@ void Vis_normal_renderer::update() {
 
     Component::update();
     game_object->get_transform().load_into_shader_global();
+
     model->draw();
     model->set_materials(vis_normal_material);
+
     model->draw();
     model->set_materials(material);
 }
