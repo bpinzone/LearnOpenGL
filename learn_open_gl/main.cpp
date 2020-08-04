@@ -14,12 +14,13 @@
 #include "shader_globals.h"
 #include "model.h"
 #include "utility.h"
+#include "manual_meshes.h"
 
 #include "components/component.h"
 #include "components/circular_path.h"
 #include "components/instances_renderer.h"
-#include "components/connector.h"
-#include "components/mst.h"
+#include "components/model_renderer.h"
+#include "components/random_rotator.h"
 
 #include <iostream>
 #include <vector>
@@ -29,19 +30,26 @@
 #include <iterator>
 #include <string>
 
+#include <random>
+#include <functional>
+
 using std::vector;
 using std::cout; using std::endl;
 using std::shared_ptr;
 using std::make_shared;
 using std::copy;
 using std::back_inserter;
+using std::transform;
 using std::string;
+using std::sin;
+using std::cos;
 
 void init_open_gl_settings();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+vector<glm::vec3> generate_cube_positions();
 
 int window_width = 2560;
 int window_height = 1440;
@@ -62,7 +70,7 @@ int main() {
 
     // glfw window creation
     // --------------------
-    glfwWindowHint(GLFW_SAMPLES, 8);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     /*
     This line is causing:
@@ -101,109 +109,89 @@ int main() {
     init_open_gl_settings();
 
 
-
     // ====================================================================================
     // The rest of main essentially serves as what you would do in an actual engine editor.
     // Put objects in scene, give them components, etc.
     // ====================================================================================
 
+    // Setup Cube Objects.
+    shared_ptr<Texture> wood_diffuse = make_shared<Texture>(
+        "./textures/box.png", Texture::Type::DIFFUSE, false);
 
-    // Textures
-    // TODO: Poor design. Bool determines if we flip vertically on stbi load.
-    shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE, false);
-    shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE, false);
-    shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR, false);
+    shared_ptr<Texture> wood_specular = make_shared<Texture>(
+        "./textures/box_specular.png", Texture::Type::SPECULAR, false);
 
-    // Shaders
-    // Special shader for instanced rendering.
-    shared_ptr<Shader> instance_directional_shader = make_shared<Shader>("./shaders/instance_dir_lit.vert", "./shaders/instance_dir_lit.frag");
+    shared_ptr<Shader> point_lit_shader = make_shared<Shader>(
+        "./shaders/lit.vert", "./shaders/lit.frag");
 
-    // Materials
-    shared_ptr<Material> instance_blue_material = make_shared<Material>(
-        instance_directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
-    );
-    shared_ptr<Material> instance_red_material = make_shared<Material>(
-        instance_directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
+    shared_ptr<Material> cube_material = make_shared<Material>(
+        point_lit_shader, Material::Textures_t{ wood_diffuse, wood_specular}
     );
 
-    // Models
-    shared_ptr<Model> sphere_model = make_shared<Model>(instance_directional_shader, "./primitive_models/sphere.obj");
-    sphere_model->set_materials(instance_blue_material);
-    shared_ptr<Model> cube_model = make_shared<Model>(instance_directional_shader, "./primitive_models/cube.obj");
-    cube_model->set_materials(instance_red_material);
+    shared_ptr<Model> cube_model = make_shared<Model>(
+        Model::Meshes_t{make_shared<Mesh>(cube_vertices, get_cube_indices(), cube_material)}
+    );
 
-    // Sphere objects
-    // Arrange them such that they move to form 4 cone shapes on 2 axes.
-    vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 500;
-    constexpr int num_axes = 2;
-    constexpr int num_spheres = spheres_per_axis * num_axes;
-    constexpr double depth_mult = 0.75;
-    constexpr double radius_mult = 0.75;
-    constexpr double speed_mult = 0.0075;
+    vector<glm::vec3> cube_positions = generate_cube_positions();
 
-    for(int axis_x = 0; axis_x < num_axes; ++axis_x){
-        for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
-            shared_ptr<Gameobject> new_sphere_object = make_shared<Gameobject>();
-            const double sign_mult = (sphere_x % 2 == 0) ? 1 : -1;
-            const double depth = sign_mult * depth_mult * sphere_x;
-            const double speed = sign_mult * speed_mult * pow(sphere_x, 2.0);
-            const double radius = radius_mult * sphere_x;
-            constexpr double start_degs = 0;
-
-            new_sphere_object->add_component(make_shared<Circular_path>(
-                depth, start_degs, radius, speed,
-                static_cast<Axis>(axis_x)));
-
-            sphere_objects.push_back(new_sphere_object);
-        }
-    }
-    shared_ptr<Gameobject> instanced_spheres_manager = make_shared<Gameobject>();
-    instanced_spheres_manager->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
-
-    // Cube objects
     vector<shared_ptr<Gameobject>> cube_objects;
-    for(int i = 0; i < num_spheres - 1; ++i){
+    transform(
+        cube_positions.begin(), cube_positions.end(), back_inserter(cube_objects),
+        [](const auto& pos){
+            auto cube = make_shared<Gameobject>();
+            cube->get_transform().translate(pos);
+            cube->add_component(make_shared<Random_rotator>());
+            return cube;
+        }
+    );
 
-        shared_ptr<Gameobject> new_cube = make_shared<Gameobject>();
-        new_cube->add_component(make_shared<Connector>(
-            sphere_objects[i], sphere_objects[i + 1]));
-        cube_objects.push_back(new_cube);
+    shared_ptr<Gameobject> cube_instances_manager = make_shared<Gameobject>();
+    cube_instances_manager->add_component(make_shared<Instances_renderer>(
+        cube_model, cube_objects
+    ));
+
+    // Setup Point light
+
+    shared_ptr<Shader> light_source_shader = make_shared<Shader>(
+        "./shaders/light_source.vert", "./shaders/light_source.frag");
+
+    shared_ptr<Material> light_source_material = make_shared<Material>(
+        light_source_shader, Material::Textures_t{});
+
+    shared_ptr<Model> light_source_model = make_shared<Model>(light_source_shader, "./primitive_models/sphere.obj");
+    light_source_model->set_materials(light_source_material);
+
+    shared_ptr<Gameobject> light_source = make_shared<Gameobject>();
+    light_source->get_transform().set_scale(glm::vec3(0.5f));
+    light_source->add_component(make_shared<Model_renderer>(light_source_model));
+    {
+        constexpr float depth = 8;
+        constexpr double starting_degrees = 0;
+        constexpr double radius = 10;
+        constexpr double speed = 10;
+        light_source->add_component(make_shared<Circular_path>(
+            depth, starting_degrees, radius, speed, Axis::Y
+        ));
     }
-    shared_ptr<Gameobject> instanced_cubes_manager = make_shared<Gameobject>();
-    instanced_cubes_manager->add_component(make_shared<Instances_renderer>(cube_model, cube_objects));
-
-    // MST Coordinator object
-    shared_ptr<Gameobject> coordinator_object = make_shared<Gameobject>();
-    coordinator_object->add_component(make_shared<MST_coordinator>(sphere_objects, cube_objects));
-
 
     /*
     Put objects in game loop containers.
-    Copy all Opaque objects
-    Order matters: sphere before coordinator. Coordinator before cubes.
     Instances before their instance manager
     */
     vector<shared_ptr<Gameobject>> opaque_objects;
-
-    // spheres
-    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(instanced_spheres_manager);
-
-    // coordinator
-    opaque_objects.push_back(coordinator_object);
-
-    // cube
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(instanced_cubes_manager);
+    opaque_objects.push_back(cube_instances_manager);
+    opaque_objects.push_back(light_source);
 
-    // === Lighting constants ===
+    // Set constant lighting parameters.
     const glm::vec3 white_light {1, 1, 1};
-    instance_directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
-    instance_directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
-    instance_directional_shader->set_vec3("dir_light.specular", white_light);
-    instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
-    instance_directional_shader->set_float("material.shininess", 32.0f);
+    point_lit_shader->set_float("material.shininess", 32.0f);
+    point_lit_shader->set_vec3("point_light.ambient",  white_light);
+    point_lit_shader->set_vec3("point_light.diffuse",  white_light * 0.75f); // darken diffuse light a bit
+    point_lit_shader->set_vec3("point_light.specular", glm::vec3{1.0f, 1.0f, 1.0f});
+    point_lit_shader->set_float("point_light.constant",  1.0f);
+    point_lit_shader->set_float("point_light.linear",    0.09f * 0.5f);
+    point_lit_shader->set_float("point_light.quadratic", 0.032f * 0.5f);
 
     for(auto& go : opaque_objects){
         go->start();
@@ -221,8 +209,8 @@ int main() {
 
         // render
         // ------
-        static constexpr float near_clip = 3.0f;
-        static constexpr float far_clip = 2600.0f;
+        static constexpr float near_clip = 0.1f;
+        static constexpr float far_clip = 1000.0f;
 
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
         Shader_globals::get_instance().set_projection(glm::perspective(
@@ -231,7 +219,9 @@ int main() {
             near_clip, far_clip
         ));
 
-        instance_directional_shader->set_vec3("camera_pos", camera.get_position());
+        point_lit_shader->set_vec3("camera_pos", camera.get_position());
+        // NOTE: Position is one frame old. Could fix by grabbing value before light object is updated. Not caring for now.
+        point_lit_shader->set_vec3("point_light.position", light_source->get_transform().get_position());
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -360,4 +350,31 @@ void mouse_callback(GLFWwindow* window, double x_pos, double y_pos) {
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
     camera.ProcessMouseScroll(yoffset);
+}
+
+vector<glm::vec3> generate_cube_positions(){
+
+    vector<glm::vec3> cube_positions;
+
+    static auto random_unit_float = std::bind(
+        std::uniform_real_distribution<float>{0.0, 1.0},
+        std::default_random_engine{}
+    );
+
+    const int num_cubes = 40.0f;
+    const float belt_radius = 10.0f;
+
+    for(int cube_x = 0; cube_x < num_cubes; cube_x++) {
+
+        const float angle = (static_cast<float>(cube_x) / num_cubes) * 360;
+
+        glm::vec3 cube_pos = glm::vec3(
+            sin(angle) * belt_radius + random_unit_float(),
+            random_unit_float() * 0.4f,
+            cos(angle) * belt_radius + random_unit_float());
+
+        cube_positions.push_back(cube_pos);
+    }
+
+    return cube_positions;
 }

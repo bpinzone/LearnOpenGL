@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		130AD50B23F9E66D00BED868 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */; };
+		138E78C724D9C559003172A5 /* random_rotator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 138E78C624D9C558003172A5 /* random_rotator.cpp */; };
 		13A5F6D0240EFE860069913A /* libassimp.3.1.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A5F6CD240EFA410069913A /* libassimp.3.1.1.dylib */; };
 		13DA825124CDF53400D1BA26 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13DA823724CDF53300D1BA26 /* texture.cpp */; };
 		13DA825224CDF53400D1BA26 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 13DA823824CDF53300D1BA26 /* mesh.cpp */; };
@@ -49,6 +50,8 @@
 /* Begin PBXFileReference section */
 		130AD50A23F9E66D00BED868 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../graphics_project_include_lib/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		132BA33523F9D55800DF94F0 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../Desktop/graphics_project_include_lib/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
+		138E78C524D9C558003172A5 /* random_rotator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = random_rotator.h; path = learn_open_gl/components/random_rotator.h; sourceTree = "<group>"; };
+		138E78C624D9C558003172A5 /* random_rotator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_rotator.cpp; path = learn_open_gl/components/random_rotator.cpp; sourceTree = "<group>"; };
 		13A5F6CD240EFA410069913A /* libassimp.3.1.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.3.1.1.dylib; path = ../../../../graphics_project_include_lib/lib/libassimp.3.1.1.dylib; sourceTree = "<group>"; };
 		13DA823724CDF53300D1BA26 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = texture.cpp; path = learn_open_gl/texture.cpp; sourceTree = "<group>"; };
 		13DA823824CDF53300D1BA26 /* mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh.cpp; path = learn_open_gl/mesh.cpp; sourceTree = "<group>"; };
@@ -123,6 +126,8 @@
 		13F0927823F9D452001D4461 = {
 			isa = PBXGroup;
 			children = (
+				138E78C624D9C558003172A5 /* random_rotator.cpp */,
+				138E78C524D9C558003172A5 /* random_rotator.h */,
 				13DA826424CDF54400D1BA26 /* circular_path.cpp */,
 				13DA826224CDF54400D1BA26 /* circular_path.h */,
 				13DA826B24CDF54400D1BA26 /* component.cpp */,
@@ -250,6 +255,7 @@
 				13DA825E24CDF53400D1BA26 /* stb_image.cpp in Sources */,
 				13DA825224CDF53400D1BA26 /* mesh.cpp in Sources */,
 				13DA827224CDF54500D1BA26 /* mst.cpp in Sources */,
+				138E78C724D9C559003172A5 /* random_rotator.cpp in Sources */,
 				13DA827324CDF54500D1BA26 /* circular_path.cpp in Sources */,
 				13DA827424CDF54500D1BA26 /* model_renderer.cpp in Sources */,
 				13DA827524CDF54500D1BA26 /* vis_normal_renderer.cpp in Sources */,

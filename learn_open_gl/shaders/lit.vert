@@ -2,9 +2,11 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
+layout (location = 3) in mat4 model; // locations 3, 4, 5, 6
+layout (location = 7) in mat3 normal; // locations 7, 8, 9.
 
-uniform mat4 model;
-uniform mat3 normal;
+// uniform mat4 model;
+// uniform mat3 normal;
 
 // uniform block
 // matrices point of maintenance.

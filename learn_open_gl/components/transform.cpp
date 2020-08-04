@@ -25,7 +25,7 @@ void Transform::set_position(const glm::vec3& position){
     recalculate_model();
 }
 
-glm::vec3 Transform::get_position() {
+const glm::vec3& Transform::get_position() {
     return glm::vec3(translation[3]);
 }
 
@@ -39,6 +39,10 @@ void Transform::set_rotation(const glm::mat4& rotation_in){
     recalculate_model();
 }
 
+const glm::mat4& Transform::get_rotation(){
+    return rotation;
+}
+
 void Transform::set_scale(const glm::mat4& scale_in){
     scale = scale_in;
     recalculate_model();
@@ -49,7 +53,7 @@ void Transform::set_scale(const glm::vec3& scale_in){
     recalculate_model();
 }
 
-glm::vec3 Transform::get_scale() const {
+const glm::vec3& Transform::get_scale() const {
     return glm::vec3(
         scale[0][0], scale[1][1], scale[2][2]
     );

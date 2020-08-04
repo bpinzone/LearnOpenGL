@@ -5,7 +5,7 @@
 #include "utility.h"
 
 // Initial values
-static constexpr glm::vec3 c_initial_position{0, 0, 1300};
+static constexpr glm::vec3 c_initial_position{0, 0, 1};
 static constexpr float c_initial_yaw = 90.0f;  // angle from positive x-axis.
 static constexpr float c_initial_pitch = 0.0f;
 static constexpr float c_initial_fov = 45.0f;
@@ -17,7 +17,7 @@ static constexpr float c_min_pitch = -89.0f;
 static constexpr float c_max_pitch = 89.0f;
 
 // Settings
-static constexpr float c_movement_speed = 200.0f;
+static constexpr float c_movement_speed = 10.0f;
 static constexpr float c_look_sensitivity = 0.1f;
 static constexpr glm::vec3 c_world_up{0, 1, 0};
 

@@ -1,18 +1,13 @@
-TODO: Proper OOP. Make members private.
+Composition hierarchy:
 
-Construction philosophy:
-    Give me everything I need directly.
-    or
-    Give me something to generate it with.
-
-Also, at any time you can set things.
-
-game object
-    model
-        meshes
+Game object has a
+    model has many
+        meshes have
             vertex data
-            Material
+            Material has
                 Shader
                 Data to put into uniforms (only that which its responsible for)
                     Textures
                     Other
+
+TODO: Some members are still not private.
