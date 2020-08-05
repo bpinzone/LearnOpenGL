@@ -11,7 +11,7 @@ public:
 
     // Translation
     void set_translation(const glm::mat4& translation_in);
-    const glm::vec3& get_position();
+    glm::vec3 get_position();
     void translate(const glm::vec3& differential);
     void set_position(const glm::vec3& position);
 
@@ -22,7 +22,7 @@ public:
     // Scale
     void set_scale(const glm::mat4& scale_in);
     void set_scale(const glm::vec3& scale_in);
-    const glm::vec3& get_scale() const;
+    glm::vec3 get_scale() const;
 
     void load_into_shader_global();
 

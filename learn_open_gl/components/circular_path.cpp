@@ -37,6 +37,7 @@ void Circular_path::update(){
 
     glm::vec3 new_position{0};
 
+    // TODO: if this is std::sin(), it takes radians... Changing this will break cone demo though.
     const float cos_portion = mult * cos(degrees);
     const float sin_portion = mult * sin(degrees);
 

@@ -125,7 +125,7 @@ int main() {
         "./shaders/lit.vert", "./shaders/lit.frag");
 
     shared_ptr<Material> cube_material = make_shared<Material>(
-        point_lit_shader, Material::Textures_t{ wood_diffuse, wood_specular}
+        point_lit_shader, Material::Textures_t{wood_diffuse, wood_specular}
     );
 
     shared_ptr<Model> cube_model = make_shared<Model>(
@@ -188,7 +188,7 @@ int main() {
     point_lit_shader->set_float("material.shininess", 32.0f);
     point_lit_shader->set_vec3("point_light.ambient",  white_light);
     point_lit_shader->set_vec3("point_light.diffuse",  white_light * 0.75f); // darken diffuse light a bit
-    point_lit_shader->set_vec3("point_light.specular", glm::vec3{1.0f, 1.0f, 1.0f});
+    point_lit_shader->set_vec3("point_light.specular", white_light);
     point_lit_shader->set_float("point_light.constant",  1.0f);
     point_lit_shader->set_float("point_light.linear",    0.09f * 0.5f);
     point_lit_shader->set_float("point_light.quadratic", 0.032f * 0.5f);
@@ -220,7 +220,8 @@ int main() {
         ));
 
         point_lit_shader->set_vec3("camera_pos", camera.get_position());
-        // NOTE: Position is one frame old. Could fix by grabbing value before light object is updated. Not caring for now.
+
+        // NOTE: Position is one frame old. Not caring for now.
         point_lit_shader->set_vec3("point_light.position", light_source->get_transform().get_position());
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -356,24 +357,26 @@ vector<glm::vec3> generate_cube_positions(){
 
     vector<glm::vec3> cube_positions;
 
-    static auto random_unit_float = std::bind(
-        std::uniform_real_distribution<float>{0.0, 1.0},
+    constexpr float max_offset = 0.5f;
+
+    static auto random_offset = std::bind(
+        std::uniform_real_distribution<float>{0.0, max_offset},
         std::default_random_engine{}
     );
 
-    const int num_cubes = 40.0f;
-    const float belt_radius = 10.0f;
+    constexpr int num_cubes = 40.0f;
+    constexpr float belt_radius = 10.0f;
 
     for(int cube_x = 0; cube_x < num_cubes; cube_x++) {
 
         const float angle = (static_cast<float>(cube_x) / num_cubes) * 360;
 
-        glm::vec3 cube_pos = glm::vec3(
-            sin(angle) * belt_radius + random_unit_float(),
-            random_unit_float() * 0.4f,
-            cos(angle) * belt_radius + random_unit_float());
+        cube_positions.push_back(glm::vec3(
+            sin(glm::radians(angle)) * belt_radius + random_offset(),
+            random_offset(),
+            cos(glm::radians(angle)) * belt_radius + random_offset()
+        ));
 
-        cube_positions.push_back(cube_pos);
     }
 
     return cube_positions;
