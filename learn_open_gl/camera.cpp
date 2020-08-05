@@ -5,8 +5,8 @@
 #include "utility.h"
 
 // Initial values
-static constexpr glm::vec3 c_initial_position{0, 0, 1300};
-static constexpr float c_initial_yaw = 90.0f;  // angle from positive x-axis.
+static constexpr glm::vec3 c_initial_position{0, 0, -65};
+static constexpr float c_initial_yaw = -90.0f;  // angle from positive x-axis.
 static constexpr float c_initial_pitch = 0.0f;
 static constexpr float c_initial_fov = 45.0f;
 

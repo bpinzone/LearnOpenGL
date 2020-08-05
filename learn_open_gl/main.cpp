@@ -135,28 +135,28 @@ int main() {
     // Sphere objects
     // Arrange them such that they move to form 4 cone shapes on 2 axes.
     vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 500;
-    constexpr int num_axes = 2;
+    constexpr int spheres_per_axis = 100;
+    constexpr int num_axes = 1;
     constexpr int num_spheres = spheres_per_axis * num_axes;
-    constexpr double depth_mult = 0.75;
-    constexpr double radius_mult = 0.75;
-    constexpr double speed_mult = 0.0075;
+    constexpr double depth_mult = 1.75;
+    constexpr double radius_mult = 1.0;
+    constexpr double speed_mult = 0.035;
 
-    for(int axis_x = 0; axis_x < num_axes; ++axis_x){
-        for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
-            shared_ptr<Gameobject> new_sphere_object = make_shared<Gameobject>();
-            const double sign_mult = (sphere_x % 2 == 0) ? 1 : -1;
-            const double depth = sign_mult * depth_mult * sphere_x;
-            const double speed = sign_mult * speed_mult * pow(sphere_x, 2.0);
-            const double radius = radius_mult * sphere_x;
-            constexpr double start_degs = 0;
+    int axis_x = 2;
+    for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
+        shared_ptr<Gameobject> new_sphere_object = make_shared<Gameobject>();
+        // const double sign_mult = (sphere_x % 2 == 0) ? 1 : -1;
+        const double sign_mult = 1;
+        const double depth = sign_mult * depth_mult * sphere_x;
+        const double speed = sign_mult * speed_mult * pow(sphere_x, 2.0);
+        const double radius = radius_mult * sphere_x;
+        constexpr double start_degs = 0;
 
-            new_sphere_object->add_component(make_shared<Circular_path>(
-                depth, start_degs, radius, speed,
-                static_cast<Axis>(axis_x)));
+        new_sphere_object->add_component(make_shared<Circular_path>(
+            depth, start_degs, radius, speed,
+            static_cast<Axis>(axis_x)));
 
-            sphere_objects.push_back(new_sphere_object);
-        }
+        sphere_objects.push_back(new_sphere_object);
     }
     shared_ptr<Gameobject> instanced_spheres_manager = make_shared<Gameobject>();
     instanced_spheres_manager->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
@@ -222,7 +222,7 @@ int main() {
         // render
         // ------
         static constexpr float near_clip = 3.0f;
-        static constexpr float far_clip = 2600.0f;
+        static constexpr float far_clip = 1000.0f;
 
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
         Shader_globals::get_instance().set_projection(glm::perspective(
