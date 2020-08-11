@@ -140,7 +140,7 @@ int main() {
     constexpr int num_spheres = spheres_per_axis * num_axes;
     constexpr double depth_mult = 0.75;
     constexpr double radius_mult = 0.75;
-    constexpr double speed_mult = 0.0075;
+    constexpr double speed_mult = 0.0065;
 
     for(int axis_x = 0; axis_x < num_axes; ++axis_x){
         for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
@@ -199,7 +199,7 @@ int main() {
 
     // === Lighting constants ===
     const glm::vec3 white_light {1, 1, 1};
-    instance_directional_shader->set_vec3("dir_light.ambient",  white_light * 0.8f * 0.6f);
+    instance_directional_shader->set_vec3("dir_light.ambient",  white_light);
     instance_directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
     instance_directional_shader->set_vec3("dir_light.specular", white_light);
     instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
