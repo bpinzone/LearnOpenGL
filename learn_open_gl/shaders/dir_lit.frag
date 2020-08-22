@@ -51,7 +51,16 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     float diff = max(dot(normal_n, -dir_light.direction), 0.0);
 
     vec3 light_ref = normalize(reflect(dir_light.direction, normal_n));
-    float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
+
+    // phong
+    // float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
+
+    // blinn-phong
+    vec3 halfway = normalize(normalize(dir_light.direction) + frag_to_camera_n);
+    float spec = 0;
+    if(diff > 0){
+        spec = pow(max(dot(halfway, normalize(fs_in.Normal)), 0.0), material.shininess);
+    }
 
     // todo: don't cast to vec3 if you want transparency.
     // Actually: This is being delt with below. (Adding transparency component)

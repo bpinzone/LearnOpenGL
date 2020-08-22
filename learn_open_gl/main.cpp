@@ -135,7 +135,7 @@ int main() {
     // Sphere objects
     // Arrange them such that they move to form 4 cone shapes on 2 axes.
     vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 500;
+    constexpr int spheres_per_axis = 10;
     constexpr int num_axes = 2;
     constexpr int num_spheres = spheres_per_axis * num_axes;
     constexpr double depth_mult = 0.75;
