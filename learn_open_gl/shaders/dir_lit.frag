@@ -116,6 +116,19 @@ void main() {
     vec3 result = calc_dir_light(dir_light, norm, frag_to_camera_n);
     FragColor = vec4(result, texture(material.diffuse1, fs_in.TexCoords).a);
 
+
+    /*
+    If you wanted to do gamma correction yourself:
+    do all lighting calculations in linear space
+    ...
+    apply gamma correction
+    // float gamma = 2.2;
+    // FragColor.rgb = pow(fragColor.rgb, vec3(1.0/gamma));
+    This will increase the values, so that when the monitor lowers them again, your linear space calculations will be correct. (I think)
+    You would need this in all your shaders contributing final values, or just at the end of your post processing step.
+    */
+
+
     // How to discard. (Before learned blending)
     // if(FragColor.a < 0.1){
     //     discard;
