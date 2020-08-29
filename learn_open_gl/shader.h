@@ -15,7 +15,7 @@ public:
         const char* geom_path = nullptr);
 
     void use() const;
-    void forward_shader_globals_to_uniforms() const;
+    void load_uniforms_with_shader_globals() const;
 
     void set_bool(const std::string& name, bool value) const;
     void set_int(const std::string& name, int value) const;

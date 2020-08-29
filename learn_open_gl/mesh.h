@@ -16,13 +16,13 @@
 // It DOES NOT store the vertex data in a separate container after construction. It only puts it in the buffer.
 // It DOES store the indices in case you want to reverse the winding order.
 
-// NOTE: V is a type representing a vertex. The material's shader MUST use this layout.
 // This is a potential problem: programming by convention here.
 class Mesh {
 public:
 
     std::shared_ptr<Material> material;
 
+    // NOTE: V is a type representing a vertex. The material's vertex shader MUST use this layout.
     // Give mesh data directly.
     template<typename V>
     Mesh(

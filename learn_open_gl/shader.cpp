@@ -71,7 +71,7 @@ void Shader::use() const {
 }
 
 // Put shader globals into this shader's uniforms.
-void Shader::forward_shader_globals_to_uniforms() const {
+void Shader::load_uniforms_with_shader_globals() const {
 
     set_mat4fv("model", Shader_globals::get_instance().get_model());
     set_mat3fv("normal", Shader_globals::get_instance().get_normal());
