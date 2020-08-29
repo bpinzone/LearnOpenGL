@@ -135,7 +135,7 @@ int main() {
     // Sphere objects
     // Arrange them such that they move to form 4 cone shapes on 2 axes.
     vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 500;
+    constexpr int spheres_per_axis = 10;
     constexpr int num_axes = 2;
     constexpr int num_spheres = spheres_per_axis * num_axes;
     constexpr double depth_mult = 0.75;
@@ -261,6 +261,17 @@ int main() {
 }
 
 void init_open_gl_settings(){
+
+    // Gamma correction.
+    // Be aware of sRGB textures. If a texture is in sRGB space, be careful not to gamma correct twice.
+    // First thing you do to such a texture is to convert it to linear space before working with it:
+    // float gamma = 2.2;
+    // vec3 diffuseColor = pow(texture(diffuse, texCoords).rgb, vec3(gamma));
+    // Alternatively, use the  GL_SRGB internal texture format.
+
+    // Most diffuse textures are in sRGB space.
+    // TODO: Need to change attenuation parameters now that we added this.
+    glEnable(GL_FRAMEBUFFER_SRGB);
 
     // Multi sampling
     glEnable(GL_MULTISAMPLE);

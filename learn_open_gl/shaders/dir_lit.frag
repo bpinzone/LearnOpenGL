@@ -51,7 +51,16 @@ vec3 calc_dir_light(Dir_light dir_light, vec3 normal_n, vec3 frag_to_camera_n) {
     float diff = max(dot(normal_n, -dir_light.direction), 0.0);
 
     vec3 light_ref = normalize(reflect(dir_light.direction, normal_n));
-    float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
+
+    // phong
+    // float spec = pow(max(dot(light_ref, frag_to_camera_n), 0.0), material.shininess);
+
+    // blinn-phong
+    vec3 halfway = normalize(normalize(dir_light.direction) + frag_to_camera_n);
+    float spec = 0;
+    if(diff > 0){
+        spec = pow(max(dot(halfway, normalize(fs_in.Normal)), 0.0), material.shininess);
+    }
 
     // todo: don't cast to vec3 if you want transparency.
     // Actually: This is being delt with below. (Adding transparency component)
@@ -106,6 +115,19 @@ void main() {
 
     vec3 result = calc_dir_light(dir_light, norm, frag_to_camera_n);
     FragColor = vec4(result, texture(material.diffuse1, fs_in.TexCoords).a);
+
+
+    /*
+    If you wanted to do gamma correction yourself:
+    do all lighting calculations in linear space
+    ...
+    apply gamma correction
+    // float gamma = 2.2;
+    // FragColor.rgb = pow(fragColor.rgb, vec3(1.0/gamma));
+    This will increase the values, so that when the monitor lowers them again, your linear space calculations will be correct. (I think)
+    You would need this in all your shaders contributing final values, or just at the end of your post processing step.
+    */
+
 
     // How to discard. (Before learned blending)
     // if(FragColor.a < 0.1){

@@ -94,6 +94,11 @@ vec3 calc_point_light(Point_light point_light, vec3 normal_n, vec3 frag_to_camer
     float spec = pow(max(dot(frag_to_camera_n, light_ref_n), 0.0), material.shininess);
 
     float distance = length(frag_to_light);
+
+    // Quadratic attenuation makes more sense now that we're using gamma correction.
+    // Physicaly correct equations look accurate only with gamma correction. Physically, light drops off with the squared distance.
+    // Ultimately, we are compensating for how a monitor works.
+    // Why aren't we compensating for eyes? We adjust colors in linear space and input values 0-1 based on our eyes anyway.
     float attenuation = 1.0 / (
         point_light.constant +
         point_light.linear * distance +
