@@ -6,36 +6,21 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader.h"
 #include "camera.h"
-#include "texture.h"
-#include "material.h"
-#include "game_object.h"
 #include "shader_globals.h"
-#include "model.h"
 #include "utility.h"
+#include "hierarchy.h"
+#include "scene_generation.h"
+#include "shader.h"
 
-#include "components/component.h"
-#include "components/circular_path.h"
-#include "components/instances_renderer.h"
-#include "components/connector.h"
-#include "components/mst.h"
-
+#include <memory>
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include <memory>
-#include <algorithm>
-#include <iterator>
-#include <string>
 
 using std::vector;
 using std::cout; using std::endl;
 using std::shared_ptr;
-using std::make_shared;
-using std::copy;
-using std::back_inserter;
-using std::string;
 
 void init_open_gl_settings();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -45,6 +30,7 @@ void processInput(GLFWwindow *window);
 
 int window_width = 2560;
 int window_height = 1440;
+Hierarchy hierarchy;
 Camera camera;
 
 int main() {
@@ -100,102 +86,12 @@ int main() {
     // --------------
     init_open_gl_settings();
 
-
-
     // ====================================================================================
     // The rest of main essentially serves as what you would do in an actual engine editor.
     // Put objects in scene, give them components, etc.
     // ====================================================================================
 
-
-    // Textures
-    // TODO: Poor design. Bool determines if we flip vertically on stbi load.
-    shared_ptr<Texture> blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE, false);
-    shared_ptr<Texture> red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE, false);
-    shared_ptr<Texture> gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR, false);
-
-    // Shaders
-    // Special shader for instanced rendering.
-    shared_ptr<Shader> instance_directional_shader = make_shared<Shader>("./shaders/instance_dir_lit.vert", "./shaders/instance_dir_lit.frag");
-
-    // Materials
-    shared_ptr<Material> instance_blue_material = make_shared<Material>(
-        instance_directional_shader, Material::Textures_t{ blue_diffuse, gray_specular }
-    );
-    shared_ptr<Material> instance_red_material = make_shared<Material>(
-        instance_directional_shader, Material::Textures_t{ red_diffuse, gray_specular }
-    );
-
-    // Models
-    shared_ptr<Model> sphere_model = make_shared<Model>(instance_directional_shader, "./primitive_models/sphere.obj");
-    sphere_model->set_materials(instance_blue_material);
-    shared_ptr<Model> cube_model = make_shared<Model>(instance_directional_shader, "./primitive_models/cube.obj");
-    cube_model->set_materials(instance_red_material);
-
-    // Sphere objects
-    // Arrange them such that they move to form 4 cone shapes on 2 axes.
-    vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 10;
-    constexpr int num_axes = 2;
-    constexpr int num_spheres = spheres_per_axis * num_axes;
-    constexpr double depth_mult = 0.75;
-    constexpr double radius_mult = 0.75;
-    constexpr double speed_mult = 0.0065;
-
-    for(int axis_x = 0; axis_x < num_axes; ++axis_x){
-        for(int sphere_x = 0; sphere_x < spheres_per_axis; ++sphere_x){
-            shared_ptr<Gameobject> new_sphere_object = make_shared<Gameobject>();
-            const double sign_mult = (sphere_x % 2 == 0) ? 1 : -1;
-            const double depth = sign_mult * depth_mult * sphere_x;
-            const double speed = sign_mult * speed_mult * pow(sphere_x, 2.0);
-            const double radius = radius_mult * sphere_x;
-            constexpr double start_degs = 0;
-
-            new_sphere_object->add_component(make_shared<Circular_path>(
-                depth, start_degs, radius, speed,
-                static_cast<Axis>(axis_x)));
-
-            sphere_objects.push_back(new_sphere_object);
-        }
-    }
-    shared_ptr<Gameobject> instanced_spheres_manager = make_shared<Gameobject>();
-    instanced_spheres_manager->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
-
-    // Cube objects
-    vector<shared_ptr<Gameobject>> cube_objects;
-    for(int i = 0; i < num_spheres - 1; ++i){
-
-        shared_ptr<Gameobject> new_cube = make_shared<Gameobject>();
-        new_cube->add_component(make_shared<Connector>(
-            sphere_objects[i], sphere_objects[i + 1]));
-        cube_objects.push_back(new_cube);
-    }
-    shared_ptr<Gameobject> instanced_cubes_manager = make_shared<Gameobject>();
-    instanced_cubes_manager->add_component(make_shared<Instances_renderer>(cube_model, cube_objects));
-
-    // MST Coordinator object
-    shared_ptr<Gameobject> coordinator_object = make_shared<Gameobject>();
-    coordinator_object->add_component(make_shared<MST_coordinator>(sphere_objects, cube_objects));
-
-
-    /*
-    Put objects in game loop containers.
-    Copy all Opaque objects
-    Order matters: sphere before coordinator. Coordinator before cubes.
-    Instances before their instance manager
-    */
-    vector<shared_ptr<Gameobject>> opaque_objects;
-
-    // spheres
-    copy(sphere_objects.begin(), sphere_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(instanced_spheres_manager);
-
-    // coordinator
-    opaque_objects.push_back(coordinator_object);
-
-    // cube
-    copy(cube_objects.begin(), cube_objects.end(), back_inserter(opaque_objects));
-    opaque_objects.push_back(instanced_cubes_manager);
+    shared_ptr<Shader> instance_directional_shader = add_mst_objects(&hierarchy);
 
     // === Lighting constants ===
     const glm::vec3 white_light {1, 1, 1};
@@ -205,9 +101,7 @@ int main() {
     instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
     instance_directional_shader->set_float("material.shininess", 32.0f);
 
-    for(auto& go : opaque_objects){
-        go->start();
-    }
+    hierarchy.start();
 
     // render loop
     // -----------
@@ -236,10 +130,7 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        // Draw
-        for(auto& go : opaque_objects){
-            go->update();
-        }
+        hierarchy.update();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
