@@ -13,10 +13,9 @@ Features:
 * Easily changing vertex data layout
 * Sharing vertex data between multiple objects
 * Skyboxes
-* Point, directional, and spot lights.
+* Point, directional, and spot lights
   
 Future Goals:
-* Gamma correction
-* Shadows
-* Normal Mapping
 * Deferred Shading
+* Shadow, normal, parallax mapping
+* SSAO
