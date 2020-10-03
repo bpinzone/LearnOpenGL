@@ -30,7 +30,7 @@ Camera::Camera()
 
 void Camera::ProcessKeyboard(Movement direction) {
 
-    float velocity = c_movement_speed * Time::get_instance().get_delta_time();
+    float velocity = c_movement_speed * Mytime::get_instance().get_delta_time();
     switch(direction){
         case Movement::FORWARD:  position += front * velocity; break;
         case Movement::BACKWARD: position -= front * velocity; break;

@@ -11,27 +11,60 @@ using std::set;
 using std::shared_ptr;
 using std::vector;
 
-set<shared_ptr<Texture>, Texture_comp> Texture::loaded_textures;
+struct Texture_comp {
 
-Texture::Texture(const std::string& path_in, Type type_in, bool flip_vertically)
-    : path{path_in}, type{type_in} {
+    using is_transparent = std::true_type;
 
-    assert(loaded_textures.find(path) == loaded_textures.end());
+    bool operator()(
+            const shared_ptr<const Texture> t1,
+            const shared_ptr<const Texture> t2) const {
+        return t1->get_paths() < t2->get_paths();
+    }
 
-    // TODO: Poor design.
-    assert(type == Type::DIFFUSE || type == Type::SPECULAR);
+    bool operator()(
+            const shared_ptr<const Texture> t,
+            const vector<string>& paths) const {
+        return t->get_paths() < paths;
+    }
 
-    glGenTextures(1, &texture_id);
+    bool operator()(
+            const vector<string>& paths,
+            const shared_ptr<const Texture> t) const {
+        return paths < t->get_paths();
+    }
+};
+
+
+// Avoid loading the same textures over and over again.
+// Identified by paths
+static set<shared_ptr<Texture>, Texture_comp> loaded_textures;
+
+
+shared_ptr<Texture> Texture::construct_texture_from_img_file(
+        const string& _path,
+        const string& _sampler_base_identifier,
+        bool flip_vertically){
+
+    vector<string> _paths{_path};
+
+    // Make sure we haven't already loaded it.
+    auto already_loaded_it = loaded_textures.find(_paths);
+    if(already_loaded_it != loaded_textures.end()){
+        return *already_loaded_it;
+    }
+
+    unsigned int new_texture_id;
+    glGenTextures(1, &new_texture_id);
 
     // Upside down image? This happens because OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis. Luckily for us, stb_image.h can flip the y-axis during image loading by adding the following statement before loading any image:
     // potential problem:
     stbi_set_flip_vertically_on_load(flip_vertically);
 
     int width, height, num_color_channels;
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &num_color_channels, 0);
+    unsigned char* data = stbi_load(_path.c_str(), &width, &height, &num_color_channels, 0);
     if(!data){
         stbi_image_free(data);
-        throw runtime_error{"Could not load texture at: " + path};
+        throw runtime_error{"Could not load texture at: " + _path};
     }
 
     GLenum format;
@@ -43,7 +76,7 @@ Texture::Texture(const std::string& path_in, Type type_in, bool flip_vertically)
 
     // Just like other objects we need to bind it so any
     // subsequent texture commands will configure the currently bound texture:
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glBindTexture(GL_TEXTURE_2D, new_texture_id);
 
     /*
     Actually generate the texture data
@@ -67,8 +100,8 @@ Texture::Texture(const std::string& path_in, Type type_in, bool flip_vertically)
     // Defines how UV coordinates behave when out of range.
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     /*
     // specify the border color in case "clamp to border" wrap mode is used.
@@ -85,28 +118,34 @@ Texture::Texture(const std::string& path_in, Type type_in, bool flip_vertically)
     // Bound texture object now has the data in it.
     // free data given by stbi_load
     stbi_image_free(data);
+
+    // bc ctor private;
+    return shared_ptr<Texture>{new Texture(
+        new_texture_id, _sampler_base_identifier, _paths)};
+
 }
 
-Texture::Texture(const vector<string> paths, Type type_in)
-    : path{"from many paths of cube"}, type{type_in} {
 
-    // TODO: Poor design
-    assert(type_in == Type::CUBE);
+shared_ptr<Texture> Texture::construct_cube_texture_from_img_file(
+        const vector<string>& _paths,
+        const string& _sampler_base_identifier){
 
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+    unsigned int new_texture_id;
+
+    glGenTextures(1, &new_texture_id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, new_texture_id);
 
     // Upside down image? This happens because OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis. Luckily for us, stb_image.h can flip the y-axis during image loading by adding the following statment before loading any image:
     // potential problem:
     stbi_set_flip_vertically_on_load(false);
 
-    for(GLuint i = 0; i < paths.size(); ++i) {
+    for(GLuint i = 0; i < _paths.size(); ++i) {
         int width, height, num_color_channels;
         unsigned char* data;
-        data = stbi_load(paths[i].c_str(), &width, &height, &num_color_channels, 0);
+        data = stbi_load(_paths[i].c_str(), &width, &height, &num_color_channels, 0);
         if(!data){
             stbi_image_free(data);
-            throw std::runtime_error{"Failed to load texture: " + paths[i]};
+            throw std::runtime_error{"Failed to load texture: " + _paths[i]};
         }
         glTexImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -120,8 +159,42 @@ Texture::Texture(const vector<string> paths, Type type_in)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    // ctor private
+    return shared_ptr<Texture>{new Texture(
+        new_texture_id, _sampler_base_identifier, _paths)};
 }
 
-Texture::Texture(unsigned int completed_texture_id, Type type_in)
-    : texture_id{completed_texture_id}, type{type_in} {
+shared_ptr<Texture> Texture::construct_texture_from_completed_id(
+        unsigned int completed_texture_id,
+        const string& _sampler_base_identifier){
+
+    // ctor private
+    return shared_ptr<Texture>{new Texture(
+        completed_texture_id, _sampler_base_identifier, vector<string>{})};
+}
+
+
+const string& Texture::get_sampler_base_identifier() const {
+    return sampler_base_identifier;
+}
+
+unsigned int Texture::get_id() const {
+    return texture_id;
+}
+
+const vector<string>& Texture::get_paths() const{
+    return paths;
+}
+
+
+// Private constructor
+Texture::Texture(
+        unsigned int _texture_id,
+        const string& _sampler_base_identifier,
+        const vector<string>& _paths)
+
+    : texture_id{_texture_id},
+    sampler_base_identifier{_sampler_base_identifier},
+    paths{_paths} {
 }

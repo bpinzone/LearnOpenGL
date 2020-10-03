@@ -32,20 +32,29 @@
     <ClCompile Include="learn_open_gl\components\component.cpp" />
     <ClCompile Include="learn_open_gl\components\connector.cpp" />
     <ClCompile Include="learn_open_gl\components\instances_renderer.cpp" />
+    <ClCompile Include="learn_open_gl\components\lights\dir_light.cpp" />
+    <ClCompile Include="learn_open_gl\components\lights\light.cpp" />
+    <ClCompile Include="learn_open_gl\components\lights\point_light.cpp" />
     <ClCompile Include="learn_open_gl\components\model_renderer.cpp" />
     <ClCompile Include="learn_open_gl\components\mst.cpp" />
     <ClCompile Include="learn_open_gl\components\outline_model_renderer.cpp" />
+    <ClCompile Include="learn_open_gl\components\render_component.cpp" />
     <ClCompile Include="learn_open_gl\components\transform.cpp" />
     <ClCompile Include="learn_open_gl\components\vis_normal_renderer.cpp" />
     <ClCompile Include="learn_open_gl\game_object.cpp" />
+    <ClCompile Include="learn_open_gl\geom_pass.cpp" />
     <ClCompile Include="learn_open_gl\glad.c" />
+    <ClCompile Include="learn_open_gl\hierarchy.cpp" />
     <ClCompile Include="learn_open_gl\main.cpp" />
     <ClCompile Include="learn_open_gl\manual_meshes.cpp" />
     <ClCompile Include="learn_open_gl\material.cpp" />
     <ClCompile Include="learn_open_gl\mesh.cpp" />
     <ClCompile Include="learn_open_gl\model.cpp" />
+    <ClCompile Include="learn_open_gl\quad_post_processor.cpp" />
+    <ClCompile Include="learn_open_gl\scene_generation.cpp" />
     <ClCompile Include="learn_open_gl\shader.cpp" />
     <ClCompile Include="learn_open_gl\shader_globals.cpp" />
+    <ClCompile Include="learn_open_gl\shared_shaders.cpp" />
     <ClCompile Include="learn_open_gl\stb_image.cpp" />
     <ClCompile Include="learn_open_gl\texture.cpp" />
     <ClCompile Include="learn_open_gl\utility.cpp" />
@@ -57,18 +66,27 @@
     <ClInclude Include="learn_open_gl\components\component.h" />
     <ClInclude Include="learn_open_gl\components\connector.h" />
     <ClInclude Include="learn_open_gl\components\instances_renderer.h" />
+    <ClInclude Include="learn_open_gl\components\lights\dir_light.h" />
+    <ClInclude Include="learn_open_gl\components\lights\light.h" />
+    <ClInclude Include="learn_open_gl\components\lights\point_light.h" />
     <ClInclude Include="learn_open_gl\components\model_renderer.h" />
     <ClInclude Include="learn_open_gl\components\mst.h" />
     <ClInclude Include="learn_open_gl\components\outline_model_renderer.h" />
+    <ClInclude Include="learn_open_gl\components\render_component.h" />
     <ClInclude Include="learn_open_gl\components\transform.h" />
     <ClInclude Include="learn_open_gl\components\vis_normal_renderer.h" />
     <ClInclude Include="learn_open_gl\game_object.h" />
+    <ClInclude Include="learn_open_gl\geom_pass.h" />
+    <ClInclude Include="learn_open_gl\hierarchy.h" />
     <ClInclude Include="learn_open_gl\manual_meshes.h" />
     <ClInclude Include="learn_open_gl\material.h" />
     <ClInclude Include="learn_open_gl\mesh.h" />
     <ClInclude Include="learn_open_gl\model.h" />
+    <ClInclude Include="learn_open_gl\quad_post_processor.h" />
+    <ClInclude Include="learn_open_gl\scene_generation.h" />
     <ClInclude Include="learn_open_gl\shader.h" />
     <ClInclude Include="learn_open_gl\shader_globals.h" />
+    <ClInclude Include="learn_open_gl\shared_shaders.h" />
     <ClInclude Include="learn_open_gl\stb_image.h" />
     <ClInclude Include="learn_open_gl\texture.h" />
     <ClInclude Include="learn_open_gl\utility.h" />
@@ -158,6 +176,7 @@
     <IncludePath>\\BPMacPro\%40REPOS\Graphics\LearnOpenGL\learn_open_gl;C:\Users\bpinzone\Downloads\glfw-3.3.2.bin.WIN64\glfw-3.3.2.bin.WIN64\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\bpinzone\Downloads\glfw-3.3.2.bin.WIN64\glfw-3.3.2.bin.WIN64\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Users\bpinzone\Downloads\glfw-3.3.2.bin.WIN64\glfw-3.3.2.bin.WIN64\lib;$(ExecutablePath)</ExecutablePath>
+    <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LearnOpenGLConfig|x64'">
     <LinkIncremental>true</LinkIncremental>

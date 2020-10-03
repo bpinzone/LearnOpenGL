@@ -11,6 +11,7 @@
 #include "material.h"
 #include "model.h"
 #include "game_object.h"
+#include "shared_shaders.h"
 
 #include "components/component.h"
 #include "components/circular_path.h"
@@ -24,37 +25,36 @@ using std::vector;
 using std::copy;
 using std::back_inserter;
 
-// TODO: temporarily returning shader from here to set values.
-shared_ptr<Shader> add_mst_objects(Hierarchy* hier){
+void add_mst_objects(Hierarchy* hier){
 
     // Textures
     // TODO: Poor design. Bool determines if we flip vertically on stbi load.
-    auto blue_diffuse = make_shared<Texture>("./textures/blue.png", Texture::Type::DIFFUSE, false);
-    auto red_diffuse = make_shared<Texture>("./textures/red.png", Texture::Type::DIFFUSE, false);
-    auto gray_specular = make_shared<Texture>("./textures/gray.png", Texture::Type::SPECULAR, false);
+    shared_ptr<Texture> blue_diffuse = Texture::construct_texture_from_img_file(
+        "./textures/blue.png", "material.diffuse", false);
 
-    // Shaders
-    // Special shader for instanced rendering.
-    auto instance_directional_shader = make_shared<Shader>(
-        "./shaders/instance_dir_lit.vert", "./shaders/instance_dir_lit.frag");
+    shared_ptr<Texture> red_diffuse = Texture::construct_texture_from_img_file(
+        "./textures/red.png", "material.diffuse", false);
+
+    shared_ptr<Texture> gray_specular = Texture::construct_texture_from_img_file(
+        "./textures/gray.png", "material.specular", false);
 
     // Materials
     auto instance_blue_material = make_shared<Material>(
-        instance_directional_shader, Material::Textures_t{ blue_diffuse, gray_specular });
+        Shared_shaders::get_instance().instance_geo_pass_shader,
+        Material::Textures_t{ blue_diffuse, gray_specular });
 
     auto instance_red_material = make_shared<Material>(
-        instance_directional_shader, Material::Textures_t{ red_diffuse, gray_specular });
+        Shared_shaders::get_instance().instance_geo_pass_shader,
+        Material::Textures_t{ red_diffuse, gray_specular });
 
     // Models
-    auto sphere_model = make_shared<Model>(instance_directional_shader, "./primitive_models/sphere.obj");
-    auto cube_model = make_shared<Model>(instance_directional_shader, "./primitive_models/cube.obj");
-    sphere_model->set_materials(instance_blue_material);
-    cube_model->set_materials(instance_red_material);
+    auto sphere_model = make_shared<Model>(instance_blue_material, "./primitive_models/sphere.obj");
+    auto cube_model = make_shared<Model>(instance_red_material, "./primitive_models/cube.obj");
 
     // Sphere objects
     // Arrange them such that they move to form 4 cone shapes on 2 axes.
     vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 10;
+    constexpr int spheres_per_axis = 100;
     constexpr int num_axes = 2;
     constexpr int num_spheres = spheres_per_axis * num_axes;
     constexpr double depth_mult = 0.75;
@@ -104,7 +104,5 @@ shared_ptr<Shader> add_mst_objects(Hierarchy* hier){
 
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(hier->opaque_objects));
     hier->opaque_objects.push_back(instanced_cubes_manager);
-
-    return instance_directional_shader;
 
 }

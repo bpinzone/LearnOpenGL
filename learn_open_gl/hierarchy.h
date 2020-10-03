@@ -19,7 +19,14 @@ public:
     void start();
     void update();
 
+    void render_start();
+    void render_update();
+
 private:
+
+    using Gameobject_fn_t = void (Gameobject::*)();
+
+    void for_each_in_hierarchy(Gameobject_fn_t go_fn);
 
 };
 

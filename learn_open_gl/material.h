@@ -59,7 +59,10 @@ private:
 
     void load_textures(aiMaterial* mat, const std::string& model_dir);
 
-    void load_textures_of_type(aiMaterial* mat, Texture::Type type, const std::string& model_dir);
+    void load_textures_of_type(
+        aiMaterial* mat, aiTextureType ai_type,
+        const std::string& sampler_base_identifier,
+        const std::string& model_dir);
 
     // Idx = Tex unit it will be mapped to.
     Textures_t textures;

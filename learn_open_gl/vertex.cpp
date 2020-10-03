@@ -43,3 +43,21 @@ int GeomTestVertex::setup_vertex_attrib_ptrs(){
 
     return idx;
 }
+
+int PostProcessQuadVertex::setup_vertex_attrib_ptrs(){
+    int idx = 0;
+
+    // Position attribute
+    glEnableVertexAttribArray(idx);
+    glVertexAttribPointer(idx, 3, GL_FLOAT, GL_FALSE, sizeof(PostProcessQuadVertex),
+        reinterpret_cast<void*>(offsetof(PostProcessQuadVertex, position)));
+    ++idx;
+
+    // Tex Coord.
+    glEnableVertexAttribArray(idx);
+    glVertexAttribPointer(idx, 2, GL_FLOAT, GL_FALSE, sizeof(PostProcessQuadVertex),
+        reinterpret_cast<void*>(offsetof(PostProcessQuadVertex, tex_coord)));
+    ++idx;
+
+    return idx;
+}

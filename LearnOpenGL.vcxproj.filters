@@ -84,6 +84,33 @@
     <ClCompile Include="learn_open_gl\vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="learn_open_gl\hierarchy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\scene_generation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\components\render_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\components\lights\dir_light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\components\lights\light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\components\lights\point_light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\geom_pass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\quad_post_processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\shared_shaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="learn_open_gl\components\circular_path.h">
@@ -147,6 +174,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="learn_open_gl\vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\hierarchy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\scene_generation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\components\render_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\components\lights\dir_light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\components\lights\light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\components\lights\point_light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\geom_pass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\quad_post_processor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\shared_shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

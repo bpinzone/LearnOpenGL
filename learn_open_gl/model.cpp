@@ -37,6 +37,11 @@ Model::Model(shared_ptr<Shader> shader, const string& model_path) {
     load_meshes(scene->mRootNode, scene, shader);
 }
 
+Model::Model(shared_ptr<Material> mat, const std::string& model_path)
+    : Model(mat->shader, model_path){
+    set_materials(mat);
+}
+
 void Model::draw(){
     for(auto& mesh : meshes){
         mesh->draw();

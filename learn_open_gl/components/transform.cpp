@@ -1,7 +1,7 @@
 #include "transform.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader_globals.h"
+#include "../shader_globals.h"
 
 Transform::Transform()
     : translation{glm::mat4(1.0)}, rotation{glm::mat4(1.0)},

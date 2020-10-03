@@ -1,6 +1,6 @@
 #include "vis_normal_renderer.h"
 
-#include "game_object.h"
+#include "../game_object.h"
 #include "transform.h"
 
 using std::shared_ptr;
@@ -22,7 +22,6 @@ void Vis_normal_renderer::update() {
         Material::Textures_t{}
     );
 
-    Component::update();
     game_object->get_transform().load_into_shader_global();
 
     model->draw();

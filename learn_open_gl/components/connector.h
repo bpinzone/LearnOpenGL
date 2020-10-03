@@ -1,7 +1,7 @@
 #ifndef CONNECTOR_H
 #define CONNECTOR_H
 
-#include "game_object.h"
+#include "../game_object.h"
 #include "component.h"
 
 #include <memory>

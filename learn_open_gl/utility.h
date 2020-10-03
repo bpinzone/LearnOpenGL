@@ -1,43 +1,36 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <glfw3.h>
-
 #include <memory>
 
-class Time {
+extern int window_width;
+extern int window_height;
+
+class Mytime {
 
 public:
 
     // Call at the top of the rendering loop.
-    void update_delta_time() {
-
-        double current_frame_start_time = glfwGetTime();
-        delta_time = current_frame_start_time - last_frame_start_time;
-
-        last_frame_start_time = current_frame_start_time;
-    }
+    void update_delta_time();
 
     // In seconds
     double get_delta_time() const {
         return delta_time;
     }
 
-    static Time& get_instance(){
-        static Time time;
+    static Mytime& get_instance(){
+        static Mytime time;
         return time;
     }
 
-	Time(const Time&) = delete;
-	Time(Time&&) = delete;
-	Time& operator= (const Time&)  = delete;
-	Time& operator= (Time&&) = delete;
+	Mytime(const Mytime&) = delete;
+	Mytime(Mytime&&) = delete;
+	Mytime& operator= (const Mytime&)  = delete;
+	Mytime& operator= (Mytime&&) = delete;
 
 private:
 
-    Time()
-        : delta_time{0}, last_frame_start_time{glfwGetTime()} {
-    }
+    Mytime();
 
     double delta_time;
     double last_frame_start_time;

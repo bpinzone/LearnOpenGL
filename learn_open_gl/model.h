@@ -21,13 +21,18 @@ public:
 
     Model(const Meshes_t& meshes_in);
 
+    // Use this shader, but extract textures and create material from model_path
     Model(std::shared_ptr<Shader> shader, const std::string& model_path);
 
+    // Use this material. Only use mesh data from model_path
+    Model(std::shared_ptr<Material> mat, const std::string& model_path);
+
+    // TODO: rename to get_first_material.
     std::shared_ptr<Material> get_material() const {
         if(meshes.empty()){
             return nullptr;
         }
-        return meshes.front()->material;
+        return meshes.front()->get_material();
     }
 
     void set_materials(std::shared_ptr<Material> material){
@@ -42,6 +47,7 @@ public:
         }
     }
 
+    // TODO: should be able to draw using a different material. Like the geometry pass.
     // Calls draw on every mesh in this model.
     void draw();
     void draw_instanced(int num_instances);

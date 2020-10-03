@@ -5,12 +5,17 @@ class Gameobject;
 
 #include <memory>
 
+// abstract.
 class Component {
 
 public:
 
-    virtual void start();
-    virtual void update();
+    virtual void start(){
+
+    }
+    virtual void update(){
+
+    }
 
     // Called by Gameobject when this component is added.
     void set_game_object(std::shared_ptr<Gameobject> game_object_in);
@@ -20,6 +25,10 @@ public:
 protected:
 
     std::shared_ptr<Gameobject> game_object;
+
+    // Make abstract
+    Component() {
+    }
 
 private:
 

@@ -2,9 +2,8 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
-
-uniform mat4 model;
-uniform mat3 normal;
+layout (location = 3) in mat4 instance_model; // locations 3, 4, 5, 6
+layout (location = 7) in mat3 instance_normal; // locations 7, 8, 9.
 
 // uniform block
 // matrices point of maintenance.
@@ -24,11 +23,11 @@ out VS_OUT {
 
 void main() {
 
-    vec4 world_pos = model * vec4(aPos, 1.0);
+    vec4 world_pos = instance_model * vec4(aPos, 1.0);
 
     gl_Position = projection * view * world_pos;
 
-    vs_out.WorldNormal = normal * aNormal;
+    vs_out.WorldNormal = instance_normal * aNormal;
     vs_out.WorldPos = world_pos.xyz;
     vs_out.TexCoord = aTexCoord;
 }

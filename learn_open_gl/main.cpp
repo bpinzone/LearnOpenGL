@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
-// Include exactly once.
+// Include exactly once per translation unit. ex: this is fine in another cpp.
+// Just don't have an include chain that results in two of these!
 #include <glfw3.h>
 
 #include <glm/glm.hpp>
@@ -12,15 +13,21 @@
 #include "hierarchy.h"
 #include "scene_generation.h"
 #include "shader.h"
+#include "quad_post_processor.h"
+#include "shared_shaders.h"
+#include "geom_pass.h"
+#include "material.h"
 
 #include <memory>
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <stdexcept>
 
 using std::vector;
 using std::cout; using std::endl;
 using std::shared_ptr;
+using std::make_shared;
 
 void init_open_gl_settings();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -28,12 +35,11 @@ void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-int window_width = 2560;
-int window_height = 1440;
 Hierarchy hierarchy;
 Camera camera;
 
 int main() {
+
 
     // glfw: initialize and configure window
     // ------------------------------
@@ -91,15 +97,31 @@ int main() {
     // Put objects in scene, give them components, etc.
     // ====================================================================================
 
-    shared_ptr<Shader> instance_directional_shader = add_mst_objects(&hierarchy);
+    // shared_ptr<Shader> instance_directional_shader = add_mst_objects(&hierarchy);
+
+    add_mst_objects(&hierarchy);
 
     // === Lighting constants ===
-    const glm::vec3 white_light {1, 1, 1};
-    instance_directional_shader->set_vec3("dir_light.ambient",  white_light);
-    instance_directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
-    instance_directional_shader->set_vec3("dir_light.specular", white_light);
-    instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
-    instance_directional_shader->set_float("material.shininess", 32.0f);
+    // const glm::vec3 white_light {1, 1, 1};
+    // instance_directional_shader->set_vec3("dir_light.ambient",  white_light);
+    // instance_directional_shader->set_vec3("dir_light.diffuse",  white_light * 0.8f); // darken diffuse light a bit
+    // instance_directional_shader->set_vec3("dir_light.specular", white_light);
+    // instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
+    // instance_directional_shader->set_float("material.shininess", 32.0f);
+
+
+    Geom_pass geom_pass;
+
+    auto lighting_pass_shader = make_shared<Shader>(
+        "./shaders/lighting_pass.vert",
+        "./shaders/lighting_pass.frag");
+
+    auto lighting_pass_mat = make_shared<Material>(
+        lighting_pass_shader,
+        // Material::Textures_t{geom_pass.get_albedo_spec_tex()} );
+        Material::Textures_t{geom_pass.get_albedo_spec_tex()} );
+
+    Quad_post_processor lighting_quad_pp(0, lighting_pass_mat);
 
     hierarchy.start();
 
@@ -107,7 +129,7 @@ int main() {
     // -----------
     while (!glfwWindowShouldClose(window)) {
 
-        Time::get_instance().update_delta_time();
+        Mytime::get_instance().update_delta_time();
 
         // input
         // -----
@@ -125,12 +147,19 @@ int main() {
             near_clip, far_clip
         ));
 
-        instance_directional_shader->set_vec3("camera_pos", camera.get_position());
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // instance_directional_shader->set_vec3("camera_pos", camera.get_position());
+
+        // replaced by call to g buffer render.
 
         hierarchy.update();
+
+        // replaced by call to g buffer render.
+        geom_pass.bind_framebuffer_and_render_update(&hierarchy);
+
+        // hierarchy.render_update();
+
+        lighting_quad_pp.render_quad();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -162,10 +191,11 @@ void init_open_gl_settings(){
 
     // Most diffuse textures are in sRGB space.
     // TODO: Need to change attenuation parameters now that we added this.
-    glEnable(GL_FRAMEBUFFER_SRGB);
+    // glEnable(GL_FRAMEBUFFER_SRGB);
 
     // Multi sampling
-    glEnable(GL_MULTISAMPLE);
+    // TODO: disable this
+    // glEnable(GL_MULTISAMPLE);
 
     // Face Culling
     glEnable(GL_CULL_FACE);
@@ -174,8 +204,9 @@ void init_open_gl_settings(){
 
     // Enable blending
     // The glBlendFunc(GLenum sfactor, GLenum dfactor) function expects two parameters ...
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // TODO: DISABLE THIS once you're doing deferred shading!
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // === Stencil test ===
     // Default: On, Writable, always passes.
@@ -233,9 +264,12 @@ void processInput(GLFWwindow *window) {
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     // make sure the viewport matches the new window dimensions;
     // note that width and height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+
+    // Input checked at end of render loop. Therefore this will never be called when a depth map for a light is in the middle of rendering.
     window_width = width;
     window_height = height;
+
+    glViewport(0, 0, window_width, window_height);
 }
 
 // [in]	xpos	The new cursor x-coordinate, relative to the left edge of the content area.

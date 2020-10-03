@@ -1,6 +1,6 @@
 #include "outline_model_renderer.h"
 #include "transform.h"
-#include "game_object.h"
+#include "../game_object.h"
 
 using std::shared_ptr;
 
@@ -14,8 +14,6 @@ Outline_model_renderer::Outline_model_renderer(
 }
 
 void Outline_model_renderer::update() {
-
-    Component::update();
 
     static const int base_flag = 1;
 

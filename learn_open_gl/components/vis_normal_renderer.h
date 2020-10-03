@@ -2,8 +2,8 @@
 #define VIS_NORMAL_RENDERER_H
 
 #include "model_renderer.h"
-#include "model.h"
-#include "material.h"
+#include "../model.h"
+#include "../material.h"
 
 #include <memory>
 

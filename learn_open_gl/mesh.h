@@ -16,11 +16,9 @@
 // It DOES NOT store the vertex data in a separate container after construction. It only puts it in the buffer.
 // It DOES store the indices in case you want to reverse the winding order.
 
-// This is a potential problem: programming by convention here.
+// This is a potential problem: programming by convention here. (V has to match vertex shader layout.)
 class Mesh {
 public:
-
-    std::shared_ptr<Material> material;
 
     // NOTE: V is a type representing a vertex. The material's vertex shader MUST use this layout.
     // Give mesh data directly.
@@ -39,7 +37,11 @@ public:
         const std::string& model_dir
     );
 
-   void set_material(std::shared_ptr<Material> material_in){
+    std::shared_ptr<Material> get_material(){
+        return material;
+    }
+
+    void set_material(std::shared_ptr<Material> material_in){
         material = material_in;
     }
 
@@ -63,6 +65,8 @@ public:
     // glDeleteBuffers(1, &ebo);
 
 private:
+
+    std::shared_ptr<Material> material;
 
     // Using assimp, returns the vertex vector, but puts the indices into the indices member.
     std::vector<Vertex> load_vertex_and_index_data(aiMesh* mesh, const aiScene* scene);

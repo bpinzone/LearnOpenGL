@@ -1,8 +1,8 @@
 #include "circular_path.h"
 
-#include "game_object.h"
+#include "../game_object.h"
 #include "transform.h"
-#include "utility.h"
+#include "../utility.h"
 
 #include <cmath>
 
@@ -30,7 +30,7 @@ void Circular_path::start(){
 
 void Circular_path::update(){
 
-    double degrees_differential = Time::get_instance().get_delta_time() * angular_speed;
+    double degrees_differential = Mytime::get_instance().get_delta_time() * angular_speed;
     degrees += degrees_differential;
     const double sign = depth > 0 ? 1 : -1;
     const double mult = sign * radius;

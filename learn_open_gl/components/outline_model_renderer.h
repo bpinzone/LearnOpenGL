@@ -2,8 +2,8 @@
 #define OUTLINE_MODEL_RENDERER_H
 
 #include "component.h"
-#include "model.h"
-#include "material.h"
+#include "../model.h"
+#include "../material.h"
 #include "model_renderer.h"
 
 #include <memory>

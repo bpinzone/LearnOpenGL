@@ -3,6 +3,7 @@
 
 #include "components/transform.h"
 #include "components/component.h"
+#include "components/render_component.h"
 
 #include <glm/glm.hpp>
 
@@ -27,24 +28,28 @@ public:
                 return p;
             }
         }
-        if(auto p = std::dynamic_pointer_cast<T>(render_component); p){
-            return p;
+        for(auto& comp : render_components){
+            if(auto p = std::dynamic_pointer_cast<T>(comp); p){
+                return p;
+            }
         }
         return nullptr;
     }
 
-    // Calls start and update on all components.
-    // Models get called last.
+    // Calls start / update on non-render components.
     void start();
     void update();
+
+    // Calls start / update on render components.
+    void render_start();
+    void render_update();
 
 private:
 
     Transform transform;
 
     std::vector<std::shared_ptr<Component>> components;
-    std::shared_ptr<Component> render_component;
-
+    std::vector<std::shared_ptr<Render_component>> render_components;
 };
 
 #endif

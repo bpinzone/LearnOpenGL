@@ -23,4 +23,14 @@ struct GeomTestVertex {
     static int setup_vertex_attrib_ptrs();
 };
 
+struct PostProcessQuadVertex {
+    glm::vec3 position;
+    glm::vec2 tex_coord;
+
+    static int setup_vertex_attrib_ptrs();
+};
+
+// NOTE: When adding another vertex class, add to the end of mesh.cpp
+// The ctor AND the setup_vao decl.
+
 #endif

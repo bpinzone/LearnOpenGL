@@ -48,8 +48,6 @@ Instances_renderer::Instances_renderer(shared_ptr<Model> common_model_in, std::v
 
 void Instances_renderer::update() {
 
-    Component::update();
-
     // Put data for instances into staging area.
     transform(
         instances.begin(), instances.end(),

@@ -1,9 +1,9 @@
 #ifndef INSTANCES_RENDERER_H
 #define INSTANCES_RENDERER_H
 
-#include "component.h"
-#include "game_object.h"
-#include "model.h"
+#include "render_component.h"
+#include "../game_object.h"
+#include "../model.h"
 
 #include <glm/glm.hpp>
 
@@ -13,7 +13,7 @@
 // Acts as the renderer for several game objects. Instances should not have a renderer.
 // Instances are still responsible for updating THEMSELVES, BEFORE this is updated.
 // Instances_renderer will extract data from the instances as necessary.
-class Instances_renderer : public Component {
+class Instances_renderer : public Render_component {
 
 public:
 

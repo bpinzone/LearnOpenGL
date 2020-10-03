@@ -1,6 +1,6 @@
 #include "connector.h"
 
-#include "utility.h"
+#include "../utility.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

@@ -1,7 +1,7 @@
 #include "mesh.h"
 
 #include <glad/glad.h>
-#include <glfw3.h>
+// #include <glfw3.h>
 
 #include <string>
 #include <utility>
@@ -181,14 +181,18 @@ void Mesh::setup_vao(const vector<V>& vertices){
 template Mesh::Mesh(
     const vector<Vertex>& vertices_in,
     const vector<unsigned int>& indices_in,
-    shared_ptr<Material> material_in
-);
+    shared_ptr<Material> material_in);
 
 template Mesh::Mesh(
     const vector<GeomTestVertex>& vertices_in,
     const vector<unsigned int>& indices_in,
-    shared_ptr<Material> material_in
-);
+    shared_ptr<Material> material_in);
+
+template Mesh::Mesh(
+    const vector<PostProcessQuadVertex>& vertices_in,
+    const vector<unsigned int>& indices_in,
+    shared_ptr<Material> material_in);
 
 template void Mesh::setup_vao(const std::vector<Vertex>& vertices);
 template void Mesh::setup_vao(const std::vector<GeomTestVertex>& vertices);
+template void Mesh::setup_vao(const std::vector<PostProcessQuadVertex>& vertices);

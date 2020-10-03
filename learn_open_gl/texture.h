@@ -2,7 +2,7 @@
 #define TEXTURE_H
 
 #include <glad/glad.h>
-#include <glfw3.h>
+// #include <glfw3.h>
 
 #include <vector>
 #include <utility>
@@ -15,65 +15,51 @@ struct Texture_comp;
 class Texture {
 public:
 
-    // Texture units in shaders should be NAMED: <lowercase type name>#
-    // Example: "diffuse1", "specular2"
-    enum class Type {
-        DIFFUSE, SPECULAR, CUBE
-    };
-
-    // TODO: Poor design.
-
-    // NOTE: Could make a static factory function, and manage this ourselves. Then client would call
-    // factory instead of Ctor, which we could make private.
-
-    // This class is NOT responsible for managing this. (Would require shared_from_this in ctor.)
-    // Although, our ctor will assert that a texture that is about to constructed is not already here.
-    static std::set<std::shared_ptr<Texture>, Texture_comp> loaded_textures;
-
-
-    // Make a diffuse or specular texture. Type must be DIFFUSE or SPECULAR.
+    // ex: sampler_base_identifier = "material.diffuse", "material.specular"
+    // Should be the same as the sampler2D identifier used in shader.
     // TODO: Poor design. Switching variable
-    Texture(const std::string& path_in, Type type_in, bool flip_vertically);
+    static std::shared_ptr<Texture> construct_texture_from_img_file(
+        const std::string& _path,
+        const std::string& _sampler_base_identifier,
+        bool flip_vertically);
 
-    // TODO: Poor design. Parameter must have specific value. Yet another reason to make factory functions.
-    // Make a cube map texture. Type must be CUBE.
+    // ex: identifier = "material.cube"
     // Paths must be in this open gl defined ordered:
     // POSITIVE_X Right, NEGATIVE_X Left, POSITIVE_Y Top, NEGATIVE_Y Bottom, POSITIVE_Z Back, NEGATIVE_Z Front
-    Texture(const std::vector<std::string> paths, Type type_in);
+    static std::shared_ptr<Texture> construct_cube_texture_from_img_file(
+        const std::vector<std::string>& _paths,
+        const std::string& _sampler_base_identifier);
 
-    Texture(unsigned int completed_texture_id, Type type_in);
+    // ex: identifier = "position", "normal", "albedo_spec"
+    static std::shared_ptr<Texture> construct_texture_from_completed_id(
+        unsigned int completed_texture_id,
+        const std::string& _sampler_base_identifier);
+
+    const std::string& get_sampler_base_identifier() const;
+    unsigned int get_id() const;
+
+    const std::vector<std::string>& get_paths() const;
+
+    friend class std::shared_ptr<Texture>;
+
+private:
 
     unsigned int texture_id;
 
+    std::string sampler_base_identifier;
+
     // Relative to dir main is in. Includes the file name.
-    // empty for cube maps.
-    const std::string path;
+    // Size should be 1 for regular images, 6 for cube maps, 0 for pre-completed textures.
+    std::vector<std::string> paths;
 
-    // One of "diffuse", "specular"
-    Type type;
+    Texture(
+        unsigned int _texture_id,
+        const std::string& _sampler_base_identifier,
+        const std::vector<std::string>& _paths);
+
+    // TODO: dtor. And with lots of other objects that are referred to by shared_ptr...
+
 };
 
-struct Texture_comp {
-
-    using is_transparent = std::true_type;
-
-    bool operator()(
-            const std::shared_ptr<const Texture> t1,
-            const std::shared_ptr<const Texture> t2) const {
-        return t1->path < t2->path;
-    }
-
-    bool operator()(
-            const std::shared_ptr<const Texture> t,
-            const std::string& path) const {
-        return t->path < path;
-    }
-
-    bool operator()(
-            const std::string& path,
-            const std::shared_ptr<const Texture> t) const {
-        return path < t->path;
-    }
-};
 
 #endif

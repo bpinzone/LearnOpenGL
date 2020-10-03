@@ -1,7 +1,7 @@
 #ifndef MST_H
 #define MST_H
 
-#include "game_object.h"
+#include "../game_object.h"
 #include "connector.h"
 
 #include <glm/glm.hpp>
@@ -35,7 +35,7 @@ private:
         bool completed;
     };
 
-    Game_objects_t& spheres;
+    Game_objects_t spheres;
     std::vector<std::shared_ptr<Connector>> connectors;
 
     // Scratch data

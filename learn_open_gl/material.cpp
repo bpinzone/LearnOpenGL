@@ -1,9 +1,14 @@
 #include "material.h"
 
 #include <glad/glad.h>
-#include <glfw3.h>
+
+#include <map>
+
+// I don't think this should be here.
+// #include <glfw3.h>
 
 using std::vector;
+using std::map;
 using std::string;
 using std::shared_ptr;
 using std::make_shared;
@@ -25,7 +30,16 @@ Material::Material(
 
 void Material::use() {
     shader->use();
+
+    // potential problem: when rendering the pp quad, these uniforms I'm setting will not exist! Does that matter???
+    // No, its fine.
+    // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glUniform.xhtml
+    // If location is equal to -1, the data passed in will be silently ignored and the specified uniform variable will not be changed.
+
     shader->load_uniforms_with_shader_globals();
+
+    // TODO: Don't have to do this every time???
+    // I think don't have to do it every time, as long as shader member doesn't change.
     assign_texture_unit_uniforms();
 
     // Would push any other uniform data into shader here...
@@ -38,28 +52,15 @@ void Material::assign_texture_unit_uniforms() {
 
     // Sampler names are diffuse1, diffuse2..., specular1, specular2...
     // Map sampler names to texture units.
-    int diffuse_seen = 0;
-    int specular_seen = 0;
-    int cube_seen = 0;
+    map<string, int> sampler_iden_count;
     int next_tex_unit_to_assign = 0;
+
     for(const auto& texture_sp : textures){
-        string uni_sampler_name{"material."};
-        switch(texture_sp->type){
-            case Texture::Type::DIFFUSE:
-                ++diffuse_seen;
-                uni_sampler_name += "diffuse" + std::to_string(diffuse_seen);
-                break;
-            case Texture::Type::SPECULAR:
-                ++specular_seen;
-                uni_sampler_name += "specular" + std::to_string(specular_seen);
-                break;
-            case Texture::Type::CUBE:
-                ++cube_seen;
-                uni_sampler_name += "cube" + std::to_string(cube_seen);
-                break;
-            default: assert(false);
-        }
-        shader->set_int(uni_sampler_name, next_tex_unit_to_assign);
+
+        string sampler_identifier = texture_sp->get_sampler_base_identifier();
+        sampler_identifier += std::to_string(++sampler_iden_count[sampler_identifier]);
+
+        shader->set_int(sampler_identifier, next_tex_unit_to_assign);
         ++next_tex_unit_to_assign;
     }
 }
@@ -71,7 +72,7 @@ void Material::bind_textures_to_units(){
         // Populate (numbered) texture units with desired textures.
         // Activate unit, then bind the texture to it. Repeat.
         glActiveTexture(GL_TEXTURE0 + texture_unit);
-        glBindTexture(GL_TEXTURE_2D, texture->texture_id);
+        glBindTexture(GL_TEXTURE_2D, texture->get_id());
         ++texture_unit;
     }
 
@@ -79,26 +80,16 @@ void Material::bind_textures_to_units(){
 }
 
 void Material::load_textures(aiMaterial* mat, const std::string& model_dir){
-    load_textures_of_type(mat, Texture::Type::DIFFUSE, model_dir);
-    load_textures_of_type(mat, Texture::Type::SPECULAR, model_dir);
+    load_textures_of_type(mat, aiTextureType_DIFFUSE, "material.diffuse", model_dir);
+    load_textures_of_type(mat, aiTextureType_SPECULAR, "material.specular", model_dir);
 }
 
 // Requires: model_dir has trailing "/"
 void Material::load_textures_of_type(
         aiMaterial* mat,
-        Texture::Type type,
-        const std::string& model_dir){
-
-    aiTextureType ai_type;
-    switch(type){
-        case Texture::Type::DIFFUSE:
-            ai_type = aiTextureType_DIFFUSE;
-            break;
-        case Texture::Type::SPECULAR:
-            ai_type = aiTextureType_SPECULAR;
-            break;
-        default: assert(false);
-    }
+        aiTextureType ai_type,
+        const string& sampler_base_identifier,
+        const string& model_dir){
 
     for(unsigned int i = 0; i < mat->GetTextureCount(ai_type); ++i){
 
@@ -110,16 +101,9 @@ void Material::load_textures_of_type(
         mat->GetTexture(ai_type, i, &ai_path);
         string texture_path = model_dir + string(ai_path.C_Str());
 
-        auto tex_it = Texture::loaded_textures.find(texture_path);
-        if(tex_it != Texture::loaded_textures.end()){
-            // We already loaded this.
-            textures.push_back(*tex_it);
-        }
-        else{
-            // Load it now.
-            shared_ptr<Texture> texture = make_shared<Texture>(texture_path, type, true);
-            Texture::loaded_textures.insert(texture);
-            textures.push_back(texture);
-        }
+        shared_ptr<Texture> texture = Texture::construct_texture_from_img_file(
+            texture_path, sampler_base_identifier, true);
+
+        textures.push_back(texture);
     }
 }
