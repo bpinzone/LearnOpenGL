@@ -1,7 +1,10 @@
 #include "scene_generation.h"
 
+#include <glm/glm.hpp>
+
 #include <algorithm>
 #include <iterator>
+#include <memory>
 
 #include "hierarchy.h"
 #include "texture.h"
@@ -18,6 +21,9 @@
 #include "components/instances_renderer.h"
 #include "components/connector.h"
 #include "components/mst.h"
+
+#include "components/follow_camera.h"
+#include "components/lights/dir_light.h"
 
 using std::shared_ptr;
 using std::make_shared;
@@ -39,22 +45,22 @@ void add_mst_objects(Hierarchy* hier){
         "./textures/gray.png", "material.specular", false);
 
     // Materials
-    auto instance_blue_material = make_shared<Material>(
-        Shared_shaders::get_instance().instance_geo_pass_shader,
+    auto blue_material = make_shared<Material>(
+        Shared_shaders::get_instance().geo_pass_shader,
         Material::Textures_t{ blue_diffuse, gray_specular });
 
-    auto instance_red_material = make_shared<Material>(
-        Shared_shaders::get_instance().instance_geo_pass_shader,
+    auto red_material = make_shared<Material>(
+        Shared_shaders::get_instance().geo_pass_shader,
         Material::Textures_t{ red_diffuse, gray_specular });
 
     // Models
-    auto sphere_model = make_shared<Model>(instance_blue_material, "./primitive_models/sphere.obj");
-    auto cube_model = make_shared<Model>(instance_red_material, "./primitive_models/cube.obj");
+    auto sphere_model = make_shared<Model>(blue_material, "./primitive_models/sphere.obj");
+    auto cube_model = make_shared<Model>(red_material, "./primitive_models/cube.obj");
 
     // Sphere objects
     // Arrange them such that they move to form 4 cone shapes on 2 axes.
     vector<shared_ptr<Gameobject>> sphere_objects;
-    constexpr int spheres_per_axis = 100;
+    constexpr int spheres_per_axis = 500;
     constexpr int num_axes = 2;
     constexpr int num_spheres = spheres_per_axis * num_axes;
     constexpr double depth_mult = 0.75;
@@ -74,8 +80,9 @@ void add_mst_objects(Hierarchy* hier){
                 static_cast<Axis>(axis_x)));
 
             sphere_objects.push_back(new_sphere_object);
+
         }
-    }
+   }
     shared_ptr<Gameobject> instanced_spheres_manager = make_shared<Gameobject>();
     instanced_spheres_manager->add_component(make_shared<Instances_renderer>(sphere_model, sphere_objects));
 
@@ -105,4 +112,23 @@ void add_mst_objects(Hierarchy* hier){
     copy(cube_objects.begin(), cube_objects.end(), back_inserter(hier->opaque_objects));
     hier->opaque_objects.push_back(instanced_cubes_manager);
 
+}
+
+void add_cam_following_dir_light(Hierarchy* hier, Camera* cam){
+
+    auto light_object = make_shared<Gameobject>();
+    light_object->add_component(make_shared<Follow_camera>(cam));
+
+    auto dir_light_comp = make_shared<Dir_light>(
+        glm::vec3(1, 1, 1),
+        glm::vec3(1, 1, 1),
+        glm::vec3(1, 1, 1),
+        glm::vec3(0, 0, -1)
+    );
+
+    light_object->add_component(dir_light_comp);
+    hier->opaque_objects.push_back(light_object);
+
+    // TODO: poor design, programming by convention.
+    hier->dir_lights.push_back(dir_light_comp);
 }

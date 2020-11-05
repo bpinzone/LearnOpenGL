@@ -5,16 +5,27 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <string>
+#include <memory>
 
+// Philosophy for instanced variants of shaders:
+// Just construct your non-instanced version, then AUTOMATICALLY:
+    // Instanced version will be constructed if it is available.
+    // Any uniform updates to non-instance version will be forwared to instance version.
+    // Instance versino wil be used when appropriate.
 class Shader {
 public:
 
     // Paths relative to main's dir.
     Shader(
-        const char* vertex_path, const char* fragment_path,
-        const char* geom_path = nullptr);
+        const std::string& vertex_path, const std::string& fragment_path,
+        const std::string& geom_path = "");
 
     void use() const;
+    // Throws if there is no instanced variant.
+    void use_instance_variant() const;
+
+    std::shared_ptr<Shader> get_instance_variant();
+
     void load_uniforms_with_shader_globals() const;
 
     void set_bool(const std::string& name, bool value) const;
@@ -29,6 +40,9 @@ public:
 private:
 
     void set_constant_uniforms();
+
+    std::shared_ptr<Shader> instance_variant;
+    std::string vert_path;
 };
 
 #endif

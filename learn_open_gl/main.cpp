@@ -18,6 +18,10 @@
 #include "geom_pass.h"
 #include "material.h"
 
+// TODO: get rid
+#include "texture.h"
+#include "components/lights/dir_light.h"
+
 #include <memory>
 #include <iostream>
 #include <vector>
@@ -29,6 +33,9 @@ using std::cout; using std::endl;
 using std::shared_ptr;
 using std::make_shared;
 
+// TODO: get rid.
+using std::shared_ptr;
+
 void init_open_gl_settings();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double x_pos, double y_pos);
@@ -36,7 +43,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 Hierarchy hierarchy;
-Camera camera;
 
 int main() {
 
@@ -100,6 +106,7 @@ int main() {
     // shared_ptr<Shader> instance_directional_shader = add_mst_objects(&hierarchy);
 
     add_mst_objects(&hierarchy);
+    add_cam_following_dir_light(&hierarchy, &camera);
 
     // === Lighting constants ===
     // const glm::vec3 white_light {1, 1, 1};
@@ -109,8 +116,11 @@ int main() {
     // instance_directional_shader->set_vec3("dir_light.direction", glm::vec3(0, 0, -1));
     // instance_directional_shader->set_float("material.shininess", 32.0f);
 
-
     Geom_pass geom_pass;
+
+    shared_ptr<Texture> dir_depth_tex = Texture::construct_texture_from_completed_id(
+        hierarchy.dir_lights.back()->get_texture_ids().front(),
+        "dir_lit_viz");
 
     auto lighting_pass_shader = make_shared<Shader>(
         "./shaders/lighting_pass.vert",
@@ -119,11 +129,15 @@ int main() {
     auto lighting_pass_mat = make_shared<Material>(
         lighting_pass_shader,
         // Material::Textures_t{geom_pass.get_albedo_spec_tex()} );
-        Material::Textures_t{geom_pass.get_albedo_spec_tex()} );
+
+        // todo: get rid of this.
+        Material::Textures_t{geom_pass.get_albedo_spec_tex(), dir_depth_tex} );
 
     Quad_post_processor lighting_quad_pp(0, lighting_pass_mat);
 
     hierarchy.start();
+
+    // its because of the FOV! Your world units are all wack!
 
     // render loop
     // -----------
@@ -141,11 +155,19 @@ int main() {
         static constexpr float far_clip = 2600.0f;
 
         Shader_globals::get_instance().set_view(camera.GetViewMatrix());
+
         Shader_globals::get_instance().set_projection(glm::perspective(
             glm::radians(camera.get_fov()),
             static_cast<float>(window_width) / window_height,
             near_clip, far_clip
         ));
+
+    // static constexpr float near_plane = 3.0f;
+    // static constexpr float far_plane = 2600.0f;
+    // static constexpr float width = 1000.0f;
+    // const glm::mat4 projection = glm::ortho(-width, width, -width, width, near_plane, far_plane);
+
+    // Shader_globals::get_instance().set_projection(projection);
 
 
         // instance_directional_shader->set_vec3("camera_pos", camera.get_position());
@@ -153,6 +175,7 @@ int main() {
         // replaced by call to g buffer render.
 
         hierarchy.update();
+        hierarchy.generate_depth_maps();
 
         // replaced by call to g buffer render.
         geom_pass.bind_framebuffer_and_render_update(&hierarchy);

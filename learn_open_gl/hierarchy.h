@@ -3,8 +3,11 @@
 
 #include <vector>
 #include <memory>
+#include <functional>
 
 class Gameobject;
+class Material;
+class Dir_light;
 
 // Stores, starts, updates your game objects. Makes coordinating update order easier.
 class Hierarchy {
@@ -16,17 +19,20 @@ public:
     std::shared_ptr<Gameobject> skybox;
     std::vector<std::shared_ptr<Gameobject>> transparent_objects;
 
+    // Lights
+    std::vector<std::shared_ptr<Dir_light>> dir_lights;
+
     void start();
     void update();
 
-    void render_start();
-    void render_update();
+    void render_start(std::shared_ptr<Material> mat_override = nullptr);
+    void render_update(std::shared_ptr<Material> mat_override = nullptr);
+
+    void generate_depth_maps();
 
 private:
 
-    using Gameobject_fn_t = void (Gameobject::*)();
-
-    void for_each_in_hierarchy(Gameobject_fn_t go_fn);
+    void for_each_in_hierarchy(std::function<void(std::shared_ptr<Gameobject>)> go_mem_func);
 
 };
 

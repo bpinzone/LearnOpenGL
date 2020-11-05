@@ -1,6 +1,7 @@
 #include "outline_model_renderer.h"
 #include "transform.h"
 #include "../game_object.h"
+#include "../material.h"
 
 using std::shared_ptr;
 
@@ -13,7 +14,8 @@ Outline_model_renderer::Outline_model_renderer(
     material = model_in->get_material();
 }
 
-void Outline_model_renderer::update() {
+// TODO: this might be broken after mat_override change.
+void Outline_model_renderer::render_update(shared_ptr<Material> mat_override) {
 
     static const int base_flag = 1;
 
@@ -24,7 +26,7 @@ void Outline_model_renderer::update() {
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     game_object->get_transform().load_into_shader_global();
-    model->draw();
+    model->draw(mat_override);
 
     // OUTLINE
     // Stencil settings

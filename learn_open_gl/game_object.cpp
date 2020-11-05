@@ -41,9 +41,9 @@ void Gameobject::update(){
     for(auto& c : components) { c->update(); };
 }
 
-void Gameobject::render_start(){
-    for(auto& c : render_components) { c->start(); };
+void Gameobject::render_start(shared_ptr<Material> mat_override){
+    for(auto& c : render_components) { c->render_start(mat_override); };
 }
-void Gameobject::render_update(){
-    for(auto& c : render_components) { c->update(); };
+void Gameobject::render_update(shared_ptr<Material> mat_override){
+    for(auto& c : render_components) { c->render_update(mat_override); };
 }

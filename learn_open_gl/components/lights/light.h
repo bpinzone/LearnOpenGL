@@ -1,32 +1,27 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <memory>
+#include <vector>
 
 // TODO: probably incomplete.
 
 #include "../component.h"
 
 class Hierarchy;
-class Shader;
 
 /*
 Abstract
 
-Holds position, orientation, lighting params (color, size, attenuation),
-and depth maps for a light source.
-
-Generates depth maps from an object hierarchy.
-
-Loads lighting parameters and depth maps into a lighting pass shader.
+Derived classes will hold parameters like color, attenuation, etc.
+    Provide getters for material to call.
+    Uses position from game object transform.
+    Uses its own direction variable instead of game object rotation. TODO: change this.
 */
 
-// TODO: make sure lights are updated after all the other objects.
-// Maybe gonna have to separate render updating and regular component updating?
-// Well, probably not, because the geometry pass will be extremely simple.
+// TODO: lighting volumes.
 
-// *** So Model_renderer's will only be involved in the geometry pass, and thats fine if it happens before shadow maps are generated!
-// so yeah, just make sure lights are updated last.
+// TODO: make sure lights are updated after all the other objects.
+
 class Light : public Component {
 
 public:
@@ -35,18 +30,12 @@ public:
     // Objects in the hierarchy should already be updated.
     virtual void generate_depth_map_from(Hierarchy* hier) = 0;
 
-    // Forward my lighting parameters to the appropriate uniform.
-    // Will use the type and light_type_arr_idx.
-    virtual void forward_lighting_params_to_shader_uniforms(std::shared_ptr<Shader> shader) = 0;
-
-    // Will use the type and light_type_arr_idx.
-    virtual void assign_texture_unit_uniform(std::shared_ptr<Shader> shader) = 0;
-
-    virtual void bind_texture_to_unit() = 0;
+    // Size will be one for a directional and spot lights. 6 for point lights.
+    // Light does not construct its own Texture object because it doesn't know the base name.
+    virtual std::vector<unsigned int> get_texture_ids() = 0;
 
     virtual ~Light() = default;
 
 };
-
 
 #endif

@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "../material.h"
+
 #include <algorithm>
 
 using std::transform;
@@ -46,7 +48,7 @@ Instances_renderer::Instances_renderer(shared_ptr<Model> common_model_in, std::v
     }
 }
 
-void Instances_renderer::update() {
+void Instances_renderer::render_update(shared_ptr<Material> mat_override) {
 
     // Put data for instances into staging area.
     transform(
@@ -67,5 +69,5 @@ void Instances_renderer::update() {
         instance_vbo_staging.size() * sizeof(decltype(instance_vbo_staging)::value_type),
         instance_vbo_staging.data());
 
-    common_model->draw_instanced(instances.size());
+    common_model->draw_instanced(instances.size(), mat_override);
 }

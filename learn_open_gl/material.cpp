@@ -28,8 +28,18 @@ Material::Material(
     load_textures(mat, model_dir);
 }
 
+// TODO: Poor design having two versions of many things to take care of instanced rendering.
 void Material::use() {
     shader->use();
+    populate_uniforms();
+}
+
+void Material::use_instance_variant() {
+    shader->use_instance_variant();
+    populate_uniforms();
+}
+
+void Material::populate_uniforms() {
 
     // potential problem: when rendering the pp quad, these uniforms I'm setting will not exist! Does that matter???
     // No, its fine.

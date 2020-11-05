@@ -7,6 +7,7 @@
 
 #include <memory>
 
+class Material;
 
 class Model_renderer : public Render_component {
 
@@ -14,7 +15,7 @@ public:
 
     Model_renderer(std::shared_ptr<Model> model_in);
 
-    void update() override;
+    void render_update(std::shared_ptr<Material> mat_override = nullptr) override;
 
 protected:
 

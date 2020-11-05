@@ -3,8 +3,11 @@
 
 #include <memory>
 
+#include "camera.h"
+
 extern int window_width;
 extern int window_height;
+extern Camera camera;
 
 class Mytime {
 

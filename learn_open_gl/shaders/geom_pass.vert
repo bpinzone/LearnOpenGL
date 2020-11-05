@@ -15,7 +15,6 @@ layout (std140) uniform matrices {
 
 // interface block
 out VS_OUT {
-
     // In world space
     vec3 WorldNormal;
     vec3 WorldPos;

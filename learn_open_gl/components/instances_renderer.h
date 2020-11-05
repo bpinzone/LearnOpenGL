@@ -10,6 +10,8 @@
 #include <memory>
 #include <vector>
 
+class Material;
+
 // Acts as the renderer for several game objects. Instances should not have a renderer.
 // Instances are still responsible for updating THEMSELVES, BEFORE this is updated.
 // Instances_renderer will extract data from the instances as necessary.
@@ -21,7 +23,7 @@ public:
 
     Instances_renderer(std::shared_ptr<Model> common_model_in, std::vector<Instance_t> instances_in);
 
-    void update() override;
+    void render_update(std::shared_ptr<Material> mat_override = nullptr) override;
 
 private:
 

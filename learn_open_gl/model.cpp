@@ -2,6 +2,8 @@
 
 #include "vertex.h"
 
+#include "material.h"
+
 #include <glm/glm.hpp>
 
 #include <stdexcept>
@@ -38,19 +40,19 @@ Model::Model(shared_ptr<Shader> shader, const string& model_path) {
 }
 
 Model::Model(shared_ptr<Material> mat, const std::string& model_path)
-    : Model(mat->shader, model_path){
+    : Model(mat->get_shader(), model_path){
     set_materials(mat);
 }
 
-void Model::draw(){
+void Model::draw(shared_ptr<Material> mat_override){
     for(auto& mesh : meshes){
-        mesh->draw();
+        mesh->draw(mat_override);
     }
 }
 
-void Model::draw_instanced(int num_instances){
+void Model::draw_instanced(int num_instances, shared_ptr<Material> mat_override){
     for(auto& mesh : meshes){
-        mesh->draw_instanced(num_instances);
+        mesh->draw_instanced(num_instances, mat_override);
     }
 }
 

@@ -8,6 +8,8 @@
 
 #include <memory>
 
+class Material;
+
 class Outline_model_renderer : public Model_renderer {
 
 public:
@@ -18,7 +20,7 @@ public:
         std::shared_ptr<Material> outline_material_in
     );
 
-    void update() override;
+    void render_update(std::shared_ptr<Material> mat_override = nullptr) override;
 
 private:
     std::shared_ptr<Material> material;

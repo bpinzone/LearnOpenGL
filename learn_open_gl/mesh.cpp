@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 // #include <glfw3.h>
 
+#include "material.h"
+
 #include <string>
 #include <utility>
 #include <algorithm>
@@ -35,9 +37,14 @@ Mesh::Mesh(
     setup_vao(vertices);
 }
 
-void Mesh::draw() {
+void Mesh::draw(shared_ptr<Material> mat_override) {
 
-    material->use();
+    if(mat_override){
+        mat_override->use();
+    }
+    else{
+        material->use();
+    }
     // Automatically binds the ebo, where it takes the indices from.
     glBindVertexArray(vao);
 
@@ -48,9 +55,14 @@ void Mesh::draw() {
     glBindVertexArray(0);
 }
 
-void Mesh::draw_instanced(int num_instances) {
+void Mesh::draw_instanced(int num_instances, shared_ptr<Material> mat_override) {
 
-    material->use();
+    if(mat_override){
+        mat_override->use_instance_variant();
+    }
+    else{
+        material->use_instance_variant();
+    }
     glBindVertexArray(vao);
     glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, num_instances);
 }

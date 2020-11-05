@@ -4,7 +4,9 @@
 #include <memory>
 
 class Shader;
+class Dir_light_depth_material;
 
+// TODO: Rename because we now have a material in here.
 class Shared_shaders {
 
 public:
@@ -18,7 +20,7 @@ public:
     Shared_shaders(Shared_shaders&& other) = delete;
 
     std::shared_ptr<Shader> geo_pass_shader;
-    std::shared_ptr<Shader> instance_geo_pass_shader;
+    std::shared_ptr<Dir_light_depth_material> dir_light_depth_material;
 
 private:
 

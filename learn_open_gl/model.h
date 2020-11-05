@@ -14,6 +14,8 @@
 #include <vector>
 #include <memory>
 
+class Material;
+
 class Model {
 public:
 
@@ -49,8 +51,8 @@ public:
 
     // TODO: should be able to draw using a different material. Like the geometry pass.
     // Calls draw on every mesh in this model.
-    void draw();
-    void draw_instanced(int num_instances);
+    void draw(std::shared_ptr<Material> mat_override = nullptr);
+    void draw_instanced(int num_instances, std::shared_ptr<Material> mat_override = nullptr);
 
     // Requires: This model only has a single mesh. Binds that mesh's vao.
     // Throws: If this model doesn't have exactly one mesh.

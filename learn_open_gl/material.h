@@ -45,11 +45,24 @@ public:
         INCLUDES texture unit assignments! Other materials may have different unit orders for names!
     */
     void use();
+    void use_instance_variant();
 
-    std::shared_ptr<Shader> shader;
+    std::shared_ptr<Shader> get_shader(){
+        return shader;
+    }
 
     // Class may be extended later.
     virtual ~Material() = default;
+
+protected:
+
+    // NOTE for derived classes:
+    // If you have additional texture uniforms, pass them to material ctor.
+    // If you have additional non-texture uniforms, override this to populate them, calling base version first.
+    virtual void populate_uniforms();
+
+    // Derived classes need to be able to set uniforms.
+    std::shared_ptr<Shader> shader;
 
 private:
 

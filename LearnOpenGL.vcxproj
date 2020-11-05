@@ -31,6 +31,7 @@
     <ClCompile Include="learn_open_gl\components\circular_path.cpp" />
     <ClCompile Include="learn_open_gl\components\component.cpp" />
     <ClCompile Include="learn_open_gl\components\connector.cpp" />
+    <ClCompile Include="learn_open_gl\components\follow_camera.cpp" />
     <ClCompile Include="learn_open_gl\components\instances_renderer.cpp" />
     <ClCompile Include="learn_open_gl\components\lights\dir_light.cpp" />
     <ClCompile Include="learn_open_gl\components\lights\light.cpp" />
@@ -41,6 +42,7 @@
     <ClCompile Include="learn_open_gl\components\render_component.cpp" />
     <ClCompile Include="learn_open_gl\components\transform.cpp" />
     <ClCompile Include="learn_open_gl\components\vis_normal_renderer.cpp" />
+    <ClCompile Include="learn_open_gl\dir_light_depth_material.cpp" />
     <ClCompile Include="learn_open_gl\game_object.cpp" />
     <ClCompile Include="learn_open_gl\geom_pass.cpp" />
     <ClCompile Include="learn_open_gl\glad.c" />
@@ -65,6 +67,7 @@
     <ClInclude Include="learn_open_gl\components\circular_path.h" />
     <ClInclude Include="learn_open_gl\components\component.h" />
     <ClInclude Include="learn_open_gl\components\connector.h" />
+    <ClInclude Include="learn_open_gl\components\follow_camera.h" />
     <ClInclude Include="learn_open_gl\components\instances_renderer.h" />
     <ClInclude Include="learn_open_gl\components\lights\dir_light.h" />
     <ClInclude Include="learn_open_gl\components\lights\light.h" />
@@ -75,6 +78,7 @@
     <ClInclude Include="learn_open_gl\components\render_component.h" />
     <ClInclude Include="learn_open_gl\components\transform.h" />
     <ClInclude Include="learn_open_gl\components\vis_normal_renderer.h" />
+    <ClInclude Include="learn_open_gl\dir_light_depth_material.h" />
     <ClInclude Include="learn_open_gl\game_object.h" />
     <ClInclude Include="learn_open_gl\geom_pass.h" />
     <ClInclude Include="learn_open_gl\hierarchy.h" />

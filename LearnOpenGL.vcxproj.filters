@@ -111,6 +111,12 @@
     <ClCompile Include="learn_open_gl\shared_shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="learn_open_gl\dir_light_depth_material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn_open_gl\components\follow_camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="learn_open_gl\components\circular_path.h">
@@ -201,6 +207,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="learn_open_gl\shared_shaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\dir_light_depth_material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn_open_gl\components\follow_camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

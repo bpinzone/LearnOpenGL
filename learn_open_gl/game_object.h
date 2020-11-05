@@ -11,6 +11,8 @@
 #include <optional>
 #include <memory>
 
+class Material;
+
 class Gameobject : public std::enable_shared_from_this<Gameobject> {
 public:
 
@@ -40,9 +42,9 @@ public:
     void start();
     void update();
 
-    // Calls start / update on render components.
-    void render_start();
-    void render_update();
+    // Calls render_start / render_update on render components.
+    void render_start(std::shared_ptr<Material> mat_override = nullptr);
+    void render_update(std::shared_ptr<Material> mat_override = nullptr);
 
 private:
 

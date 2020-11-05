@@ -11,6 +11,8 @@
 #include <vector>
 #include <memory>
 
+class Material;
+
 // A single drawable object.
 // Conceptually, it has it's structural data and a material.
 // It DOES NOT store the vertex data in a separate container after construction. It only puts it in the buffer.
@@ -47,9 +49,10 @@ public:
 
     // Calls use on the material.
     // Draws elements using our vao generated from vertex data.
-    void draw();
+    void draw(std::shared_ptr<Material> mat_override = nullptr);
 
-    void draw_instanced(int num_instances);
+    // TODO: instead of default param, overload this.
+    void draw_instanced(int num_instances, std::shared_ptr<Material> mat_override = nullptr);
 
     void reverse_winding_order();
 

@@ -4,6 +4,7 @@
 
 int window_width = 2560;
 int window_height = 1440;
+Camera camera;
 
 void Mytime::update_delta_time() {
 
